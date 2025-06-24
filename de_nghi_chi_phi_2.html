@@ -83,6 +83,7 @@
       display: inline-block;
       overflow: hidden;
       text-overflow: ellipsis;
+      min-height: 1em;
     }
 
     .full-width-item {
@@ -116,7 +117,6 @@
 </head>
 <body>
   <div class="container">
-    <!-- Nội dung chính -->
     <div class="content">
       <div class="header">
         <div class="header-logo">
@@ -171,20 +171,19 @@
         </div>
         <div class="grid grid-cols-[auto_1fr] gap-2 full-width-item">
           <span class="info-label">Hình thức thanh toán:</span>
-          <span class="info-value" id="hinh_thuc"></span>
+          <div class="info-value" id="hinh_thuc"></div>
         </div>
         <div class="grid grid-cols-[auto_1fr] gap-2 full-width-item">
           <span class="info-label">Thông tin chuyển khoản:</span>
-          <span class="info-value" id="tt_thanh_toan"></span>
+          <div class="info-value" id="tt_thanh_toan"></div>
         </div>
         <div class="grid grid-cols-[auto_1fr] gap-2 full-width-item">
           <span class="info-label">Ghi chú:</span>
-          <span class="info-value" id="ghi_chu"></span>
+          <div class="info-value" id="ghi_chu"></div>
         </div>
       </div>
     </div>
 
-    <!-- Chữ ký -->
     <div class="signature-grid">
       <div><p class="signature-text">Người đề nghị</p></div>
       <div><p class="signature-text">Quản lý</p></div>
@@ -193,7 +192,6 @@
     </div>
   </div>
 
-  <!-- JS nạp biến từ URL -->
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
