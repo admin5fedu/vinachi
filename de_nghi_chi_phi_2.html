@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=210mm, height=148.5mm" />
-  <title>Phiếu Đề Nghị Chi Tạm Ứng</title>
+  <title>Phiếu Đề Nghị chi phí</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @page {
@@ -136,43 +136,43 @@
         </div>
       </div>
 
-      <p class="text-right text-gray-500 text-sm italic mb-1"><?!= ngay ?></p>
-      <div class="section-title">PHIẾU ĐỀ NGHỊ <?!= loai_phieu ?></div>
-      <p class="text-center text-sm font-normal text-gray-500 mb-2">(Mã phiếu: <?!= id ?>)</p>
+      <p class="text-right text-gray-500 text-sm italic mb-1"><span id="ngay"></span></p>
+      <div class="section-title">PHIẾU ĐỀ NGHỊ <span id="loai_phieu"></span></div>
+      <p class="text-center text-sm font-normal text-gray-500 mb-2">(Mã phiếu: <span id="id"></span>)</p>
       <p class="text-center text-sm font-semibold text-gray-700 mb-3">Kính gửi: Phòng Tài chính Kế toán</p>
 
       <div class="info-grid">
         <div class="full-width-item info-group-row">
-          <div><span class="info-label">Họ tên:</span> <span class="info-value"><?!= ho_va_ten ?></span></div>
-          <div><span class="info-label">MNV:</span> <span class="info-value"><?!= mnv ?></span></div>
-          <div><span class="info-label">Phòng:</span> <span class="info-value"><?!= phong ?></span></div>
+          <div><span class="info-label">Họ tên:</span> <span class="info-value" id="ho_va_ten"></span></div>
+          <div><span class="info-label">MNV:</span> <span class="info-value" id="mnv"></span></div>
+          <div><span class="info-label">Phòng:</span> <span class="info-value" id="phong"></span></div>
         </div>
 
-        <div><span class="info-label">Thời gian đề nghị:</span> <span class="info-value"><?!= tg_de_nghi ?></span></div>
-        <div><span class="info-label">Thời gian cần có:</span> <span class="info-value"><?!= tg_can_co ?></span></div>
-        <div><span class="info-label">Nội dung đề nghị:</span> <span class="info-value"><?!= nd_de_nghi ?></span></div>
-        <div><span class="info-label">Khoản mục:</span> <span class="info-value"><?!= khoan_muc ?></span></div>
+        <div><span class="info-label">Thời gian đề nghị:</span> <span class="info-value" id="tg_de_nghi"></span></div>
+        <div><span class="info-label">Thời gian cần có:</span> <span class="info-value" id="tg_can_co"></span></div>
+        <div><span class="info-label">Nội dung đề nghị:</span> <span class="info-value" id="nd_de_nghi"></span></div>
+        <div><span class="info-label">Khoản mục:</span> <span class="info-value" id="khoan_muc"></span></div>
 
         <div class="full-width-item">
           <span class="info-label">Tổng chi phí đề xuất:</span>
-          <span class="info-value text-red-600 font-bold"><?!= tong_cp ?> VNĐ</span>
+          <span class="info-value text-red-600 font-bold" id="tong_cp"></span> VNĐ
         </div>
         <div class="full-width-item">
           <span class="info-label">Tổng tiền thanh toán hiện tại:</span>
-          <span class="info-value text-red-600 font-bold"><?!= so_tien ?> VNĐ</span>
-          <span class="info-value italic ml-2">(<?!= bang_chu ?>)</span>
+          <span class="info-value text-red-600 font-bold" id="so_tien"></span> VNĐ
+          <span class="info-value italic ml-2" id="bang_chu"></span>
         </div>
         <div class="full-width-item">
           <span class="info-label">Hình thức thanh toán:</span>
-          <span class="info-value"><?!= hinh_thuc ?></span>
+          <span class="info-value" id="hinh_thuc"></span>
         </div>
         <div class="full-width-item">
           <span class="info-label">Thông tin chuyển khoản:</span>
-          <span class="info-value"><?!= tt_thanh_toan ?></span>
+          <span class="info-value" id="tt_thanh_toan"></span>
         </div>
         <div class="full-width-item">
           <span class="info-label">Ghi chú:</span>
-          <span class="info-value"><?!= ghi_chu ?></span>
+          <span class="info-value" id="ghi_chu"></span>
         </div>
       </div>
     </div>
@@ -190,20 +190,13 @@
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
-      const placeholders = document.body.innerHTML.match(/\<\?\!=\s*(\w+)\s*\?\>/g) || [];
 
-      let replacedHTML = document.body.innerHTML;
-
-      placeholders.forEach((placeholder) => {
-        const keyMatch = placeholder.match(/\<\?\!=\s*(\w+)\s*\?\>/);
-        if (!keyMatch) return;
-        const key = keyMatch[1];
-        const value = params.get(key) || '';
-        const regex = new RegExp(`<\\?!=\\s*${key}\\s*\\?>`, 'g');
-        replacedHTML = replacedHTML.replace(regex, decodeURIComponent(value));
+      params.forEach((value, key) => {
+        const el = document.getElementById(key);
+        if (el) {
+          el.textContent = decodeURIComponent(value);
+        }
       });
-
-      document.body.innerHTML = replacedHTML;
     })();
   </script>
 </body>
