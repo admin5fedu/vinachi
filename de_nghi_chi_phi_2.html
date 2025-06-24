@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=210mm, height=148.5mm" />
-  <title>Phiếu Đề Nghị Chi phí</title>
+  <title>Phiếu Đề Nghị Chi Tạm Ứng</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @page {
@@ -14,21 +14,22 @@
     html, body {
       margin: 0;
       padding: 0;
-      width: 210mm;
-      height: 148.5mm;
+      width: 100vw;
+      height: 100vh;
       font-family: Arial, sans-serif;
       font-size: 11.5px;
       background: #f5f5f5;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
     }
 
     .container {
-      width: 194mm;
+      width: 210mm;
+      height: 148.5mm;
       background: white;
       padding: 8mm;
-      box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
       display: flex;
       flex-direction: column;
       gap: 6mm;
@@ -98,6 +99,9 @@
     @media print {
       html, body {
         background: white;
+        width: 210mm;
+        height: 148.5mm;
+        display: block;
       }
       .container {
         box-shadow: none;
@@ -107,7 +111,6 @@
 </head>
 <body>
   <div class="container">
-    <!-- Nội dung chính -->
     <div class="content">
       <div class="header">
         <div class="header-logo">
