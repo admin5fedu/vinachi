@@ -150,8 +150,7 @@
           <span class="info-label">Khoản mục:</span> <span class="info-value" id="khoan_muc"></span>
         </div>
         <div class="grid grid-cols-[auto_1fr] gap-2 full-width-item">
-          <span class="info-label">Tổng chi phí đề xuất:</span>
-          <span class="info-value text-red-600 font-bold" id="tong_cp"></span> VNĐ
+          <span class="info-label">Tổng chi phí đề xuất:</span> <span class="info-value text-red-600 font-bold" id="tong_cp"></span> VNĐ
         </div>
         <div class="grid grid-cols-[auto_1fr] gap-2 full-width-item">
           <span class="info-label">Tổng tiền thanh toán hiện tại:</span>
@@ -190,7 +189,10 @@
       const params = new URLSearchParams(window.location.search);
       params.forEach((value, key) => {
         const el = document.getElementById(key);
-        if (el) el.textContent = decodeURIComponent(value);
+        if (el) {
+          const formatted = decodeURIComponent(value).replace(/(?:\r\n|\r|\n)/g, "<br>");
+          el.innerHTML = formatted;
+        }
       });
     })();
   </script>
