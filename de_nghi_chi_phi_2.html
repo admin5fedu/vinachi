@@ -26,7 +26,7 @@
 
     .container {
       width: 190mm;
-      height: 128.5mm; /* Chiều cao thực tế sau khi trừ lề */
+      height: 128.5mm;
       background: white;
       padding: 10mm;
       box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
@@ -37,7 +37,7 @@
     }
 
     .content {
-      height: 100mm; /* Giới hạn để luôn chừa phần chữ ký */
+      height: 100mm;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -185,5 +185,26 @@
       <div><p class="signature-text">Phê duyệt</p></div>
     </div>
   </div>
+
+  <!-- JS nạp biến từ URL -->
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const placeholders = document.body.innerHTML.match(/\<\?\!=\s*(\w+)\s*\?\>/g) || [];
+
+      let replacedHTML = document.body.innerHTML;
+
+      placeholders.forEach((placeholder) => {
+        const keyMatch = placeholder.match(/\<\?\!=\s*(\w+)\s*\?\>/);
+        if (!keyMatch) return;
+        const key = keyMatch[1];
+        const value = params.get(key) || '';
+        const regex = new RegExp(`<\\?!=\\s*${key}\\s*\\?>`, 'g');
+        replacedHTML = replacedHTML.replace(regex, decodeURIComponent(value));
+      });
+
+      document.body.innerHTML = replacedHTML;
+    })();
+  </script>
 </body>
 </html>
