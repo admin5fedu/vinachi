@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=210mm, height=148.5mm" />
-  <title>Phiếu Đề Nghị chi phí</title>
+  <title>Phiếu Đề Nghị Chi Tạm Ứng</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @page {
@@ -76,7 +76,12 @@
     .info-group-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 16px;
+      white-space: nowrap;
+    }
+
+    .info-group-row span {
+      white-space: nowrap;
     }
 
     .info-label {
@@ -143,9 +148,9 @@
 
       <div class="info-grid">
         <div class="full-width-item info-group-row">
-          <div><span class="info-label">Họ tên:</span> <span class="info-value" id="ho_va_ten"></span></div>
-          <div><span class="info-label">MNV:</span> <span class="info-value" id="mnv"></span></div>
-          <div><span class="info-label">Phòng:</span> <span class="info-value" id="phong"></span></div>
+          <span><span class="info-label">Họ tên:</span> <span class="info-value" id="ho_va_ten"></span></span>
+          <span><span class="info-label">MNV:</span> <span class="info-value" id="mnv"></span></span>
+          <span><span class="info-label">Phòng:</span> <span class="info-value" id="phong"></span></span>
         </div>
 
         <div><span class="info-label">Thời gian đề nghị:</span> <span class="info-value" id="tg_de_nghi"></span></div>
@@ -190,7 +195,6 @@
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
-
       params.forEach((value, key) => {
         const el = document.getElementById(key);
         if (el) {
