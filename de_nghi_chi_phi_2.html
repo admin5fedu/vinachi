@@ -73,17 +73,6 @@
       margin-bottom: 4px;
     }
 
-    .info-group-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      white-space: nowrap;
-    }
-
-    .info-group-row span {
-      white-space: nowrap;
-    }
-
     .info-label {
       font-weight: 600;
       color: #4b5563;
@@ -147,10 +136,17 @@
       <p class="text-center text-sm font-semibold text-gray-700 mb-3">Kính gửi: Phòng Tài chính Kế toán</p>
 
       <div class="info-grid">
-        <div class="full-width-item info-group-row">
-          <span><span class="info-label">Họ tên:</span> <span class="info-value" id="ho_va_ten"></span></span>
-          <span><span class="info-label">MNV:</span> <span class="info-value" id="mnv"></span></span>
-          <span><span class="info-label">Phòng:</span> <span class="info-value" id="phong"></span></span>
+        <!-- Họ tên - MNV - Phòng -->
+        <div class="full-width-item grid grid-cols-3 gap-4 items-center">
+          <div class="flex gap-1">
+            <span class="info-label">Họ tên:</span> <span class="info-value" id="ho_va_ten"></span>
+          </div>
+          <div class="flex gap-1">
+            <span class="info-label">MNV:</span> <span class="info-value" id="mnv"></span>
+          </div>
+          <div class="flex gap-1">
+            <span class="info-label">Phòng:</span> <span class="info-value" id="phong"></span>
+          </div>
         </div>
 
         <div><span class="info-label">Thời gian đề nghị:</span> <span class="info-value" id="tg_de_nghi"></span></div>
