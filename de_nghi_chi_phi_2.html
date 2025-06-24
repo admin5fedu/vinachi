@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=210mm, height=148.5mm" />
-  <title>Phiếu Đề Nghị Chi Tạm Ứng</title>
+  <title>Phiếu Đề Nghị Chi phí</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @page {
@@ -150,26 +150,27 @@
           <span class="info-label">Khoản mục:</span> <span class="info-value" id="khoan_muc"></span>
         </div>
         <div class="grid grid-cols-[auto_1fr] gap-2 full-width-item">
-          <span class="info-label">Tổng chi phí đề xuất:</span> <span class="info-value text-red-600 font-bold" id="tong_cp"></span> VNĐ
+          <span class="info-label">Tổng chi phí đề xuất:</span>
+          <span class="info-value text-red-600 font-bold" id="tong_cp_full"></span>
         </div>
         <div class="grid grid-cols-[auto_1fr] gap-2 full-width-item">
           <span class="info-label">Tổng tiền thanh toán hiện tại:</span>
-          <span>
-            <span class="info-value text-red-600 font-bold" id="so_tien"></span> VNĐ
-            <span class="info-value italic ml-2" id="bang_chu"></span>
-          </span>
+          <span class="info-value text-red-600 font-bold" id="so_tien_full"></span>
+          <span class="info-value italic ml-2" id="bang_chu"></span>
         </div>
-        <div class="grid grid-cols-[auto_1fr] gap-2 full-width-item">
-          <span class="info-label">Hình thức thanh toán:</span>
-          <div class="info-value" id="hinh_thuc"></div>
-        </div>
-        <div class="grid grid-cols-[auto_1fr] gap-2 full-width-item">
-          <span class="info-label">Thông tin chuyển khoản:</span>
-          <div class="info-value" id="tt_thanh_toan"></div>
-        </div>
-        <div class="grid grid-cols-[auto_1fr] gap-2 full-width-item">
-          <span class="info-label">Ghi chú:</span>
-          <div class="info-value" id="ghi_chu"></div>
+
+        <!-- Hình thức, thông tin và ghi chú chia đều 2 cột -->
+        <div class="grid grid-cols-2 gap-4 full-width-item">
+          <div class="grid grid-cols-[auto_1fr] gap-2">
+            <span class="info-label">Hình thức thanh toán:</span>
+            <div class="info-value" id="hinh_thuc"></div>
+            <span class="info-label mt-2">Thông tin chuyển khoản:</span>
+            <div class="info-value" id="tt_thanh_toan"></div>
+          </div>
+          <div class="grid grid-cols-[auto_1fr] gap-2">
+            <span class="info-label">Ghi chú:</span>
+            <div class="info-value" id="ghi_chu" style="min-height: 30mm;"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -187,13 +188,31 @@
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
-      params.forEach((value, key) => {
+      const getText = (key) => decodeURIComponent(params.get(key) || "").replace(/(?:\r\n|\r|\n)/g, "<br>");
+
+      const fieldMap = [
+        "ngay", "loai_phieu", "id", "ho_va_ten", "mnv", "phong",
+        "tg_de_nghi", "tg_can_co", "nd_de_nghi", "khoan_muc",
+        "hinh_thuc", "tt_thanh_toan", "ghi_chu", "bang_chu"
+      ];
+
+      fieldMap.forEach(key => {
         const el = document.getElementById(key);
-        if (el) {
-          const formatted = decodeURIComponent(value).replace(/(?:\r\n|\r|\n)/g, "<br>");
-          el.innerHTML = formatted;
-        }
+        if (el) el.innerHTML = getText(key);
       });
+
+      const tong_cp = document.getElementById("tong_cp_full");
+      const so_tien = document.getElementById("so_tien_full");
+
+      if (tong_cp) {
+        const value = getText("tong_cp");
+        tong_cp.innerHTML = `${value} <span style="white-space: nowrap;">VNĐ</span>`;
+      }
+
+      if (so_tien) {
+        const value = getText("so_tien");
+        so_tien.innerHTML = `${value} <span style="white-space: nowrap;">VNĐ</span>`;
+      }
     })();
   </script>
 </body>
