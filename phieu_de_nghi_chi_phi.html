@@ -8,7 +8,7 @@
   <style>
     @page {
       size: A5 landscape;
-      margin: 10mm;
+      margin: 8mm; /* Đã sửa margin thành 8mm */
     }
 
     html, body {
@@ -23,7 +23,7 @@
 
     .container {
       width: 210mm;
-      height: 148.5mm;
+      height: 148mm; /* Đã sửa lại cho khớp kích thước A5 landscape */
       background: white;
       margin: 20px auto;
       padding: 8mm;
@@ -89,9 +89,19 @@
     @media print {
       html, body {
         background: white;
+        margin: 0;
+        padding: 0;
       }
       .container {
         box-shadow: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+      /* Ẩn các thành phần không cần thiết khi in */
+      .no-print {
+        display: none;
       }
     }
   </style>
@@ -171,6 +181,13 @@
       });
 
       document.body.innerHTML = replacedHTML;
+      
+      // Tự động in khi có tham số 'print' trong URL
+      if (params.has('print')) {
+        window.addEventListener('load', () => {
+          window.print();
+        });
+      }
     })();
   </script>
 </body>
