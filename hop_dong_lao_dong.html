@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hợp đồng lao động</title>
+    <style>
+        /* General body styles */
+        body {
+            font-family: "Times New Roman", Times, serif;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Page container for A4 size and margins */
+        .page {
+            width: 210mm; /* A4 width */
+            min-height: 297mm; /* A4 height */
+            padding: 2.5cm 3cm 2.5cm 3cm; /* Top, Right, Bottom, Left margins (2.5cm bottom, 3cm left/right, 2.5cm top) */
+            margin: 1cm auto; /* Center the page with 1cm top/bottom external margin */
+            border: 1px solid #eee; /* Light border for visual separation */
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            position: relative; /* For page numbering positioning */
+            background-color: #fff; /* White background for the page */
+        }
+
+        /* Styles for printing */
+        @media print {
+            body {
+                background: none; /* No background when printing */
+            }
+            .page {
+                margin: 0;
+                border: none;
+                box-shadow: none;
+                page-break-after: always; /* Force page break after each .page */
+            }
+            /* Adjust page numbering for print to be at the bottom center */
+            .page-number {
+                position: absolute;
+                bottom: 1cm; /* Adjust as needed for print */
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 0.9em;
+                color: #555;
+            }
+            /* .page-number { display: none; } */ /* Uncomment to hide page numbers when printing */
+        }
+
+        /* Header styles - Using grid for better alignment */
+        .header-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns, equal width */
+            gap: 20px; /* Space between columns */
+            margin-bottom: 20px;
+        }
+
+        .header-left, .header-right {
+            text-align: center;
+        }
+
+        .header .company-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .header .contract-info {
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .header .socialist-republic {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+        }
+
+        .header .independence-freedom-happiness {
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .header .date-location {
+            text-align: right;
+            font-style: italic;
+            margin-top: 10px; /* Adjusted margin-top to avoid overlapping */
+            margin-bottom: 30px;
+        }
+
+        /* Main title of the document */
+        .document-title {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        /* Section headings */
+        h2, h3, h4 {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Paragraph spacing */
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        /* Lists */
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            margin-bottom: 5px;
+        }
+
+        ul li:before {
+            content: "- "; /* Custom bullet point for list items */
+        }
+
+        /* Specific styles for signatory section */
+        .signatory-section {
+            display: flex;
+            justify-content: space-around; /* Distribute items with space around them */
+            margin-top: 50px;
+            text-align: center;
+            width: 100%; /* Ensure it takes full width of its parent */
+        }
+
+        .signatory-section > div {
+            flex: 1; /* Allow items to grow and shrink */
+            /* Removed padding: 0 10px; as it could cause perceived imbalance */
+            text-align: center; /* Explicitly center content within each signature block */
+        }
+
+        .signatory-section p {
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .signatory-section .signature-placeholder {
+            margin-top: 60px; /* Space for signature */
+            font-style: italic;
+            font-weight: normal;
+        }
+
+        /* Page numbering */
+        .page-number {
+            position: absolute;
+            bottom: 1cm;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Page 1 -->
+    <div class="page">
+        <div class="header-grid">
+            <div class="header-left">
+                <div class="company-name">CÔNG TY TNHH VINACHI<br>VIỆT NAM</div>
+                <div class="contract-info">Hợp đồng số : 21/2025/HĐLĐ-VNC</div>
+            </div>
+            <div class="header-right">
+                <div class="socialist-republic">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+                <div class="independence-freedom-happiness">Độc lập – Tự do – Hạnh phúc</div>
+            </div>
+        </div>
+        <div class="header">
+            <div class="date-location">Vinachi, Ngày 1 tháng 6 năm 2025</div>
+        </div>
+
+
+        <h1 class="document-title">HỢP ĐỒNG LAO ĐỘNG</h1>
+
+        <p>Căn cứ Bộ luật lao động số 45/2019/QH14 ngày 20 tháng 11 năm 2019;</p>
+        <p>Căn cứ vào Nghị định 145/2000/NĐ-CP quy định chi tiết và hướng dẫn thi hành một số điều của Bộ luật lao động về điều kiện lao động và quan hệ lao động;</p>
+        <p>Căn cứ vào thông tư 10/2020/TT-BLĐTBXH hướng dẫn một số nội dung tại Bộ luật lao động;</p>
+        <p>Căn cứ nhu cầu hoạt động của Công ty.</p>
+
+        <p>TẠI VĂN PHÒNG CÔNG TY TNHH VINACHI VIỆT NAM</p>
+
+        <p><strong>Bên sử dụng lao động:</strong></p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Ông: Nguyễn Văn Chức</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Quốc tịch: Việt Nam</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Đại diện cho: Công ty TNHH Vinachi Việt Nam</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Địa chỉ: Khu TMDV làng nghề Kim Thiều, Hương Mạc, Từ Sơn, Bắc Ninh</p>
+
+        <p><strong>Bên người lao động:</strong></p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Ông/bà: Nguyễn Công Anh</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Quốc tịch: Việt Nam</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Sinh ngày: 26/12/1997</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Điện thoại: 0961339155</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Địa chỉ: Thôn 8 - Xã Phù Lưu Tế - Huyện Mỹ Đức - Hà Nội</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;CCCD/CMND: 001097006151</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Cấp ngày: 19/01/2022</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Nơi cấp: Cục CS QLHC về TTXH</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Trình độ:</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;Chuyên ngành:</p>
+
+        <p>Thỏa thuận ký kết hợp đồng lao động và cam kết làm đúng những điều khoản sau đây:</p>
+
+        <h2>ĐIỀU 1: THỜI HẠN VÀ CÔNG VIỆC</h2>
+        <p><strong>1.1 Loại hợp đồng:</strong> Chính thức.</p>
+        <p><strong>1.2 Thời hạn:</strong> HĐ Lao động: Từ ngày 01-06-2025 đến hết ngày 01-06-2026</p>
+        <p>Khi hết thời hạn nêu trên, nếu hai bên không có thỏa thuận nào khác cần chỉnh sửa, bổ sung có liên quan tới quyền lợi, trách nhiệm của mỗi bên thì bản hợp đồng này sẽ mặc định được gia hạn thêm 1 năm tiếp theo, cho đến khi một trong hai bên có thỏa thuận khác hoặc chấm dứt hợp đồng.</p>
+        <p><strong>1.3 Địa điểm làm việc:</strong> Của hàng Hà Nội tại An Khánh - Hoài Đức - Hà Nội</p>
+        <p><strong>1.4 Vị trí làm việc:</strong> TN TT Xuất nhập tồn</p>
+
+        <div class="page-number">1</div>
+    </div>
+
+    <!-- Page 2 -->
+    <div class="page">
+        <p><strong>1.5 Chức vụ:</strong> Trưởng nhóm</p>
+        <p><strong>1.6 Phòng:</strong> Kho - Logictic</p>
+
+        <p><strong>1.7 Công việc phải làm:</strong></p>
+        <ul>
+            <li>Được quy định theo bản mô tả về Chức năng – Nhiệm vụ - Công việc được giao.</li>
+            <li>Phối hợp cùng với các bộ phận, phòng ban khác trong Công ty để phát huy tối đa hiệu quả công việc.</li>
+            <li>Công việc khác sẽ theo sự chỉ đạo của cấp trên và Ban giám đốc.</li>
+        </ul>
+
+        <h2>ĐIỀU 2: CHẾ ĐỘ LÀM VIỆC VÀ TRANG THIẾT BỊ LÀM VIỆC</h2>
+        <p><strong>2.1 Thời gian làm việc:</strong> Từ thứ 2 đến thứ 7 hàng tuần.</p>
+        <p>Giờ làm việc có thể được thay đổi căn cứ vào nội quy công ty đối với từng thời điểm trong năm, bộ phận, chức danh cụ thể nhằm phù hợp với tính chất, đặc thù công việc của từng vị trí hay khu vực, địa lý. Công ty có quyền thay đổi, điều chỉnh múi giờ làm việc tùy theo từng thời điểm.</p>
+        <p><strong>2.2 Chế độ nghỉ chiều thứ 7 (Quyền lợi thêm):</strong></p>
+        <p>Tùy theo vị trí chức vụ, người lao động được nghỉ 1 số buổi chiều thứ 7 mà vẫn được tính lương. Cụ thể như sau: Cấp nhân viên: 1 buổi, cấp trưởng nhóm: 2 buổi, cấp trưởng bộ phận: 3 buổi, cấp trưởng phòng và ban giám đốc: tất cả chiều thứ 7.</p>
+        <p>Tuy nhiên, để được hưởng cơ chế này, người lao động phải viết đơn trên phần mềm của công ty để khai báo (nhằm phân biệt với nghỉ không lương, nghỉ vô lý do) và phải được xét duyệt của các cấp quản lý. Cấp quản lý có thể không xét duyệt cho người lao động nghỉ nếu có các công việc cần phải hoàn thành.</p>
+        <p><strong>2.3 Ngày công tiêu chuẩn:</strong> 26 ngày / 1 tháng</p>
+        <p><strong>2.4 Thời gian làm thêm/tăng ca:</strong> Tùy vào tính chất, khối lượng, tiến độ công việc mà người sử dụng lao động yêu cầu người lao động làm thêm/tăng ca.</p>
+        <p><strong>2.5 Chế độ thanh toán lương làm thêm/ tăng ca:</strong> Những trường hợp làm thêm/tăng ca do NSDLĐ yêu cầu thì NLĐ sẽ được tính theo quy định của Luật lao động và Quy chế công ty. Trường hợp NLĐ làm thêm/tăng ca không do NSDLĐ yêu cầu thì sẽ không được hưởng.</p>
+        <p><strong>2.6 Trang bị các thiết bị, công cụ, đồ dùng làm việc, bảo hộ lao động:</strong> Sẽ được công ty cấp phát phù hợp với tính chất công việc tại mỗi vị trí làm việc. Mọi tài sản do công ty trang bị, NLĐ chỉ có quyền sử dụng, không có quyền sở hữu. Vì vậy, trong mọi tình huống, NLĐ làm mất thì NLĐ có trách nhiệm bồi hoàn theo quy định công ty.</p>
+
+        <h2>ĐIỀU 3: QUYỀN LỢI VÀ NGHĨA VỤ CỦA BÊN B (NLĐ)</h2>
+        <p><strong>3.1. Quyền lợi của Bên B:</strong></p>
+        <p><strong>3.1.1. Lương và các khoản phụ trợ cấp, hỗ trợ:</strong> NLĐ được hưởng các khoản lương thưởng và phúc lợi từ quỹ tiền lương hàng năm của Công ty bao gồm các khoản như sau:</p>
+        <p>a. Mã ngạch bậc lương:</p>
+        <p>b. <strong>Tổng lương vị trí: 11.132.000. Bao gồm:</strong></p>
+        <ul>
+            <li>Lương cơ bản: 6.072.000.</li>
+            <li>Lương KPI: 4.048.000.</li>
+            <li>Lương đàm phán: 0.</li>
+            <li>Phụ cấp vị trí: 0</li>
+            <li>Phụ cấp vùng miền: 1.012.000</li>
+            <li>Phụ cấp kiêm nhiệm: 0</li>
+            <li>Phụ cấp thêm: 0.</li>
+        </ul>
+        <p>c. Thưởng kinh doanh và thưởng cho khối gián tiếp</p>
+
+        <div class="page-number">2</div>
+    </div>
+
+    <!-- Page 3 -->
+    <div class="page">
+        <p>Thưởng đạt theo quy chế của công ty. Người lao động có thể đề nghị P. HCNS hướng dẫn và giải đáp về phương pháp chia thưởng đạt.</p>
+        <p>Điều kiện nhận được thưởng đạt đối với khối kinh doanh là hoàn thành 85% mức áp doanh thu cá nhân. Đối với khối gián tiếp là cả công ty hoàn thành 85% doanh thu kế hoạch.</p>
+        <p>d. Các gói thưởng khác đối với khối kinh doanh</p>
+        <p>Với khối kinh doanh, các khoản thưởng khác mà nhân viên có thể đạt được bao gồm Thưởng chiết khấu, thưởng bán cao hơn giá niêm yết, thưởng bán hàng tồn kho thanh lý, ...</p>
+        <p>e. Thưởng lợi nhuận công ty sau tháng 4 hàng năm nếu có: (thời điểm khi còn làm việc tại vinachi)</p>
+        <p>f. Thưởng lương tháng 13: theo quy chế công ty</p>
+        <p>g. Miễn phí ăn hoặc hỗ trợ:</p>
+        <ul>
+            <li>Đối với bữa trưa: Tại Bắc Ninh + Mỹ Đức: 500.000/1 tháng với Hoài Đức 750.000/1 tháng</li>
+            <li>Đối với bữa tối: CBNV đóng bổ sung thêm 400.000đ/tháng.</li>
+        </ul>
+        <p>h. Chỗ ở: Miễn phí chỗ ở cho CBNV có nhu cầu đăng ký ở tại nơi do công ty thuê.</p>
+        <p><strong>3.1.3. Chế độ nâng lương:</strong> NLĐ được xét nâng mức lương trong các trường hợp sau:</p>
+        <ul>
+            <li>Công ty tăng mức lương tối thiểu áp dụng tại Công ty.</li>
+            <li>Kết quả hoạt động kinh doanh hàng năm của công ty tăng trưởng tốt.</li>
+            <li>NLĐ có tay nghề, trình độ, năng lực cao qua quá trình làm việc được các cấp Quản lý và BLĐ ghi nhận.</li>
+            <li>NLĐ thể hiện được sự cống hiến trong công việc trong thời gian làm việc.</li>
+            <li>NLĐ tuân thủ tốt và ít hoặc không vi phạm mọi nội quy, quy định của công ty.</li>
+            <li>NLĐ có chỉ số đo lường kết quả làm việc đạt thành tích cao hoặc hoàn thành nhiệm vụ tốt.</li>
+            <li>NLĐ được giao thêm công việc hoặc vị trí kiêm nhiệm khác và luôn hoàn thành tốt.</li>
+            <li>NLĐ đạt thỏa thuận với Ban Giám đốc.</li>
+        </ul>
+        <p><strong>3.1.4. Hình thức trả lương hàng tháng:</strong> Chuyển khoản.</p>
+        <p><strong>3.1.5. Thời gian trả lương:</strong> Công ty áp dụng trả lương 2 lần/tháng. Cụ thể:</p>
+        <ul>
+            <li>Lần 1: Vào ngày 05 hàng tháng đối với Lương thời gian (Lương cứng/Lương CB)</li>
+            <li>Lần 2: Vào ngày 15 hàng tháng đối với Lương KPI + thưởng đạt, khoán chiết khấu, thưởng khác, Các loại Phụ Trợ cấp, hỗ trợ (Nếu có) + tạm ứng (Nếu có).</li>
+        </ul>
+        <p>Trường hợp bất khả kháng, vì một lý do nào đó khiến công ty chưa kịp thanh toán đúng ngày trên, phòng HCNS hoặc Kế toán công ty sẽ thông báo cho NLĐ nắm được nguyên nhân, lý do cụ thể.</p>
+        <p><strong>3.1.6. Chế độ nghỉ ngơi:</strong> Theo Nội quy Công ty.</p>
+        <p><strong>3.1.7. Bảo hiểm Bắt buộc (BHXH, BHYT, BHTN):</strong> Căn cứ theo quy định, quy chế của công ty nhưng vẫn đảm bảo đúng quy định pháp luật.</p>
+        <p><strong>3.1.8. Chế độ đào tạo:</strong> Người lao động sẽ được cử đi đào tạo, và có cam kết làm việc trong thời gian 6 tháng đến 1 năm sau đào tạo.</p>
+        <p><strong>3.1.9. Quyền lợi khác:</strong> NLĐ được khen thưởng bằng vật phẩm hoặc tiền mặt khi có thành tích tốt trong quá trình làm việc hoặc theo quy định của công ty.</p>
+
+        <p><strong>3.2. Nghĩa vụ của Bên B:</strong></p>
+        <p><strong>3.2.1. Hoàn thành những công việc đã cam kết trong bản hợp đồng này và bản mô tả, phân công chức năng - nhiệm vụ - công việc cho vị trí được giao.</strong></p>
+
+        <div class="page-number">3</div>
+    </div>
+
+    <!-- Page 4 -->
+    <div class="page">
+        <p><strong>3.2.2. Tuân thủ đúng và đầy đủ mọi nội quy, quy định, quy trình do công ty đề ra trong suốt quá trình làm việc.</strong></p>
+        <p><strong>3.2.3. Đến công ty làm việc bằng Thái độ tích cực, lạc quan, cởi mở, vui vẻ nhất. Nhiệt tình phối hợp, hỗ trợ Phòng ban Bộ phận/Cá nhân trong công ty khi có đề xuất và yêu cầu.</strong></p>
+        <p><strong>3.2.4. Thực hiện các công việc khác theo yêu cầu từ cấp trên hoặc BLĐ công ty giao.</strong></p>
+        <p><strong>3.2.5. Bồi thường tài sản trong trường hợp làm hư hỏng, thất thoát tài sản đã được giao:</strong> Căn cứ vào mức độ thiệt hại, tính chất sự việc mà NLĐ phải bồi thường theo quyết định của Công ty.</p>
+        <p><strong>3.2.6. Bảo vệ tài sản và bí mật công nghệ, kinh doanh của công ty:</strong> Khi chưa được sự đồng ý của các cấp quản lý có thẩm quyền và BLĐ công ty, NLĐ không được phép mang bất kỳ tài sản nào của công ty ra bên ngoài (Trụ sở, cơ sở chi nhánh, Văn phòng trực thuộc công ty, nơi làm việc khác). Không được phép cung cấp hoặc trao đổi với bên thứ ba nào (Ngoài NLĐ và Công ty) về các thông tin tài liệu, bản vẽ thiết kế, số liệu tài chính, công nghệ, quy trình, chính sách bán hàng, cách thức hoạt động kinh doanh và những thông tin được xem là bí mật kinh doanh của công ty mà NLĐ đã được biết trong quá trình làm việc dưới mọi hình thức.</p>
+        <p><strong>3.2.7. Không cung cấp thông tin về chính sách lương, thưởng của cá nhân cho đồng nghiệp và bên ngoài công ty khi chưa được sự đồng ý của BLĐ công ty.</strong></p>
+        <p><strong>3.2.8. Nghiêm cấm sử dụng mọi thông tin, hình ảnh của công ty vào mục đích cá nhân làm ảnh hưởng tới uy tín về hình ảnh, thương hiệu của công ty.</strong></p>
+        <p><strong>3.2.9. Nghiêm cấm tạo, sử dụng các loại tài khoản cá nhân trên Internet để bán các sản phẩm của công ty hoặc có các hành động khác có yếu tố gây rủi ro cho công ty trên Internet khi chưa được sự đồng ý của BLĐ công ty.</strong></p>
+        <p><strong>3.2.10. Trong thời gian làm việc tại công ty. Nghiêm cấm NLĐ kết hợp, liên kết với các tổ chức/cá nhân khác nhằm bán sản phẩm của các Doanh nghiệp/Tổ chức Cá thể khác, thuộc diện đối thủ cạnh tranh đối với Vinachi.</strong></p>
+        <p><strong>3.2.11. NLĐ xin nghỉ phép năm và việc riêng:</strong> NLĐ có trách nhiệm làm đơn xin nghỉ phép/Việc riêng theo quy định, quy trình của công ty. Chỉ được phép nghỉ khi có đầy đủ chữ ký xác nhận của các cấp có thẩm quyền. Trường hợp tự ý nghỉ khi chưa được sự đồng ý của các cấp có thẩm quyền, không theo quy trình sẽ được coi là “Nghỉ không phép”, phòng HCNS thực hiện xử lý vi phạm theo nội quy, quy định của công ty. Trong trường hợp phát sinh sự cố bất khả kháng như Con, Vợ (Chồng), Bố (Mẹ) đẻ, cá nhân NLĐ bị biến cố ở mức độ nghiêm trọng thì NLĐ sẽ được các cấp QL và BLĐ công ty linh động không cần làm đơn báo trước mà cho phép bổ sung đơn sau, nhưng NLĐ phải có trách nhiệm báo cho QL trực tiếp, phòng HCNS nắm được.</p>
+        <p><strong>3.2.12. NLĐ xin nghỉ việc (Chấm dứt hợp đồng) trước thời hạn:</strong></p>
+        <p><strong>a. Thông báo và phê duyệt:</strong></p>
+        <ul>
+            <li>NLĐ có nghĩa vụ phải làm đơn xin nghỉ việc trình lên Quản lý trực tiếp, phòng HCNS ký duyệt.</li>
+            <li>Phòng HCNS sẽ có trách nhiệm trình BLĐ phê duyệt và thông báo lại kết quả cho NLĐ biết thời gian được nghỉ.</li>
+        </ul>
+        <p><strong>b. Thời gian bắt đầu nghỉ việc:</strong></p>
+        <ul>
+            <li>Đối với cấp Quản lý: 60 ngày, kể từ ngày Đơn được BLĐ ký duyệt đơn (Không tính từ ngày NLĐ làm Đơn).</li>
+            <li>Đối với các cấp nhân viên: 30 ngày, kể từ ngày Đơn được BLĐ ký duyệt (Không tính từ ngày NLĐ làm Đơn).</li>
+        </ul>
+
+        <div class="page-number">4</div>
+    </div>
+
+    <!-- Page 5 -->
+    <div class="page">
+        <ul>
+            <li>Trường hợp khác: Trong trường hợp các cấp Quản lý có thẩm quyền và BLĐ phê duyệt cho nghỉ trước thời hạn được quy định trên thì NLĐ sẽ được nghỉ sớm hơn.</li>
+        </ul>
+        <p><strong>c. Trong thời gian chờ nghỉ:</strong></p>
+        <p>NLĐ vẫn phải làm việc bình thường và hoàn thành mọi công việc được giao. Trường hợp NLĐ có thái độ, hành động tiêu cực trong thời gian này, công ty sẽ căn cứ tính chất, mức độ của sự việc và có thể chuyển sang trạng thái “Sa thải nhân sự, đồng thời NLĐ có thể sẽ bị mất một số quyền lợi theo quy định của công ty.</p>
+        <p><strong>d. Trước khi nghỉ việc NLĐ có nghĩa vụ sau:</strong></p>
+        <ul>
+            <li>Thứ 1: Bàn giao công việc cho người được thay thế công việc của mình hoặc cho QL trực tiếp bằng biên bản bàn giao, được ký xác nhận của bên giao và bên nhận.</li>
+            <li>Thứ 2: Đào tạo, hướng dẫn tận tình mọi công việc có liên quan cho người được thay thế.</li>
+            <li>Thứ 3: Hoàn trả đầy đủ các tài sản, đồ dùng, trang thiết bị mà công ty đã cung cấp trong quá trình làm việc (Trừ những vật phẩm được thưởng, tặng, biểu, cho, mua của công ty) bằng biên bản bàn giao, được ký xác nhận của bên giao và bên nhận.</li>
+        </ul>
+        <p>Trường hợp NLĐ chưa hoàn thành 3 nghĩa vụ trên, NLĐ chỉ được hưởng 50%/ Tổng thu nhập đang còn trong công ty.</p>
+        <p><strong>e. Lưu ý khác:</strong></p>
+        <p>NLĐ cố tình nghỉ việc không lý do, không đúng – đủ quy trình, trình tự hoặc cố tình không thực hiện các bước như đã nêu trên thì NLĐ chỉ được hưởng lương cơ bản.</p>
+
+        <h2>ĐIỀU 4: QUYỀN HẠN VÀ NGHĨA VỤ CỦA BÊN A (Bên sử dụng Lao động)</h2>
+        <p><strong>4.1 Quyền hạn của Bên A:</strong></p>
+        <ul>
+            <li>Điều hành NLĐ tùy theo tình hình hoạt động kinh doanh trong từng thời điểm.</li>
+            <li>Có quyền yêu cầu, điều chuyển NLĐ sang những phòng ban/bộ phận hoặc công việc khác để phù hợp với trình độ, năng lực, kỹ năng hoặc phù hợp với chiến lược nhân sự, chiến lược kinh doanh.</li>
+            <li>Có quyền chấm dứt hợp đồng, kỷ luật NLĐ nếu NLĐ vi phạm nội quy, quy định, quy chế của công ty hoặc vi phạm pháp luật theo quy định của nhà nước, hoặc không đáp ứng được công việc trước thời hạn hợp đồng đã ký kết với NLĐ.</li>
+            <li>Trường hợp công ty chấm dứt hợp đồng: Tùy theo mức độ, lý do mà công ty đưa ra thời gian chính thức chấm dứt hợp đồng. Tuy nhiên, tối thiểu phải thông báo cho NLĐ trước ít nhất 30 ngày làm việc, nhằm tạo điều kiện cho NLĐ có thời gian tìm kiếm công việc khác. Nếu NLĐ có nguyện vọng xin dừng làm việc ngay, không cần thời gian chờ đợi tìm việc mới thì công ty sẽ tạo điều kiện cho NLĐ được dừng công việc sớm.</li>
+        </ul>
+        <p><strong>4.2. Nghĩa vụ của Bên A:</strong></p>
+        <ul>
+            <li>Đảm bảo việc làm và thực hiện đầy đủ các điều khoản đã nêu trong hợp đồng này.</li>
+            <li>Thanh toán đầy đủ, đúng thời hạn các chế độ và quyền lợi cho NLĐ theo hợp đồng này.</li>
+            <li>Tạo mọi điều kiện thuận lợi để NLĐ có được môi trường làm việc tốt nhất.</li>
+            <li>Trang bị cho NLĐ các trang thiết bị, dụng cụ cần thiết để phục vụ, đáp ứng công việc.</li>
+        </ul>
+
+        <h2>ĐIỀU 5: ĐIỀU KHOẢN THI HÀNH:</h2>
+        <p>5.1 Những vấn đề thỏa thuận khác không được ghi trong hợp đồng này hoặc có thêm thỏa thuận khác thì hai bên sẽ thỏa thuận và thực hiện việc bổ sung thêm văn bản khác hoặc thay thế bằng bản hợp đồng khác để phù hợp với thỏa thuận giữa hai bên.</p>
+        <p>5.2 Các thỏa thuận được nêu trong hợp đồng này. Trường hợp có điều khoản không nằm trong Bộ luật lao động thì sẽ được áp dụng theo Bộ luật dân sự nhằm mục đích hai bên đạt được sự đồng thuận, cùng nhau hợp tác, đồng thời cùng nhau đề cao và tôn trọng giá trị tập thể.</p>
+
+        <div class="page-number">5</div>
+    </div>
+
+    <!-- Page 6 -->
+    <div class="page">
+        <p>5.3 Khi hai bên ký kết thêm mẫu văn bản khác có liên quan thì văn bản đó trở thành một phần không thể tách rời của hợp đồng thỏa thuận này và mọi nội dung trong văn bản đó đều có giá trị pháp lý như nhau.</p>
+        <p>5.4 Bản hợp đồng được thành lập dựa trên tinh thần đàm phán thỏa thuận tự nguyện giữa hai bên, không bên nào ép buộc bên nào. Sau khi xem xét, hai bên đã đọc và hiểu rõ các nội dung được nêu trong hợp đồng này, đồng thời đi đến thống nhất lập thành hai (2) bản có giá trị pháp lý như nhau, mỗi bên giữ một bản, có hiệu lực kể từ ngày ký.</p>
+        <p>5.5 Nếu hết thời hạn trên hợp đồng, 2 bên không thanh lý hợp đồng thì HĐ này sẽ tự động gia hạn 1 năm, hiệu lực cho đến thời điểm có “Biên bản thanh lý hợp đồng được xác nhận"</p>
+
+        <div class="signatory-section">
+            <div>
+                <p>Người lao động</p>
+                <p class="signature-placeholder">(Ký tên, ghi rõ họ tên)</p>
+            </div>
+            <div>
+                <p>Người sử dụng lao động</p>
+                <p class="signature-placeholder">(Ký tên, đóng dấu)</p>
+            </div>
+        </div>
+
+        <div class="page-number">6</div>
+    </div>
+
+</body>
+</html>
