@@ -117,16 +117,26 @@
         display: block;
         overflow: visible;
       }
+
       .a5-wrapper {
         width: auto;
         height: auto;
       }
+
       .container {
         width: 194mm;
-        height: 132.5mm;
+        min-height: 132.5mm;
+        height: auto;
         box-shadow: none;
         padding: 0;
         font-size: 11.5px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .signature-grid {
+        break-inside: avoid;
+        page-break-inside: avoid;
       }
     }
   </style>
