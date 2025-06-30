@@ -2,38 +2,47 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=210mm, height=148.5mm" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Phiếu Đề Nghị Chi phí</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* Print styles: Ensure A5 landscape for actual printing */
     @page {
       size: A5 landscape;
-      margin: 8mm;
+      margin: 8mm; /* This sets the print margin for the entire page */
     }
 
+    /* Base styles for screen display: Center a fixed A5-sized container */
     html, body {
       margin: 0;
       padding: 0;
-      width: 210mm;
-      height: 148.5mm;
+      width: 100vw;   /* Use full viewport width to center the A5 page */
+      height: 100vh;  /* Use full viewport height to center the A5 page */
       font-family: Arial, sans-serif;
-      font-size: 11.5px;
+      font-size: 11.5px; /* Fixed font size for all devices */
       background: #f5f5f5;
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      justify-content: center; /* Center the A5 page horizontally */
+      align-items: center;   /* Center the A5 page vertically */
+      overflow: auto; /* Allow scrolling if the A5 page is larger than the viewport */
+      box-sizing: border-box; /* Include padding/border in the element's total width/height */
     }
 
     .container {
-      width: 194mm;
+      width: 210mm;   /* Fixed A5 landscape width */
+      height: 148.5mm; /* Fixed A5 landscape height */
       background: white;
-      padding: 8mm;
-      box-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+      padding: 8mm; /* This acts as the internal margin for the content within the A5 page */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for the page on screen */
       display: flex;
       flex-direction: column;
       gap: 6mm;
+      box-sizing: border-box; /* Include padding in the element's total width and height */
+      flex-shrink: 0; /* Prevent container from shrinking on smaller screens */
+      flex-grow: 0;   /* Prevent container from growing */
     }
 
+    /* Other content-specific styles (unchanged from your original) */
     .header {
       display: flex;
       align-items: center;
@@ -42,7 +51,8 @@
     }
 
     .header-logo img {
-      width: 45px;
+      width: 45px; /* Fixed size */
+      height: auto;
     }
 
     .header-company-info {
@@ -50,7 +60,7 @@
     }
 
     .section-title {
-      font-size: 1.1rem;
+      font-size: 1.1rem; /* Relative to container's fixed font-size */
       font-weight: 700;
       text-align: center;
       color: #1f2937;
@@ -74,7 +84,7 @@
       display: inline-block;
       white-space: normal;
       word-wrap: break-word;
-      line-height: 1.3;
+      line-height: inherit; /* Inherit line height for consistency */
     }
 
     .full-width-item {
@@ -86,8 +96,9 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       text-align: center;
-      font-size: 0.8rem;
+      font-size: 0.8rem; /* Relative to container's fixed font-size */
       padding-top: 3mm;
+      margin-top: auto; /* Pushes signature section to the bottom */
     }
 
     .signature-text {
@@ -95,12 +106,24 @@
       color: #1f2937;
     }
 
+    /* Print media query: Overrides screen styles when actually printing */
     @media print {
       html, body {
+        width: auto; /* Auto width for print to be controlled by @page */
+        height: auto; /* Auto height for print to be controlled by @page */
         background: white;
+        display: block; /* Revert to block display for print flow */
+        overflow: visible; /* Ensure all content is visible for printing */
       }
       .container {
-        box-shadow: none;
+        /* For print, the @page rule defines the overall paper size and margins. */
+        /* The container within the print context should fill the printable area. */
+        /* A5 landscape is 210x148.5mm. With 8mm @page margins, content area is 194x132.5mm. */
+        width: 194mm; /* The usable width after @page margins */
+        height: 132.5mm; /* The usable height after @page margins */
+        box-shadow: none; /* No shadow on print */
+        padding: 0; /* No extra padding here, @page margin handles the space */
+        font-size: 11.5px; /* Ensure fixed font size for print */
       }
     }
   </style>
@@ -184,7 +207,7 @@
     </div>
   </div>
 
-  <!-- JS gán biến từ URL -->
+  <!-- JS gán biến từ URL (unchanged from your original) -->
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
