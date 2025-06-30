@@ -27,14 +27,13 @@
 
     .a5-wrapper {
       width: 210mm;
-      height: 148.5mm;
-      overflow: hidden;
+      min-height: 148.5mm;
       box-sizing: content-box;
     }
 
     .container {
       width: 210mm;
-      height: 148.5mm;
+      min-height: 148.5mm;
       background: white;
       padding: 8mm;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -42,8 +41,6 @@
       flex-direction: column;
       gap: 6mm;
       box-sizing: border-box;
-      flex-shrink: 0;
-      flex-grow: 0;
     }
 
     .header {
@@ -101,7 +98,6 @@
       text-align: center;
       font-size: 0.8rem;
       padding-top: 3mm;
-      /* ❌ margin-top: auto bị loại bỏ để tránh khoảng trắng lớn */
     }
 
     .signature-text {
@@ -111,6 +107,8 @@
 
     @media print {
       html, body {
+        margin: 0;
+        padding: 0;
         width: auto;
         height: auto;
         background: white;
@@ -120,18 +118,16 @@
 
       .a5-wrapper {
         width: auto;
-        height: auto;
+        min-height: auto;
       }
 
       .container {
         width: 194mm;
-        min-height: 132.5mm;
+        min-height: auto;
         height: auto;
         box-shadow: none;
         padding: 0;
         font-size: 11.5px;
-        display: flex;
-        flex-direction: column;
       }
 
       .signature-grid {
