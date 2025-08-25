@@ -243,6 +243,7 @@
         </div>
 
         <div class="p-6">
+            <!-- Đã thêm md:flex-row để đảm bảo layout theo hàng ngang trên các màn hình lớn, và flex-col trên mobile. -->
             <div class="flex flex-col md:flex-row gap-6">
                 <div class="flex-1">
                     <table class="summary-table w-full max-w-sm ml-auto">
@@ -269,7 +270,8 @@
                     </table>
                 </div>
                 
-                <div class="flex-1 flex flex-col gap-4">
+                <!-- Thay đổi flex-col gap-4 thành flex-row flex-1 và thêm flex-wrap để tránh xuống dòng -->
+                <div class="flex flex-row flex-1 flex-wrap gap-4">
                     <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
                         <div class="font-bold text-gray-800 mb-1">Tài khoản cá nhân</div>
                         <div class="text-sm text-gray-600 leading-relaxed">
