@@ -5,283 +5,47 @@
     <!-- Thẻ meta đã được chỉnh sửa: Xóa width=device-width -->
     <meta name="viewport" content="initial-scale=1.0">
     <title>Bảng Báo Giá - Vinachi Việt Nam</title>
+    <!-- Thư viện Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Thêm các thư viện cần thiết cho việc xuất PDF và Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        /* General styling for the body and wrapper */
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            @apply bg-gray-100 text-gray-800;
         }
 
         /* Container that forces A4 size and allows scrolling on small screens */
         .a4-container {
             width: 21cm;
             min-height: 29.7cm;
-            background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            margin: 20px auto;
-            border-radius: 12px;
-            overflow: hidden;
-            box-sizing: border-box; /* Ensures padding doesn't affect fixed width */
+            @apply bg-white shadow-xl rounded-xl mx-auto my-5 overflow-hidden;
         }
 
         /* Mobile styling: allow horizontal scroll to view fixed A4 content */
         @media (max-width: 768px) {
             body {
-                justify-content: flex-start; /* Align to the left to show scrollbar */
-                overflow-x: auto; /* Enable horizontal scroll */
+                @apply flex justify-start overflow-x-auto;
             }
             .a4-container {
-                margin: 10px;
-                border-radius: 8px;
+                @apply mx-2 my-2 rounded-lg;
             }
         }
 
-        /* Standard responsive container rules applied inside A4 container */
-        .container {
-            width: 100%; /* Fill the parent A4 container */
-        }
-        
-        /* Header and content sections */
-        .header {
-            background: #f8f9fa;
-            color: #2c3e50;
-            padding: 30px;
-            text-align: center;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        .company-name {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .company-addresses {
-            font-size: 13px;
-            line-height: 1.6;
-            color: #6c757d;
-        }
-
-        .quote-info {
-            padding: 25px;
-            background: #ecf0f1;
-            border-bottom: 3px solid #3498db;
-        }
-
-        .quote-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .customer-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .info-label {
-            font-weight: bold;
-            color: #34495e;
-            margin-right: 10px;
-            min-width: 120px;
-        }
-
-        .date {
-            text-align: right;
-            font-weight: bold;
-            color: #7f8c8d;
-            grid-column: span 2;
-            margin-top: 10px;
-        }
-
-        .products-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        .products-table th {
-            background: #34495e;
-            color: white;
-            padding: 12px 8px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 14px;
-            border: 1px solid #2c3e50;
-        }
-
-        .products-table td {
-            padding: 12px 8px;
-            border: 1px solid #bdc3c7;
-            text-align: center;
-            vertical-align: middle;
-            font-size: 13px;
-        }
-
-        .products-table tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-
-        .products-table tbody tr:hover {
-            background-color: #e8f4fd;
-        }
-
-        .product-name {
-            text-align: left !important;
-            font-weight: 500;
-            max-width: 200px;
-        }
-
-        .price {
-            font-weight: bold;
-            color: #27ae60;
-        }
-
-        .total-price {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-
-        .summary {
-            padding: 25px;
-            background: #f8f9fa;
-        }
-
-        .summary-table {
-            width: 100%;
-            max-width: 400px;
-            margin-left: auto;
-        }
-
-        .summary-table td {
-            padding: 8px 15px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .summary-table .label {
-            font-weight: bold;
-            color: #34495e;
-        }
-
-        .summary-table .value {
-            text-align: right;
-            font-weight: bold;
-        }
-
-        .final-total {
-            background: #2c3e50 !important;
-            color: white !important;
-            font-size: 18px !important;
-            font-weight: bold !important;
-        }
-
-        .final-total .label, .final-total .value {
-            color: white !important;
-        }
-
-        .amount-words {
-            background: #3498db;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-            margin: 20px 0;
-            border-radius: 8px;
-        }
-
-        .bank-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 20px;
-            background: #ecf0f1;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .bank-account {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-        }
-
-        .bank-title {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 8px;
-        }
-
-        .bank-details {
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-            font-style: italic;
-            background: #f8f9fa;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            padding: 0 20px;
-        }
-
-        .action-buttons button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
+        /* Thêm hiệu ứng hover cho button */
         .action-buttons button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
         }
 
-        #printBtn {
-            background-color: #2c3e50;
-            color: white;
+        .products-table th, .products-table td {
+            border: 1px solid #e2e8f0;
         }
-
-        #pdfBtn {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        #xlsxBtn {
-            background-color: #27ae60;
-            color: white;
-        }
-
-        /* Hide buttons and set print styles */
+        
         @media print {
             .action-buttons, .footer {
                 display: none;
@@ -327,211 +91,217 @@
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800">
     <div class="a4-container">
-        <div class="header">
-            <div class="company-name" id="companyName">CÔNG TY TNHH VINACHI VIỆT NAM</div>
-            <div class="company-addresses" id="companyBranches">
+        <div class="p-8 text-center bg-gray-50 border-b-2 border-gray-200 rounded-t-xl">
+            <div class="text-xl font-bold mb-3 text-gray-900" id="companyName">CÔNG TY TNHH VINACHI VIỆT NAM</div>
+            <div class="text-sm leading-relaxed text-gray-600" id="companyBranches">
                 <div>CS1: Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</div>
                 <div>CS2: Km8+500 Đại lộ Thăng Long, Hoài Đức, Hà Nội</div>
                 <div>CS3: Thạch Thất - Hà Nội</div>
             </div>
         </div>
 
-        <div class="quote-info">
-            <div class="quote-title">BẢNG BÁO GIÁ</div>
-            <div class="customer-info">
-                <div class="info-item">
-                    <span class="info-label">Kính gửi:</span>
-                    <span id="customerName">Khách hàng Chị Vân Giang</span>
+        <div class="p-6 bg-blue-50 border-b-2 border-blue-400">
+            <div class="text-2xl font-bold text-center text-blue-800 mb-4">BẢNG BÁO GIÁ</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                <div class="flex items-center">
+                    <span class="font-semibold text-gray-700 w-32 shrink-0">Kính gửi:</span>
+                    <span id="customerName" class="font-medium text-gray-900">Khách hàng Chị Vân Giang</span>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Số điện thoại:</span>
-                    <span id="customerPhone">0915711288</span>
+                <div class="flex items-center">
+                    <span class="font-semibold text-gray-700 w-32 shrink-0">Số điện thoại:</span>
+                    <span id="customerPhone" class="font-medium text-gray-900">0915711288</span>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Địa chỉ:</span>
-                    <span id="customerAddress">Toà TC2 Vinsmart</span>
+                <div class="flex items-center">
+                    <span class="font-semibold text-gray-700 w-32 shrink-0">Địa chỉ:</span>
+                    <span id="customerAddress" class="font-medium text-gray-900">Toà TC2 Vinsmart</span>
                 </div>
-                <div class="date" id="quoteDate">Ngày 25 tháng 08 năm 2025</div>
+                <div class="text-right font-medium text-gray-600 col-span-1 md:col-span-2 mt-2" id="quoteDate">Ngày 25 tháng 08 năm 2025</div>
             </div>
         </div>
 
-        <div class="action-buttons">
-            <button id="printBtn">In</button>
-            <button id="pdfBtn">Xuất PDF</button>
-            <button id="xlsxBtn">Xuất XLSX</button>
+        <div class="action-buttons flex justify-center gap-4 my-6 px-4">
+            <button id="printBtn" class="bg-gray-700 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-200 ease-in-out shadow-md">
+                In
+            </button>
+            <button id="pdfBtn" class="bg-red-600 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-200 ease-in-out shadow-md">
+                Xuất PDF
+            </button>
+            <button id="xlsxBtn" class="bg-green-600 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-200 ease-in-out shadow-md">
+                Xuất XLSX
+            </button>
         </div>
 
-        <div style="padding: 20px;">
-            <table class="products-table">
+        <div class="px-6">
+            <table class="products-table w-full border-collapse">
                 <thead>
-                    <tr>
-                        <th style="width: 4%;">TT</th>
-                        <th style="width: 10%;">Mã</th>
-                        <th style="width: 25%;">Tên sản phẩm</th>
-                        <th style="width: 8%;">Hình ảnh</th>
-                        <th style="width: 6%;">ĐVT</th>
-                        <th style="width: 6%;">Số lượng</th>
-                        <th style="width: 10%;">Đơn giá</th>
-                        <th style="width: 6%;">CK</th>
-                        <th style="width: 10%;">Giá sau CK</th>
-                        <th style="width: 10%;">Thành tiền</th>
+                    <tr class="bg-gray-800 text-white text-sm font-semibold text-center">
+                        <th class="p-3 w-[4%]">TT</th>
+                        <th class="p-3 w-[10%]">Mã</th>
+                        <th class="p-3 w-[25%]">Tên sản phẩm</th>
+                        <th class="p-3 w-[8%]">Hình ảnh</th>
+                        <th class="p-3 w-[6%]">ĐVT</th>
+                        <th class="p-3 w-[6%]">Số lượng</th>
+                        <th class="p-3 w-[10%]">Đơn giá</th>
+                        <th class="p-3 w-[6%]">CK</th>
+                        <th class="p-3 w-[10%]">Giá sau CK</th>
+                        <th class="p-3 w-[10%]">Thành tiền</th>
                     </tr>
                 </thead>
-                <tbody id="productTableBody">
+                <tbody id="productTableBody" class="text-xs text-center">
                     <!-- Product data will be inserted here by JavaScript -->
-                    <tr>
-                        <td>1</td>
-                        <td>D6801-2</td>
-                        <td class="product-name">Vòi rửa bát cảm ứng Inox 304 nóng lạnh màu xám Duraval D6801-2</td>
-                        <td><div style="background:#f0f0f0; padding:8px; border-radius:4px; font-size:11px;">Hình ảnh</div></td>
-                        <td>Bộ</td>
-                        <td>1</td>
-                        <td class="price">1.750.000</td>
-                        <td>0,0%</td>
-                        <td class="price">1.750.000</td>
-                        <td class="total-price">1.750.000</td>
+                    <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                        <td class="p-3">1</td>
+                        <td class="p-3">D6801-2</td>
+                        <td class="p-3 text-left font-medium max-w-[200px]">Vòi rửa bát cảm ứng Inox 304 nóng lạnh màu xám Duraval D6801-2</td>
+                        <td class="p-3"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Hình ảnh</div></td>
+                        <td class="p-3">Bộ</td>
+                        <td class="p-3">1</td>
+                        <td class="p-3 font-semibold text-green-600">1.750.000</td>
+                        <td class="p-3">0,0%</td>
+                        <td class="p-3 font-semibold text-green-600">1.750.000</td>
+                        <td class="p-3 font-bold text-red-600">1.750.000</td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>D623130</td>
-                        <td class="product-name">Giá gia vị inox 304 Duraval 300mm D623130</td>
-                        <td><div style="background:#f0f0f0; padding:8px; border-radius:4px; font-size:11px;">Hình ảnh</div></td>
-                        <td>Cái</td>
-                        <td>1</td>
-                        <td class="price">1.255.000</td>
-                        <td>0,0%</td>
-                        <td class="price">1.255.000</td>
-                        <td class="total-price">1.255.000</td>
+                    <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                        <td class="p-3">2</td>
+                        <td class="p-3">D623130</td>
+                        <td class="p-3 text-left font-medium max-w-[200px]">Giá gia vị inox 304 Duraval 300mm D623130</td>
+                        <td class="p-3"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Hình ảnh</div></td>
+                        <td class="p-3">Cái</td>
+                        <td class="p-3">1</td>
+                        <td class="p-3 font-semibold text-green-600">1.255.000</td>
+                        <td class="p-3">0,0%</td>
+                        <td class="p-3 font-semibold text-green-600">1.255.000</td>
+                        <td class="p-3 font-bold text-red-600">1.255.000</td>
                     </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>D624530</td>
-                        <td class="product-name">Giá dao thớt inox 304 Pro Duraval 300mm D624530</td>
-                        <td><div style="background:#f0f0f0; padding:8px; border-radius:4px; font-size:11px;">Hình ảnh</div></td>
-                        <td>Bộ</td>
-                        <td>1</td>
-                        <td class="price">1.570.000</td>
-                        <td>0,0%</td>
-                        <td class="price">1.570.000</td>
-                        <td class="total-price">1.570.000</td>
+                    <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                        <td class="p-3">3</td>
+                        <td class="p-3">D624530</td>
+                        <td class="p-3 text-left font-medium max-w-[200px]">Giá dao thớt inox 304 Pro Duraval 300mm D624530</td>
+                        <td class="p-3"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Hình ảnh</div></td>
+                        <td class="p-3">Bộ</td>
+                        <td class="p-3">1</td>
+                        <td class="p-3 font-semibold text-green-600">1.570.000</td>
+                        <td class="p-3">0,0%</td>
+                        <td class="p-3 font-semibold text-green-600">1.570.000</td>
+                        <td class="p-3 font-bold text-red-600">1.570.000</td>
                     </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>D6609-7848</td>
-                        <td class="product-name">Chậu rửa 1 hố inox 304 Duraval D6609-7848</td>
-                        <td><div style="background:#f0f0f0; padding:8px; border-radius:4px; font-size:11px;">Hình ảnh</div></td>
-                        <td>Bộ</td>
-                        <td>1</td>
-                        <td class="price">4.105.000</td>
-                        <td>0,0%</td>
-                        <td class="price">4.105.000</td>
-                        <td class="total-price">4.105.000</td>
+                    <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                        <td class="p-3">4</td>
+                        <td class="p-3">D6609-7848</td>
+                        <td class="p-3 text-left font-medium max-w-[200px]">Chậu rửa 1 hố inox 304 Duraval D6609-7848</td>
+                        <td class="p-3"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Hình ảnh</div></td>
+                        <td class="p-3">Bộ</td>
+                        <td class="p-3">1</td>
+                        <td class="p-3 font-semibold text-green-600">4.105.000</td>
+                        <td class="p-3">0,0%</td>
+                        <td class="p-3 font-semibold text-green-600">4.105.000</td>
+                        <td class="p-3 font-bold text-red-600">4.105.000</td>
                     </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>D63342D</td>
-                        <td class="product-name">Thùng gạo tráng gương inox 304 màu đen Duraval 20 Kg D63342D</td>
-                        <td><div style="background:#f0f0f0; padding:8px; border-radius:4px; font-size:11px;">Hình ảnh</div></td>
-                        <td>Cái</td>
-                        <td>1</td>
-                        <td class="price">1.035.000</td>
-                        <td>0,0%</td>
-                        <td class="price">1.035.000</td>
-                        <td class="total-price">1.035.000</td>
+                    <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                        <td class="p-3">5</td>
+                        <td class="p-3">D63342D</td>
+                        <td class="p-3 text-left font-medium max-w-[200px]">Thùng gạo tráng gương inox 304 màu đen Duraval 20 Kg D63342D</td>
+                        <td class="p-3"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Hình ảnh</div></td>
+                        <td class="p-3">Cái</td>
+                        <td class="p-3">1</td>
+                        <td class="p-3 font-semibold text-green-600">1.035.000</td>
+                        <td class="p-3">0,0%</td>
+                        <td class="p-3 font-semibold text-green-600">1.035.000</td>
+                        <td class="p-3 font-bold text-red-600">1.035.000</td>
                     </tr>
-                    <tr>
-                        <td>6</td>
-                        <td>D650275</td>
-                        <td class="product-name">Khay chia thìa, đũa, dĩa Duraval 800mm D650275</td>
-                        <td><div style="background:#f0f0f0; padding:8px; border-radius:4px; font-size:11px;">Hình ảnh</div></td>
-                        <td>Cái</td>
-                        <td>1</td>
-                        <td class="price">216.000</td>
-                        <td>0,0%</td>
-                        <td class="price">216.000</td>
-                        <td class="total-price">216.000</td>
+                    <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                        <td class="p-3">6</td>
+                        <td class="p-3">D650275</td>
+                        <td class="p-3 text-left font-medium max-w-[200px]">Khay chia thìa, đũa, dĩa Duraval 800mm D650275</td>
+                        <td class="p-3"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Hình ảnh</div></td>
+                        <td class="p-3">Cái</td>
+                        <td class="p-3">1</td>
+                        <td class="p-3 font-semibold text-green-600">216.000</td>
+                        <td class="p-3">0,0%</td>
+                        <td class="p-3 font-semibold text-green-600">216.000</td>
+                        <td class="p-3 font-bold text-red-600">216.000</td>
                     </tr>
-                    <tr>
-                        <td>7</td>
-                        <td>D62728</td>
-                        <td class="product-name">Giá xoong nồi inox 304 Duraval 800mm D62728</td>
-                        <td><div style="background:#f0f0f0; padding:8px; border-radius:4px; font-size:11px;">Hình ảnh</div></td>
-                        <td>Bộ</td>
-                        <td>1</td>
-                        <td class="price">1.325.000</td>
-                        <td>0,0%</td>
-                        <td class="price">1.325.000</td>
-                        <td class="total-price">1.325.000</td>
+                    <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                        <td class="p-3">7</td>
+                        <td class="p-3">D62728</td>
+                        <td class="p-3 text-left font-medium max-w-[200px]">Giá xoong nồi inox 304 Duraval 800mm D62728</td>
+                        <td class="p-3"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Hình ảnh</div></td>
+                        <td class="p-3">Bộ</td>
+                        <td class="p-3">1</td>
+                        <td class="p-3 font-semibold text-green-600">1.325.000</td>
+                        <td class="p-3">0,0%</td>
+                        <td class="p-3 font-semibold text-green-600">1.325.000</td>
+                        <td class="p-3 font-bold text-red-600">1.325.000</td>
                     </tr>
-                    <tr>
-                        <td>8</td>
-                        <td>D62848</td>
-                        <td class="product-name">Giá bát đĩa đa năng inox 304 Duraval 800mm D62848</td>
-                        <td><div style="background:#f0f0f0; padding:8px; border-radius:4px; font-size:11px;">Hình ảnh</div></td>
-                        <td>Bộ</td>
-                        <td>1</td>
-                        <td class="price">1.410.000</td>
-                        <td>0,0%</td>
-                        <td class="price">1.410.000</td>
-                        <td class="total-price">1.410.000</td>
+                    <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                        <td class="p-3">8</td>
+                        <td class="p-3">D62848</td>
+                        <td class="p-3 text-left font-medium max-w-[200px]">Giá bát đĩa đa năng inox 304 Duraval 800mm D62848</td>
+                        <td class="p-3"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Hình ảnh</div></td>
+                        <td class="p-3">Bộ</td>
+                        <td class="p-3">1</td>
+                        <td class="p-3 font-semibold text-green-600">1.410.000</td>
+                        <td class="p-3">0,0%</td>
+                        <td class="p-3 font-semibold text-green-600">1.410.000</td>
+                        <td class="p-3 font-bold text-red-600">1.410.000</td>
                     </tr>
-                    <tr>
-                        <td>9</td>
-                        <td>D62578</td>
-                        <td class="product-name">Giá bát nâng hạ vách, nan inox 304 Duraval 800mm D62578</td>
-                        <td><div style="background:#f0f0f0; padding:8px; border-radius:4px; font-size:11px;">Hình ảnh</div></td>
-                        <td>Cái</td>
-                        <td>1</td>
-                        <td class="price">4.275.000</td>
-                        <td>0,0%</td>
-                        <td class="price">4.275.000</td>
-                        <td class="total-price">4.275.000</td>
+                    <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                        <td class="p-3">9</td>
+                        <td class="p-3">D62578</td>
+                        <td class="p-3 text-left font-medium max-w-[200px]">Giá bát nâng hạ vách, nan inox 304 Duraval 800mm D62578</td>
+                        <td class="p-3"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Hình ảnh</div></td>
+                        <td class="p-3">Cái</td>
+                        <td class="p-3">1</td>
+                        <td class="p-3 font-semibold text-green-600">4.275.000</td>
+                        <td class="p-3">0,0%</td>
+                        <td class="p-3 font-semibold text-green-600">4.275.000</td>
+                        <td class="p-3 font-bold text-red-600">4.275.000</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="summary">
-            <div style="display: flex; gap: 30px; align-items: flex-start;">
-                <div style="flex: 1;">
-                    <table class="summary-table">
-                        <tr>
-                            <td class="label">TỔNG ĐH</td>
-                            <td class="value" id="totalOrder">16.941.000</td>
+        <div class="p-6">
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex-1">
+                    <table class="summary-table w-full max-w-sm ml-auto">
+                        <tr class="border-b border-gray-300">
+                            <td class="p-2 font-semibold text-gray-700">TỔNG ĐH</td>
+                            <td class="p-2 text-right font-bold text-gray-900" id="totalOrder">16.941.000</td>
                         </tr>
-                        <tr>
-                            <td class="label" id="vatRate">VAT (0,0%)</td>
-                            <td class="value" id="vatAmount">0</td>
+                        <tr class="border-b border-gray-300">
+                            <td class="p-2 font-semibold text-gray-700" id="vatRate">VAT (0,0%)</td>
+                            <td class="p-2 text-right font-bold text-gray-900" id="vatAmount">0</td>
                         </tr>
-                        <tr>
-                            <td class="label">Chi phí khác</td>
-                            <td class="value" id="otherCosts">0</td>
+                        <tr class="border-b border-gray-300">
+                            <td class="p-2 font-semibold text-gray-700">Chi phí khác</td>
+                            <td class="p-2 text-right font-bold text-gray-900" id="otherCosts">0</td>
                         </tr>
-                        <tr>
-                            <td class="label">Giảm giá khác</td>
-                            <td class="value" id="otherDiscounts">0</td>
+                        <tr class="border-b border-gray-300">
+                            <td class="p-2 font-semibold text-gray-700">Giảm giá khác</td>
+                            <td class="p-2 text-right font-bold text-gray-900" id="otherDiscounts">0</td>
                         </tr>
-                        <tr class="final-total">
-                            <td class="label">TỔNG TIỀN</td>
-                            <td class="value" id="finalTotal">16.941.000</td>
+                        <tr class="final-total bg-gray-800 text-white text-lg font-bold">
+                            <td class="p-3">TỔNG TIỀN</td>
+                            <td class="p-3 text-right" id="finalTotal">16.941.000</td>
                         </tr>
                     </table>
                 </div>
                 
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 15px;">
-                    <div class="bank-account">
-                        <div class="bank-title">Tài khoản cá nhân</div>
-                        <div class="bank-details">
+                <div class="flex-1 flex flex-col gap-4">
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                        <div class="font-bold text-gray-800 mb-1">Tài khoản cá nhân</div>
+                        <div class="text-sm text-gray-600 leading-relaxed">
                             STK: 09844434099<br>
                             Ngân hàng: TP Bank<br>
                             Chủ TK: VU THI HOA
                         </div>
                     </div>
-                    <div class="bank-account">
-                        <div class="bank-title">Tài khoản công ty</div>
-                        <div class="bank-details">
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                        <div class="font-bold text-gray-800 mb-1">Tài khoản công ty</div>
+                        <div class="text-sm text-gray-600 leading-relaxed">
                             STK: 119002673143<br>
                             Ngân hàng: Vietinbank - KCN Tiên Sơn - Bắc Ninh<br>
                             Chủ TK: CONG TY TNHH VINACHI VIET NAM
@@ -541,11 +311,11 @@
             </div>
         </div>
 
-        <div class="amount-words" id="amountInWords">
+        <div class="amount-words bg-blue-600 text-white font-bold p-4 text-center rounded-lg mx-6 my-4" id="amountInWords">
             Mười sáu triệu chín trăm bốn mươi mốt ngàn đồng
         </div>
 
-        <div class="footer">
+        <div class="footer text-center text-sm italic text-gray-500 p-6 bg-gray-50 rounded-b-xl">
             Mọi thông tin thắc mắc, quy khách vui lòng liên hệ theo thông tin Nguyễn Thị Hiền để được giải đáp.<br>
             Trân trọng cảm ơn!
         </div>
@@ -616,8 +386,6 @@
             }
 
             // Update product table
-            // The existing products are static. To make them dynamic, you'd need to pass a JSON string of products via the URL.
-            // Example URL for products: &products=[{"id":"1","code":"D6801-2","name":"Vòi rửa bát...","price":"1750000","qty":"1"}]
             if (params.products) {
                 try {
                     const products = JSON.parse(params.products);
@@ -625,17 +393,17 @@
                     productTableBody.innerHTML = ''; // Clear existing static rows
                     products.forEach((product, index) => {
                         const row = `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${product.code}</td>
-                                <td class="product-name">${product.name}</td>
-                                <td><div style="background:#f0f0f0; padding:8px; border-radius:4px; font-size:11px;">Hình ảnh</div></td>
-                                <td>${product.unit}</td>
-                                <td>${product.quantity}</td>
-                                <td class="price">${formatCurrency(product.price)}</td>
-                                <td>${product.discountRate}%</td>
-                                <td class="price">${formatCurrency(product.priceAfterDiscount)}</td>
-                                <td class="total-price">${formatCurrency(product.total)}</td>
+                            <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                                <td class="p-3">${index + 1}</td>
+                                <td class="p-3">${product.code}</td>
+                                <td class="p-3 text-left font-medium max-w-[200px]">${product.name}</td>
+                                <td class="p-3"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Hình ảnh</div></td>
+                                <td class="p-3">${product.unit}</td>
+                                <td class="p-3">${product.quantity}</td>
+                                <td class="p-3 font-semibold text-green-600">${formatCurrency(product.price)}</td>
+                                <td class="p-3">${product.discountRate}%</td>
+                                <td class="p-3 font-semibold text-green-600">${formatCurrency(product.priceAfterDiscount)}</td>
+                                <td class="p-3 font-bold text-red-600">${formatCurrency(product.total)}</td>
                             </tr>
                         `;
                         productTableBody.innerHTML += row;
