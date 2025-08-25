@@ -29,6 +29,7 @@
             margin: 20px auto;
             border-radius: 12px;
             overflow: hidden;
+            box-sizing: border-box; /* Ensures padding doesn't affect fixed width */
         }
 
         /* Mobile styling: allow horizontal scroll to view fixed A4 content */
@@ -292,7 +293,30 @@
             body {
                 padding: 0;
                 background: white;
+                color: black;
             }
+            
+            /* Cải thiện hiển thị khi in: Chuyển hết về nền trắng chữ đen */
+            body * {
+                background: none !important;
+                color: black !important;
+            }
+
+            .products-table th, .products-table td, .summary-table td {
+                border-color: black !important;
+            }
+
+            .products-table th {
+                background-color: white !important;
+            }
+
+            .summary-table .final-total {
+                background-color: white !important;
+            }
+            
+            /* Force exact colors for printing, primarily for black text */
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         /* Set page size and margins for print */
