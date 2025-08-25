@@ -2,17 +2,12 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <!-- Thẻ meta đã được chỉnh sửa: Xóa width=device-width -->
     <meta name="viewport" content="initial-scale=1.0">
     <title>Bảng Báo Giá - Vinachi Việt Nam</title>
     <!-- Thư viện Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Thêm các thư viện cần thiết cho việc xuất PDF và Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -36,18 +31,12 @@
             }
         }
 
-        /* Thêm hiệu ứng hover cho button */
-        .action-buttons button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
-        }
-
         .products-table th, .products-table td {
             border: 1px solid #e2e8f0;
         }
         
         @media print {
-            .action-buttons, .footer {
+            .footer {
                 display: none;
             }
             .a4-container {
@@ -93,46 +82,36 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
     <div class="a4-container">
-        <div class="p-8 text-center bg-gray-50 border-b-2 border-gray-200 rounded-t-xl">
-            <div class="text-xl font-bold mb-3 text-gray-900" id="companyName">CÔNG TY TNHH VINACHI VIỆT NAM</div>
-            <div class="text-sm leading-relaxed text-gray-600" id="companyBranches">
+        <!-- Đã chỉnh p-8 thành p-4 và leading-relaxed thành leading-snug để giảm khoảng cách -->
+        <div class="p-4 text-center bg-gray-50 border-b-2 border-gray-200 rounded-t-xl">
+            <div class="text-lg font-bold mb-2 text-gray-900" id="companyName">CÔNG TY TNHH VINACHI VIỆT NAM</div>
+            <div class="text-xs leading-snug text-gray-600" id="companyBranches">
                 <div>CS1: Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</div>
                 <div>CS2: Km8+500 Đại lộ Thăng Long, Hoài Đức, Hà Nội</div>
                 <div>CS3: Thạch Thất - Hà Nội</div>
             </div>
         </div>
 
-        <div class="p-6 bg-blue-50 border-b-2 border-blue-400">
-            <div class="text-2xl font-bold text-center text-blue-800 mb-4">BẢNG BÁO GIÁ</div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+        <!-- Đã chỉnh p-6 thành p-4 và gap-y-3 thành gap-y-2 để giảm khoảng cách -->
+        <div class="p-4 bg-blue-50 border-b-2 border-blue-400">
+            <div class="text-xl font-bold text-center text-blue-800 mb-3">BẢNG BÁO GIÁ</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 <div class="flex items-center">
-                    <span class="font-semibold text-gray-700 w-32 shrink-0">Kính gửi:</span>
+                    <span class="font-semibold text-gray-700 w-24 shrink-0">Kính gửi:</span>
                     <span id="customerName" class="font-medium text-gray-900">Khách hàng Chị Vân Giang</span>
                 </div>
                 <div class="flex items-center">
-                    <span class="font-semibold text-gray-700 w-32 shrink-0">Số điện thoại:</span>
+                    <span class="font-semibold text-gray-700 w-24 shrink-0">Số điện thoại:</span>
                     <span id="customerPhone" class="font-medium text-gray-900">0915711288</span>
                 </div>
                 <div class="flex items-center">
-                    <span class="font-semibold text-gray-700 w-32 shrink-0">Địa chỉ:</span>
+                    <span class="font-semibold text-gray-700 w-24 shrink-0">Địa chỉ:</span>
                     <span id="customerAddress" class="font-medium text-gray-900">Toà TC2 Vinsmart</span>
                 </div>
                 <div class="text-right font-medium text-gray-600 col-span-1 md:col-span-2 mt-2" id="quoteDate">Ngày 25 tháng 08 năm 2025</div>
             </div>
         </div>
-
-        <div class="action-buttons flex justify-center gap-4 my-6 px-4">
-            <button id="printBtn" class="bg-gray-700 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-200 ease-in-out shadow-md">
-                In
-            </button>
-            <button id="pdfBtn" class="bg-red-600 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-200 ease-in-out shadow-md">
-                Xuất PDF
-            </button>
-            <button id="xlsxBtn" class="bg-green-600 text-white py-3 px-6 rounded-lg font-semibold transition-all duration-200 ease-in-out shadow-md">
-                Xuất XLSX
-            </button>
-        </div>
-
+        
         <div class="px-6">
             <table class="products-table w-full border-collapse">
                 <thead>
@@ -419,77 +398,8 @@
             return new Intl.NumberFormat('vi-VN').format(amount);
         }
 
-        // --- New code to handle button functionality ---
-
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const printBtn = document.getElementById('printBtn');
-            const pdfBtn = document.getElementById('pdfBtn');
-            const xlsxBtn = document.getElementById('xlsxBtn');
-            const a4Container = document.querySelector('.a4-container');
-
-            // Nút In - Print Button
-            printBtn.addEventListener('click', () => {
-                window.print();
-            });
-
-            // Nút Xuất PDF - PDF Export Button
-            pdfBtn.addEventListener('click', () => {
-                // Kích thước A4 theo mm
-                const a4Width_mm = 210;
-                const a4Height_mm = 297;
-                const margin_mm = 10; // 1cm
-                const contentWidth_mm = a4Width_mm - 2 * margin_mm;
-                
-                // Lấy kích thước thật của nội dung để tính tỷ lệ
-                const containerWidth = a4Container.offsetWidth;
-                const containerHeight = a4Container.offsetHeight;
-
-                // Tạo PDF với khổ A4
-                const pdf = new window.jspdf.jsPDF({
-                    orientation: 'p',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                // Sử dụng html2canvas để render nội dung của A4 container
-                html2canvas(a4Container).then(canvas => {
-                    const imgData = canvas.toDataURL('image/jpeg');
-                    const imgWidth = contentWidth_mm;
-                    const imgHeight = (containerHeight * imgWidth) / containerWidth;
-
-                    // Thêm hình ảnh vào PDF với lề 1cm
-                    pdf.addImage(imgData, 'JPEG', margin_mm, margin_mm, imgWidth, imgHeight);
-
-                    // Lưu file PDF
-                    pdf.save('bao_gia_vinachi.pdf');
-                });
-            });
-
-            // Nút Xuất XLSX - XLSX Export Button
-            xlsxBtn.addEventListener('click', () => {
-                // Get the HTML table element
-                const table = document.querySelector('.products-table');
-
-                // Check if the table exists
-                if (!table) {
-                    console.error('Table not found');
-                    return;
-                }
-
-                // Convert HTML table to a worksheet
-                const ws = XLSX.utils.table_to_sheet(table);
-
-                // Create a new workbook and add the worksheet
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Báo Giá");
-
-                // Write the workbook to a file and download it
-                XLSX.writeFile(wb, "bao_gia_vinachi.xlsx");
-            });
-
-            // Run the update function when the page loads
-            updateContent();
-        });
+        // Run the update function when the page loads
+        updateContent();
     </script>
 </body>
 </html>
