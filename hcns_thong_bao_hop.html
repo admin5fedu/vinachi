@@ -84,14 +84,14 @@
             text-align: center;
         }
 
-        /* Styles for the print button - UPDATED */
+        /* Styles for the print button */
         .print-button {
             display: block;
             margin: 20px auto;
             padding: 15px 40px;
             font-size: 18px;
             cursor: pointer;
-            border: 2px solid red; /* Changed border color to red */
+            border: 2px solid red;
             border-radius: 8px;
             background-color: #f9f9f9;
             font-weight: bold;
@@ -221,9 +221,9 @@
             if (element) {
                 const paramValue = params.get(paramName);
                 if (paramValue) {
-                    // Replace commas and hyphens with line breaks for readability
-                    const formattedText = paramValue.replace(/, |-/g, '<br>- ');
-                    element.innerHTML = '<br>' + formattedText;
+                    // Replace %0A with line breaks for new lines
+                    const formattedText = paramValue.replace(/%0A/g, '<br>');
+                    element.innerHTML = formattedText;
                 } else {
                     element.innerHTML = '';
                 }
