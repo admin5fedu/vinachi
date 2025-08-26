@@ -8,27 +8,44 @@
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
-            margin: 20px;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            border: 1px solid #ddd;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .header, .footer {
-            text-align: center;
-        }
-        .header h1 {
             margin: 0;
-            font-size: 24px;
+            padding: 0;
+            color: #333;
+            background-color: #f0f0f0;
         }
-        .header h2 {
-            margin: 5px 0 20px;
+        
+        .container {
+            width: 21cm;
+            min-height: 29.7cm;
+            margin: 30px auto;
+            border: 1px solid #ddd;
+            padding: 2cm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            box-sizing: border-box;
+        }
+        
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .header-table td {
+            vertical-align: top;
+            padding: 0;
+        }
+        .header-table .company-info {
+            text-align: left;
+        }
+        .company-info h2 {
+            margin: 0 0 5px;
             font-size: 18px;
             color: #555;
+        }
+        .company-info .address {
+            font-style: italic;
+            margin: 0;
+            font-size: 16px;
         }
         .location {
             font-style: italic;
@@ -58,25 +75,52 @@
             font-style: italic;
             margin-top: 20px;
         }
-        .signature {
+        .signature-wrapper {
+            text-align: right;
             margin-top: 30px;
+        }
+        .signature {
+            display: inline-block;
             text-align: center;
         }
-        .signature p {
-            margin: 0;
+
+        /* Print-specific styles for A4 format */
+        @media print {
+            body {
+                background-color: #fff;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                width: 21cm;
+                min-height: 29.7cm;
+                padding: 1.5cm 2cm;
+                margin: 0;
+                box-shadow: none;
+                border: none;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h1>VINACHI</h1>
-        <h2>CÔNG TY TNHH VINACHI VIỆT NAM</h2>
-    </div>
+    <!-- Header Section as a table -->
+    <table class="header-table">
+        <tr>
+            <td style="width: 20%;">
+                <!-- Logo placeholder -->
+                <img src="https://placehold.co/100x50?text=VINACHI+LOGO" alt="VINACHI Logo">
+            </td>
+            <td class="company-info" style="width: 80%;">
+                <h2>CÔNG TY TNHH VINACHI VIỆT NAM</h2>
+                <p class="address">Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</p>
+            </td>
+        </tr>
+    </table>
+    
     <div class="location">
-        <p>Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</p>
-        <p>Vinachi, ngày 28 tháng 8 năm 2025</p>
+        <p>Vinachi, <span id="ngay_thang">ngày 28 tháng 8 năm 2025</span></p>
     </div>
 
     <hr>
@@ -89,19 +133,14 @@
         <p>Chúng tôi xin thông báo nội dung cuộc họp như sau:</p>
         <div class="details">
             <ul>
-                <li>1. Ngày họp: <strong>28/08/2025 (T5)</strong></li>
-                <li>2. Thời gian từ: <strong>15:00 đến 16:00</strong></li>
-                <li>3. Địa điểm: <strong>CN Bắc Ninh</strong></li>
-                <li>4. Nơi tổ chức: <strong>PH tầng 3</strong></li>
-                <li>5. Chủ tọa: <strong>Lưu Thị Hồng Hà</strong></li>
-                <li>6. Chủ đề cuộc họp: <strong>Báo cáo hết thử việc của TPKD kênh bán buôn - Nguyễn Văn Lập</strong></li>
-                <li>7. Nội dung chi tiết cuộc họp:</li>
-                <li>8. Thành phần tham dự:</li>
-                <ul>
-                    <li>- Ban giám đốc</li>
-                    <li>- Các Trưởng phòng</li>
-                    <li>- Toàn bộ nhân viên phòng bán buôn</li>
-                </ul>
+                <li>1. Ngày họp: <strong id="ngayhop_data"></strong></li>
+                <li>2. Thời gian từ: <strong id="thoigian_data"></strong></li>
+                <li>3. Địa điểm: <strong id="diadiem_data"></strong></li>
+                <li>4. Nơi tổ chức: <strong id="noitochuc_data"></strong></li>
+                <li>5. Chủ tọa: <strong id="chutoa_data"></strong></li>
+                <li>6. Chủ đề cuộc họp: <strong id="chude_data"></strong></li>
+                <li id="noidungchitiet_li">7. Nội dung chi tiết cuộc họp: <span id="noidungchitiet_data"></span></li>
+                <li id="thanhphan_li">8. Thành phần tham dự: <span id="thanhphan_data"></span></li>
             </ul>
         </div>
         <p class="note">Đề nghị những người có tên đến trước giờ họp (Khuyến nghị 10 phút), sắp xếp công việc và chuẩn bị nội dung để cuộc họp diễn ra đúng kế hoạch và đạt hiệu quả cao.</p>
@@ -111,12 +150,63 @@
         <p>Trân trọng!</p>
     </div>
     
-    <div class="signature">
-        <p><strong>CÔNG TY TNHH VINACHI VIỆT NAM</strong></p>
-        <p>(Đã thông qua)</p>
+    <!-- Updated signature section -->
+    <div class="signature-wrapper">
+        <div class="signature">
+            <p><strong>CÔNG TY TNHH VINACHI VIỆT NAM</strong></p>
+            <p>(Đã thông qua)</p>
+        </div>
     </div>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+
+        // Function to update element content based on URL parameter
+        const updateElement = (id, paramName, fallbackText = '') => {
+            const element = document.getElementById(id);
+            if (element) {
+                const paramValue = params.get(paramName);
+                if (paramValue) {
+                    element.innerHTML = paramValue;
+                } else {
+                    element.innerHTML = fallbackText;
+                }
+            }
+        };
+
+        // Update the date at the top
+        updateElement('ngay_thang', 'ngay');
+
+        // Update the main content fields
+        updateElement('ngayhop_data', 'ngayhop');
+        updateElement('thoigian_data', 'thoigian');
+        updateElement('diadiem_data', 'diadiem');
+        updateElement('noitochuc_data', 'noitochuc');
+        updateElement('chutoa_data', 'chutoa');
+        updateElement('chude_data', 'chude');
+
+        // Special handling for multi-line content (e.g., details, participants)
+        const updateMultiLineElement = (id, paramName) => {
+            const element = document.getElementById(id);
+            if (element) {
+                const paramValue = params.get(paramName);
+                if (paramValue) {
+                    // Replace commas and hyphens with line breaks for readability
+                    const formattedText = paramValue.replace(/, |-/g, '<br>- ');
+                    element.innerHTML = '<br>' + formattedText;
+                } else {
+                    element.innerHTML = '';
+                }
+            }
+        };
+
+        updateMultiLineElement('noidungchitiet_data', 'noidungchitiet');
+        updateMultiLineElement('thanhphan_data', 'thanhphan');
+    });
+</script>
 
 </body>
 </html>
