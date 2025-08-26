@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo họp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            width: 21cm;
+            min-height: 29.7cm;
+            margin: 30px auto;
+            border: 1px solid #ddd;
+            padding: 2cm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            box-sizing: border-box;
+        }
+        
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .header-table td {
+            vertical-align: top;
+            padding: 0;
+        }
+        .header-table .company-info {
+            text-align: left;
+        }
+        /* Adjusted font size and line height for company info */
+        .company-info h2 {
+            margin: 0;
+            font-size: 16px; /* Reduced font size */
+            line-height: 1.2; /* Tighter line spacing */
+            color: #555;
+        }
+        .company-info .address {
+            font-style: italic;
+            margin: 0;
+            font-size: 14px; /* Reduced font size */
+            line-height: 1.2; /* Tighter line spacing */
+        }
+        .location {
+            font-style: italic;
+            text-align: right;
+            margin-bottom: 15px; /* Reduced margin */
+            font-size: 14px;
+        }
+        /* Adjusted font size for section title */
+        .section-title {
+            font-weight: bold;
+            font-size: 18px; /* Reduced font size */
+            text-align: center;
+            margin-bottom: 15px; /* Reduced margin */
+        }
+        .content {
+            margin-bottom: 20px;
+            font-size: 14px; /* Reduced font size for content */
+        }
+        .content p {
+            margin: 5px 0;
+        }
+        .details ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .details li {
+            margin-bottom: 5px;
+        }
+        .note {
+            font-style: italic;
+            margin-top: 20px;
+        }
+        .signature-wrapper {
+            text-align: right;
+            margin-top: 30px;
+        }
+        .signature {
+            display: inline-block;
+            text-align: center;
+        }
+
+        /* Styles for the print button */
+        .print-button {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 40px;
+            font-size: 18px;
+            cursor: pointer;
+            border: 2px solid red;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            font-weight: bold;
+            color: red;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .print-button:hover {
+            background-color: #e8e8e8;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Print-specific styles for A4 format and hiding elements */
+        @media print {
+            body {
+                background-color: #fff;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                width: 21cm;
+                min-height: 29.7cm;
+                padding: 1.5cm 2cm;
+                margin: 0;
+                box-shadow: none;
+                border: none;
+            }
+            /* Hide the print button when printing */
+            .print-button {
+                display: none;
+            }
+        }
+        
+        .red-text {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-button" onclick="window.print()">IN</button>
+
+<div class="container">
+    <!-- Header Section as a table -->
+    <table class="header-table">
+        <tr>
+            <td style="width: 20%;">
+                <!-- Updated logo source -->
+                <img src="https://drive.google.com/thumbnail?id=12VL0Dxkj5d8xwLFVRslpHdtlWd4MHF5a" alt="VINACHI Logo" style="max-width: 100px; height: auto;">
+            </td>
+            <td class="company-info" style="width: 80%;">
+                <h2>CÔNG TY TNHH VINACHI VIỆT NAM</h2>
+                <p class="address">Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</p>
+            </td>
+        </tr>
+    </table>
+    
+    <div class="location">
+        <p>Vinachi, <span id="ngay_thang">ngày 28 tháng 8 năm 2025</span></p>
+    </div>
+
+    <hr>
+
+    <div class="section-title">
+        THÔNG BÁO CUỘC HỌP
+    </div>
+
+    <div class="content">
+        <p>Chúng tôi xin thông báo nội dung cuộc họp như sau:</p>
+        <div class="details">
+            <ul>
+                <li>1. Ngày họp: <strong id="ngayhop_data"></strong></li>
+                <li>2. Thời gian từ: <strong id="thoigian_data"></strong></li>
+                <li>3. Địa điểm: <strong id="diadiem_data"></strong></li>
+                <li>4. Nơi tổ chức: <strong id="noitochuc_data"></strong></li>
+                <li>5. Chủ tọa: <strong id="chutoa_data"></strong></li>
+                <li>6. Chủ đề cuộc họp: <strong id="chude_data" class="red-text"></strong></li>
+                <li id="noidungchitiet_li">7. Nội dung chi tiết cuộc họp:<br><span id="noidungchitiet_data"></span></li>
+                <li id="thanhphan_li">8. Thành phần tham dự:<br><span id="thanhphan_data" class="red-text"></span></li>
+            </ul>
+        </div>
+        <p class="note">Đề nghị những người có tên đến trước giờ họp (Khuyến nghị 10 phút), sắp xếp công việc và chuẩn bị nội dung để cuộc họp diễn ra đúng kế hoạch và đạt hiệu quả cao.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Trân trọng!</p>
+    </div>
+    
+    <!-- Updated signature section -->
+    <div class="signature-wrapper">
+        <div class="signature">
+            <p><strong>CÔNG TY TNHH VINACHI VIỆT NAM</strong></p>
+            <p>(Đã thông qua)</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+
+        // Function to update element content based on URL parameter
+        const updateElement = (id, paramName, fallbackText = '') => {
+            const element = document.getElementById(id);
+            if (element) {
+                const paramValue = params.get(paramName);
+                if (paramValue) {
+                    element.innerHTML = paramValue;
+                } else {
+                    element.innerHTML = fallbackText;
+                }
+            }
+        };
+
+        // Update the date at the top
+        updateElement('ngay_thang', 'ngay');
+
+        // Update the main content fields
+        updateElement('ngayhop_data', 'ngayhop');
+        updateElement('thoigian_data', 'thoigian');
+        updateElement('diadiem_data', 'diadiem');
+        updateElement('noitochuc_data', 'noitochuc');
+        updateElement('chutoa_data', 'chutoa');
+        updateElement('chude_data', 'chude');
+
+        // Special handling for multi-line content (e.g., details, participants)
+        const updateMultiLineElement = (id, paramName) => {
+            const element = document.getElementById(id);
+            if (element) {
+                const paramValue = params.get(paramName);
+                if (paramValue) {
+                    // Decode the URI component to handle %0A as a newline character
+                    const decodedText = decodeURIComponent(paramValue);
+                    // Replace the actual newline character (\n) with a <br> tag
+                    const formattedText = decodedText.replace(/\n/g, '<br>');
+                    element.innerHTML = formattedText;
+                } else {
+                    element.innerHTML = '';
+                }
+            }
+        };
+
+        updateMultiLineElement('noidungchitiet_data', 'noidungchitiet');
+        updateMultiLineElement('thanhphan_data', 'thanhphan');
+    });
+</script>
+
+</body>
+</html>
