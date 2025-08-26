@@ -221,8 +221,10 @@
             if (element) {
                 const paramValue = params.get(paramName);
                 if (paramValue) {
-                    // Replace %0A with line breaks for new lines
-                    const formattedText = paramValue.replace(/%0A/g, '<br>');
+                    // Decode the URI component to handle %0A as a newline character
+                    const decodedText = decodeURIComponent(paramValue);
+                    // Replace the actual newline character (\n) with a <br> tag
+                    const formattedText = decodedText.replace(/\n/g, '<br>');
                     element.innerHTML = formattedText;
                 } else {
                     element.innerHTML = '';
