@@ -84,7 +84,28 @@
             text-align: center;
         }
 
-        /* Print-specific styles for A4 format */
+        /* Styles for the print button - UPDATED */
+        .print-button {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 40px;
+            font-size: 18px;
+            cursor: pointer;
+            border: 2px solid red; /* Changed border color to red */
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            font-weight: bold;
+            color: red;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .print-button:hover {
+            background-color: #e8e8e8;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Print-specific styles for A4 format and hiding elements */
         @media print {
             body {
                 background-color: #fff;
@@ -99,10 +120,16 @@
                 box-shadow: none;
                 border: none;
             }
+            /* Hide the print button when printing */
+            .print-button {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
+
+    <button class="print-button" onclick="window.print()">IN</button>
 
 <div class="container">
     <!-- Header Section as a table -->
