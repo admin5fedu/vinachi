@@ -249,18 +249,11 @@
                 document.getElementById('salespersonName').innerText = params.salespersonName;
             }
             
-            // Update Total order from URL parameter
+            // Update summary table
             if (params.totalOrder) {
                 document.getElementById('totalOrder').innerText = formatCurrency(params.totalOrder);
-                // Also update final total, as it's often the same initially
-                if (!params.finalTotal) {
-                    document.getElementById('finalTotal').innerText = formatCurrency(params.totalOrder);
-                }
             }
-
-            // Update summary table
             if (params.vatRate) {
-                // Sửa đổi logic để hiển thị giá trị VAT chính xác
                 const vatValue = parseFloat(params.vatRate);
                 const vatDisplay = (vatValue === 10) ? '10%' : ((vatValue * 100).toFixed(1).replace('.0', '') + '%');
                 document.getElementById('vatRate').innerText = `VAT (${vatDisplay})`;
@@ -274,6 +267,7 @@
             if (params.otherDiscounts) {
                 document.getElementById('otherDiscounts').innerText = formatCurrency(params.otherDiscounts);
             }
+            // Logic mới: ưu tiên giá trị finalTotal từ URL nếu có
             if (params.finalTotal) {
                 document.getElementById('finalTotal').innerText = formatCurrency(params.finalTotal);
             }
@@ -341,8 +335,6 @@
 
                     // Calculate derived values
                     product.priceAfterDiscount = product.price * (1 - product.discountRate);
-                    // Lỗi ở đây: product.total được tính lại từ các giá trị thô, không phải giá trị sau CK
-                    // Sửa lại: product.total = product.quantity * product.priceAfterDiscount;
                     product.total = product.quantity * product.priceAfterDiscount;
 
                     totalOrderValue += product.total;
@@ -366,9 +358,8 @@
                 }
             });
 
-            // Update the summary values
+            // Update the total order, but DO NOT overwrite final total
             document.getElementById('totalOrder').innerText = formatCurrency(totalOrderValue);
-            document.getElementById('finalTotal').innerText = formatCurrency(totalOrderValue);
         }
 
         // Helper function to create an image tag with a fallback
