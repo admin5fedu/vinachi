@@ -240,8 +240,17 @@
             if (params.customerAddress) {
                 document.getElementById('customerAddress').innerText = params.customerAddress;
             }
+            // Logic mới để chuyển đổi định dạng ngày tháng
             if (params.date) {
-                document.getElementById('quoteDate').innerText = params.date;
+                const parts = params.date.split('/');
+                if (parts.length === 3) {
+                    const day = parts[0];
+                    const month = parts[1];
+                    const year = parts[2];
+                    document.getElementById('quoteDate').innerText = `Ngày ${day} tháng ${month} năm ${year}`;
+                } else {
+                    document.getElementById('quoteDate').innerText = params.date;
+                }
             }
             
             // Update salesperson name
