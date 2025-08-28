@@ -260,7 +260,10 @@
 
             // Update summary table
             if (params.vatRate) {
-                document.getElementById('vatRate').innerText = `VAT (${(parseFloat(params.vatRate) * 100).toFixed(1)}%)`.replace('.0', '');
+                // Sửa đổi logic để hiển thị giá trị VAT chính xác
+                const vatValue = parseFloat(params.vatRate);
+                const vatDisplay = (vatValue === 10) ? '10%' : ((vatValue * 100).toFixed(1).replace('.0', '') + '%');
+                document.getElementById('vatRate').innerText = `VAT (${vatDisplay})`;
             }
             if (params.vatAmount) {
                 document.getElementById('vatAmount').innerText = formatCurrency(params.vatAmount);
