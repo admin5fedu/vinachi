@@ -35,6 +35,14 @@
             border: 1px solid #e2e8f0;
         }
         
+        /* Đảm bảo hình ảnh co giãn bên trong ô */
+        .products-table .image-cell img {
+            width: 100%; /* Giữ chiều rộng tối đa của ô */
+            height: auto; /* Tự động điều chỉnh chiều cao để giữ tỷ lệ */
+            max-width: 80px; /* Giới hạn kích thước tối đa của ảnh */
+            max-height: 80px;
+        }
+        
         @media print {
             .footer {
                 display: none;
@@ -269,21 +277,21 @@
                     const productTableBody = document.getElementById('productTableBody');
                     productTableBody.innerHTML = '';
                     products.forEach((product, index) => {
-                        const row = `
-                            <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
-                                <td class="p-3">${index + 1}</td>
-                                <td class="p-3">${product.code}</td>
-                                <td class="p-3 text-left font-medium max-w-[200px]">${product.name}</td>
-                                <td class="p-3">${createImageTag(product.imageUrl)}</td>
-                                <td class="p-3">${product.unit}</td>
-                                <td class="p-3">${formatCurrency(product.quantity)}</td>
-                                <td class="p-3 font-semibold text-green-600">${formatCurrency(product.price)}</td>
-                                <td class="p-3">${product.discountRate}%</td>
-                                <td class="p-3 font-semibold text-green-600">${formatCurrency(product.priceAfterDiscount)}</td>
-                                <td class="p-3 font-bold text-red-600">${formatCurrency(product.total)}</td>
-                            </tr>
+                        const row = document.createElement('tr');
+                        row.className = 'odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200';
+                        row.innerHTML = `
+                            <td class="p-3">${index + 1}</td>
+                            <td class="p-3">${product.code}</td>
+                            <td class="p-3 text-left font-medium max-w-[200px]">${product.name}</td>
+                            <td class="p-3 image-cell">${createImageTag(product.imageUrl)}</td>
+                            <td class="p-3">${product.unit}</td>
+                            <td class="p-3">${formatCurrency(product.quantity)}</td>
+                            <td class="p-3 font-semibold text-green-600">${formatCurrency(product.price)}</td>
+                            <td class="p-3">${product.discountRate}%</td>
+                            <td class="p-3 font-semibold text-green-600">${formatCurrency(product.priceAfterDiscount)}</td>
+                            <td class="p-3 font-bold text-red-600">${formatCurrency(product.total)}</td>
                         `;
-                        productTableBody.innerHTML += row;
+                        productTableBody.appendChild(row);
                     });
                 } catch (e) {
                     console.error("Failed to parse products from URL:", e);
@@ -330,7 +338,7 @@
                         <td class="p-3">${index + 1}</td>
                         <td class="p-3">${product.code}</td>
                         <td class="p-3 text-left font-medium max-w-[200px]">${product.name}</td>
-                        <td class="p-3">${createImageTag(product.imageUrl)}</td>
+                        <td class="p-3 image-cell">${createImageTag(product.imageUrl)}</td>
                         <td class="p-3">${product.unit}</td>
                         <td class="p-3">${formatCurrency(product.quantity)}</td>
                         <td class="p-3 font-semibold text-green-600">${formatCurrency(product.price)}</td>
@@ -353,7 +361,7 @@
                 // If no URL is provided, return a placeholder
                 return `<div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Không có ảnh</div>`;
             }
-            return `<img src="${url}" alt="Hình ảnh sản phẩm" class="w-16 h-16 object-cover rounded-md mx-auto" onerror="this.src='https://placehold.co/64x64/E5E7EB/9CA3AF?text=Ảnh+lỗi';">`;
+            return `<img src="${url}" alt="Hình ảnh sản phẩm" class="object-cover rounded-md mx-auto" onerror="this.src='https://placehold.co/64x64/E5E7EB/9CA3AF?text=Ảnh+lỗi';">`;
         }
 
         // Helper function to format currency with dots
