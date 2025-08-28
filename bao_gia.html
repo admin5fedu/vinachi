@@ -198,7 +198,7 @@
         </div>
 
         <div class="footer text-center text-sm italic text-gray-500 p-6 bg-gray-50 rounded-b-xl">
-            Mọi thông tin thắc mắc, quy khách vui lòng liên hệ theo thông tin Nguyễn Thị Hiền để được giải đáp.<br>
+            Mọi thông tin thắc mắc, quy khách vui lòng liên hệ theo thông tin <span id="salespersonName">Nguyễn Thị Hiền</span> để được giải đáp.<br>
             Trân trọng cảm ơn!
         </div>
     </div>
@@ -242,6 +242,11 @@
             }
             if (params.date) {
                 document.getElementById('quoteDate').innerText = params.date;
+            }
+            
+            // Update salesperson name
+            if (params.salespersonName) {
+                document.getElementById('salespersonName').innerText = params.salespersonName;
             }
 
             // Update summary table
