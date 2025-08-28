@@ -260,7 +260,7 @@
 
             // Update summary table
             if (params.vatRate) {
-                document.getElementById('vatRate').innerText = `VAT (${params.vatRate}%)`;
+                document.getElementById('vatRate').innerText = `VAT (${(parseFloat(params.vatRate) * 100).toFixed(1)}%)`.replace('.0', '');
             }
             if (params.vatAmount) {
                 document.getElementById('vatAmount').innerText = formatCurrency(params.vatAmount);
@@ -298,7 +298,7 @@
                             <td class="p-3">${product.unit}</td>
                             <td class="p-3">${formatCurrency(product.quantity)}</td>
                             <td class="p-3 font-semibold text-green-600">${formatCurrency(product.price)}</td>
-                            <td class="p-3">${product.discountRate}%</td>
+                            <td class="p-3">${(parseFloat(product.discountRate) * 100).toFixed(1).replace('.0', '')}%</td>
                             <td class="p-3 font-semibold text-green-600">${formatCurrency(product.priceAfterDiscount)}</td>
                             <td class="p-3 font-bold text-red-600">${formatCurrency(product.total)}</td>
                         `;
@@ -337,7 +337,7 @@
                     product.discountRate = parseFloat(cols[6]) || 0;
 
                     // Calculate derived values
-                    product.priceAfterDiscount = product.price * (1 - product.discountRate / 100);
+                    product.priceAfterDiscount = product.price * (1 - product.discountRate);
                     product.total = product.quantity * product.priceAfterDiscount;
 
                     totalOrderValue += product.total;
@@ -353,7 +353,7 @@
                         <td class="p-3">${product.unit}</td>
                         <td class="p-3">${formatCurrency(product.quantity)}</td>
                         <td class="p-3 font-semibold text-green-600">${formatCurrency(product.price)}</td>
-                        <td class="p-3">${product.discountRate}%</td>
+                        <td class="p-3">${(product.discountRate * 100).toFixed(1).replace('.0', '')}%</td>
                         <td class="p-3 font-semibold text-green-600">${formatCurrency(product.priceAfterDiscount)}</td>
                         <td class="p-3 font-bold text-red-600">${formatCurrency(product.total)}</td>
                     `;
