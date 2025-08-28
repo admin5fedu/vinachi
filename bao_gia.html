@@ -248,11 +248,17 @@
             if (params.salespersonName) {
                 document.getElementById('salespersonName').innerText = params.salespersonName;
             }
-
-            // Update summary table
+            
+            // Update Total order from URL parameter
             if (params.totalOrder) {
                 document.getElementById('totalOrder').innerText = formatCurrency(params.totalOrder);
+                // Also update final total, as it's often the same initially
+                if (!params.finalTotal) {
+                    document.getElementById('finalTotal').innerText = formatCurrency(params.totalOrder);
+                }
             }
+
+            // Update summary table
             if (params.vatRate) {
                 document.getElementById('vatRate').innerText = `VAT (${params.vatRate}%)`;
             }
