@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bảng Dữ Liệu Hàng Hóa</title>
-    <!-- Tải Tailwind CSS để tạo kiểu -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
@@ -35,23 +34,6 @@
             overflow-x: auto;
             border-radius: 8px;
             border: 1px solid #e5e7eb;
-            position: relative; /* Dùng cho loading overlay */
-        }
-
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            color: #4b5563;
-            font-weight: 500;
-            z-index: 2000;
         }
         
         table {
@@ -229,11 +211,10 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100">
     <div class="a4-container">
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-800 text-center mb-2">DANH SÁCH SẢN PHẨM XUẤT VAT</h1>
-            <p class="text-center text-sm text-gray-600">Dữ liệu được cập nhật tự động từ web app.</p>
         </div>
         
         <!-- Khu vực bộ lọc -->
@@ -302,17 +283,13 @@
                 </button>
                 
                 <div class="stats-bar">
-                    <span id="stats"><span id="visible-count">0</span>/<span id="total-count">0</span> sản phẩm</span>
+                    <span id="stats"><span id="visible-count">9</span>/<span id="total-count">9</span> sản phẩm</span>
                 </div>
             </div>
         </div>
         
         <div class="table-container">
-            <!-- Hiển thị thông báo đang tải -->
-            <div id="loading-message" class="loading-overlay">
-                Đang tải dữ liệu...
-            </div>
-            <table id="dataTable" class="hidden">
+            <table id="dataTable">
                 <thead>
                     <tr>
                         <th style="width: 15%;">Mã hàng</th>
@@ -324,18 +301,85 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Dữ liệu sẽ được chèn vào đây từ JavaScript -->
+                    <!-- Dữ li���u sẽ được tải từ webapp -->
                 </tbody>
             </table>
         </div>
-    </div>
-    <script>
-        // Hàng đợi cho các yêu cầu fetch để tránh lỗi API
-        let fetchQueue = Promise.resolve();
         
-        // Dữ liệu sản phẩm được lưu trữ sau khi tải
-        let allProducts = [];
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeyxCfjyJk_JgZbDpt5Flwo0lDzt62Vr63sqRJxQOuMfCnmR_KLolV2hK6ig9MVI9g/exec';
+
+    </div>
+
+    <script>
+        // Biến lưu trữ dữ liệu từ webapp
+        let tableData = [];
+        
+        // Khởi tạo bộ lọc khi trang được tải
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromWebapp();
+        });
+        
+        // Hàm tải dữ liệu từ webapp
+        async function loadDataFromWebapp() {
+            try {
+                // Hiển thị loading
+                const tbody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
+                
+                const response = await fetch('https://script.google.com/macros/s/AKfycbyeyxCfjyJk_JgZbDpt5Flwo0lDzt62Vr63sqRJxQOuMfCnmR_KLolV2hK6ig9MVI9g/exec');
+                const data = await response.json();
+                
+                tableData = data;
+                renderTable(data);
+                initializeFilters();
+                
+            } catch (error) {
+                console.error('Lỗi khi tải dữ liệu:', error);
+                const tbody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Không thể tải dữ liệu. Vui lòng thử lại sau.</td></tr>';
+            }
+        }
+        
+        // Hàm render bảng từ dữ liệu
+        function renderTable(data) {
+            const tbody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Xử lý dữ liệu
+                const maHang = item['Mã hàng'] || '';
+                const tenHang = item['Tên hàng hóa'] || '';
+                const dvt = item['ĐVT'] || '';
+                const soLuong = item['Số lượng tồn'] || 0;
+                const thueXuat = item['Thuế suất'] || 0;
+                const loaiSP = item['Loại sản phẩm'] || '';
+                
+                // Chuyển đổi thuế suất từ decimal sang phần trăm
+                const thueXuatPercent = (thueXuat * 100).toFixed(2) + '%';
+                
+                // Xác định màu cho loại sản phẩm
+                let loaiClass = 'bg-blue-100 text-blue-800';
+                if (loaiSP === 'Loại B') {
+                    loaiClass = 'bg-green-100 text-green-800';
+                } else if (loaiSP === 'Loại C') {
+                    loaiClass = 'bg-yellow-100 text-yellow-800';
+                }
+                
+                row.innerHTML = `
+                    <td>${maHang}</td>
+                    <td>${tenHang}</td>
+                    <td class="text-center">${dvt}</td>
+                    <td class="text-center font-semibold">${soLuong}</td>
+                    <td class="text-center">${thueXuatPercent}</td>
+                    <td class="text-center"><span class="${loaiClass} px-2 py-1 rounded text-xs">${loaiSP}</span></td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            updateStats();
+        }
         
         // Biến lưu trữ các giá trị đã chọn
         const selectedFilters = {
@@ -345,123 +389,62 @@
             'ten-hang': []
         };
         
-        /**
-         * Chuyển đổi một giá trị sang chuỗi và chuẩn hóa để so sánh.
-         * @param {any} value - Giá trị cần chuẩn hóa.
-         * @returns {string} Chuỗi đã chuẩn hóa.
-         */
-        const normalizeString = (value) => {
-            if (value === null || typeof value === 'undefined') {
-                return '';
-            }
-            return String(value).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        };
-
-        /**
-         * Hàm khởi tạo chính để tải dữ liệu và thiết lập giao diện.
-         */
-        document.addEventListener('DOMContentLoaded', async function() {
-            const loadingMessage = document.getElementById('loading-message');
-            const dataTable = document.getElementById('dataTable');
-
-            try {
-                // Tải dữ liệu từ web app
-                const response = await fetch(SCRIPT_URL);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                console.log("Dữ liệu đã tải:", data);
-                
-                // Lấy mảng dữ liệu từ phản hồi
-                const products = data.data; 
-
-                if (!Array.isArray(products) || products.length === 0) {
-                    loadingMessage.textContent = 'Không có dữ liệu để hiển thị.';
-                    return;
-                }
-                
-                allProducts = products;
-                
-                // Ẩn overlay tải và hiển thị bảng
-                loadingMessage.classList.add('hidden');
-                dataTable.classList.remove('hidden');
-
-                // Khởi tạo các bộ lọc và hiển thị bảng ban đầu
-                populateFilters();
-                renderTable(allProducts);
-
-            } catch (error) {
-                console.error('Lỗi khi tải dữ liệu:', error);
-                loadingMessage.textContent = 'Lỗi khi tải dữ liệu. Vui lòng thử lại sau.';
-            }
-        });
-        
-        /**
-         * Chuyển đổi một giá trị sang chuỗi và chuẩn hóa để so sánh.
-         * @param {any} value - Giá trị cần chuẩn hóa.
-         * @returns {string} Chuỗi đã chuẩn hóa.
-         */
-        const getFilterValue = (product, filterType) => {
-            switch (filterType) {
-                case 'ma-hang': return normalizeString(product.MaHang);
-                case 'dvt': return normalizeString(product.DVT);
-                case 'loai': return normalizeString(product.LoaiSP);
-                case 'ten-hang': return normalizeString(product.TenHangHoa);
-                default: return '';
-            }
-        };
-
-        /**
-         * Hàm tạo các dropdown filter từ dữ liệu bảng.
-         */
-        function populateFilters() {
-            if (allProducts.length === 0) return;
+        // Hàm khởi tạo các dropdown filter từ dữ liệu webapp
+        function initializeFilters() {
+            if (tableData.length === 0) return;
             
+            // Tập hợp dữ liệu unique cho từng cột
             const maHangSet = new Set();
             const dvtSet = new Set();
             const loaiSet = new Set();
             const tenHangSet = new Set();
             
-            allProducts.forEach(product => {
-                if (product.MaHang) maHangSet.add(product.MaHang);
-                if (product.DVT) dvtSet.add(product.DVT);
-                if (product.LoaiSP) loaiSet.add(product.LoaiSP);
-                if (product.TenHangHoa) tenHangSet.add(product.TenHangHoa);
+            tableData.forEach(item => {
+                // Mã hàng
+                if (item['Mã hàng']) {
+                    maHangSet.add(item['Mã hàng']);
+                }
+                
+                // ĐVT
+                if (item['ĐVT']) {
+                    dvtSet.add(item['ĐVT']);
+                }
+                
+                // Loại sản phẩm
+                if (item['Loại sản phẩm']) {
+                    loaiSet.add(item['Loại sản phẩm']);
+                }
+                
+                // Tên hàng hóa
+                if (item['Tên hàng hóa']) {
+                    tenHangSet.add(item['Tên hàng hóa']);
+                }
             });
             
+            // Tạo dropdown items
             createDropdownItems('ma-hang', Array.from(maHangSet));
             createDropdownItems('dvt', Array.from(dvtSet));
             createDropdownItems('loai', Array.from(loaiSet));
             createDropdownItems('ten-hang', Array.from(tenHangSet));
         }
         
-        /**
-         * Hàm tạo dropdown items
-         * @param {string} dropdownId - ID của dropdown (ví dụ: 'ma-hang').
-         * @param {string[]} items - Mảng các chuỗi để tạo items.
-         */
+        // Hàm tạo dropdown items
         function createDropdownItems(dropdownId, items) {
             const dropdown = document.getElementById(dropdownId + '-dropdown');
             dropdown.innerHTML = '';
             
-            // Sắp xếp các mục theo thứ tự bảng chữ cái
-            items.sort().forEach(item => {
+            items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'dropdown-item';
                 div.innerHTML = `
-                    <input type="checkbox" class="dropdown-checkbox" value="${item}" 
-                        onchange="handleCheckboxChange('${dropdownId}', '${item}', this.checked)">
+                    <input type="checkbox" class="dropdown-checkbox" value="${item}" onchange="handleCheckboxChange('${dropdownId}', '${item}', this.checked)">
                     <span>${item}</span>
                 `;
                 dropdown.appendChild(div);
             });
         }
         
-        /**
-         * Hàm toggle dropdown
-         * @param {string} dropdownId - ID của dropdown để mở/đóng.
-         */
+        // Hàm toggle dropdown
         function toggleDropdown(dropdownId) {
             const dropdown = document.getElementById(dropdownId + '-dropdown');
             const button = dropdown.previousElementSibling;
@@ -479,12 +462,7 @@
             button.classList.toggle('active');
         }
         
-        /**
-         * Hàm xử lý khi checkbox thay đổi
-         * @param {string} dropdownId - ID của dropdown.
-         * @param {string} value - Giá trị của checkbox.
-         * @param {boolean} checked - Trạng thái của checkbox (true/false).
-         */
+        // Hàm xử lý khi checkbox thay đổi
         function handleCheckboxChange(dropdownId, value, checked) {
             if (checked) {
                 if (!selectedFilters[dropdownId].includes(value)) {
@@ -498,10 +476,7 @@
             applyFilters();
         }
         
-        /**
-         * Hàm cập nhật hiển thị dropdown
-         * @param {string} dropdownId - ID của dropdown.
-         */
+        // Hàm cập nhật hiển thị dropdown
         function updateDropdownDisplay(dropdownId) {
             const display = document.getElementById(dropdownId + '-display');
             const selected = selectedFilters[dropdownId];
@@ -515,6 +490,7 @@
                 };
                 display.textContent = labels[dropdownId];
             } else if (selected.length === 1) {
+                // Hiển thị tên ngắn gọn
                 let displayText = selected[0];
                 if (dropdownId === 'ma-hang' && displayText.length > 20) {
                     displayText = displayText.substring(0, 20) + '...';
@@ -537,99 +513,91 @@
             }
         });
         
-        /**
-         * Hàm áp dụng tất cả bộ lọc và hiển thị lại bảng.
-         */
+        // Hàm áp dụng tất cả bộ lọc
         function applyFilters() {
-            const filteredProducts = allProducts.filter(product => {
+            // Lấy giá trị các bộ lọc
+            const selectedMaHang = selectedFilters['ma-hang'];
+            const selectedDvt = selectedFilters['dvt'];
+            const selectedLoai = selectedFilters['loai'];
+            const selectedTenHang = selectedFilters['ten-hang'];
+            
+            // Lọc dữ liệu
+            const filteredData = tableData.filter(item => {
                 // Lọc Mã hàng
-                const maHangFilter = selectedFilters['ma-hang'];
-                if (maHangFilter.length > 0 && !maHangFilter.includes(product.MaHang)) {
-                    return false;
+                if (selectedMaHang.length > 0) {
+                    if (!selectedMaHang.includes(item['Mã hàng'])) {
+                        return false;
+                    }
                 }
-
+                
                 // Lọc ĐVT
-                const dvtFilter = selectedFilters['dvt'];
-                if (dvtFilter.length > 0 && !dvtFilter.includes(product.DVT)) {
-                    return false;
+                if (selectedDvt.length > 0) {
+                    if (!selectedDvt.includes(item['ĐVT'])) {
+                        return false;
+                    }
                 }
                 
                 // Lọc Loại sản phẩm
-                const loaiFilter = selectedFilters['loai'];
-                if (loaiFilter.length > 0 && !loaiFilter.includes(product.LoaiSP)) {
-                    return false;
+                if (selectedLoai.length > 0) {
+                    if (!selectedLoai.includes(item['Loại sản phẩm'])) {
+                        return false;
+                    }
                 }
-
+                
                 // Lọc Tên hàng hóa
-                const tenHangFilter = selectedFilters['ten-hang'];
-                if (tenHangFilter.length > 0 && !tenHangFilter.includes(product.TenHangHoa)) {
-                    return false;
+                if (selectedTenHang.length > 0) {
+                    if (!selectedTenHang.includes(item['Tên hàng hóa'])) {
+                        return false;
+                    }
                 }
-
+                
                 return true;
             });
             
-            renderTable(filteredProducts);
-            updateStats(filteredProducts.length);
+            // Render lại bảng với dữ liệu đã lọc
+            renderTable(filteredData);
         }
         
-        /**
-         * Hàm render bảng với dữ liệu đã lọc.
-         * @param {object[]} data - Mảng các đối tượng sản phẩm để hiển thị.
-         */
-        function renderTable(data) {
-            const tbody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-            tbody.innerHTML = '';
-            
-            data.forEach(product => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${product.MaHang || ''}</td>
-                    <td>${product.TenHangHoa || ''}</td>
-                    <td class="text-center">${product.DVT || ''}</td>
-                    <td class="text-center font-semibold">${product.SoLuongTon || ''}</td>
-                    <td class="text-center">${product.ThueSuat ? product.ThueSuat + '%' : ''}</td>
-                    <td class="text-center">
-                        <span class="${product.LoaiSP === 'Loại A' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'} 
-                            px-2 py-1 rounded text-xs">
-                            ${product.LoaiSP || ''}
-                        </span>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            updateStats(data.length);
-        }
-        
-        /**
-         * Hàm xóa tất cả bộ lọc.
-         */
+        // Hàm xóa tất cả bộ lọc
         function clearAllFilters() {
+            // Reset selected filters
             selectedFilters['ma-hang'] = [];
             selectedFilters['dvt'] = [];
             selectedFilters['loai'] = [];
             selectedFilters['ten-hang'] = [];
             
+            // Uncheck tất cả checkbox
             document.querySelectorAll('.dropdown-checkbox').forEach(checkbox => {
                 checkbox.checked = false;
             });
             
+            // Reset dropdown displays
             updateDropdownDisplay('ma-hang');
             updateDropdownDisplay('dvt');
             updateDropdownDisplay('loai');
             updateDropdownDisplay('ten-hang');
             
-            renderTable(allProducts);
+            // Hiển thị lại tất cả dữ liệu
+            renderTable(tableData);
         }
         
-        /**
-         * Hàm cập nhật thống kê số lượng sản phẩm.
-         * @param {number} visibleCount - Số lượng sản phẩm hiển thị.
-         */
-        function updateStats(visibleCount) {
+        // Hàm cập nhật thống kê
+        function updateStats() {
+            const table = document.getElementById('dataTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            let visibleCount = rows.length;
+            
+            // Kiểm tra nếu có dòng loading hoặc error
+            if (rows.length === 1 && (
+                rows[0].textContent.includes('Đang tải dữ liệu') || 
+                rows[0].textContent.includes('Không thể tải dữ liệu')
+            )) {
+                visibleCount = 0;
+            }
+            
             document.getElementById('visible-count').textContent = visibleCount;
-            document.getElementById('total-count').textContent = allProducts.length;
+            document.getElementById('total-count').textContent = tableData.length;
         }
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9768ce77614d0962',t:'MTc1NjQzNjUxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
