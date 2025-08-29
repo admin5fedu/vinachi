@@ -273,18 +273,16 @@
                     </div>
                 </div>
                 
-                <!-- Lọc Mã hàng -->
+                <!-- Tìm kiếm Mã hàng -->
                 <div class="relative">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Mã hàng</label>
-                    <div class="custom-dropdown">
-                        <div class="dropdown-button" onclick="toggleDropdown('ma-hang')">
-                            <span id="ma-hang-display">Chọn mã hàng...</span>
-                            <span class="dropdown-arrow">▼</span>
-                        </div>
-                        <div class="dropdown-content" id="ma-hang-dropdown">
-                            <!-- Options sẽ được tạo tự động -->
-                        </div>
-                    </div>
+                    <input 
+                        type="text" 
+                        id="ma-hang-search" 
+                        placeholder="Nhập mã hàng để tìm kiếm..." 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm h-10"
+                        oninput="handleProductCodeSearch(this.value)"
+                    >
                 </div>
                 
                 <!-- Tìm kiếm tên hàng -->
@@ -415,7 +413,7 @@
         
         // Biến lưu trữ các giá trị đã chọn
         const selectedFilters = {
-            'ma-hang': [],
+            'ma-hang': '',
             'loai': [],
             'ten-hang': ''
         };
@@ -425,29 +423,16 @@
             if (tableData.length === 0) return;
             
             // Tập hợp dữ liệu unique cho từng cột
-            const maHangSet = new Set();
             const loaiSet = new Set();
-            const tenHangSet = new Set();
             
             tableData.forEach(item => {
-                // Mã hàng
-                if (item['Mã hàng']) {
-                    maHangSet.add(item['Mã hàng']);
-                }
-                
                 // Loại sản phẩm
                 if (item['Loại sản phẩm']) {
                     loaiSet.add(item['Loại sản phẩm']);
                 }
-                
-                // Tên hàng hóa
-                if (item['Tên hàng hóa']) {
-                    tenHangSet.add(item['Tên hàng hóa']);
-                }
             });
             
             // Tạo dropdown items
-            createDropdownItems('ma-hang', Array.from(maHangSet));
             createDropdownItems('loai', Array.from(loaiSet));
         }
         
@@ -531,6 +516,12 @@
             applyFilters();
         }
         
+        // Hàm xử lý tìm kiếm mã hàng
+        function handleProductCodeSearch(value) {
+            selectedFilters['ma-hang'] = value.toLowerCase().trim();
+            applyFilters();
+        }
+        
         // Đóng dropdown khi click bên ngoài
         document.addEventListener('click', function(event) {
             if (!event.target.closest('.custom-dropdown')) {
@@ -544,15 +535,16 @@
         // Hàm áp dụng tất cả bộ lọc
         function applyFilters() {
             // Lấy giá trị các bộ lọc
-            const selectedMaHang = selectedFilters['ma-hang'];
+            const searchMaHang = selectedFilters['ma-hang'];
             const selectedLoai = selectedFilters['loai'];
             const searchTenHang = selectedFilters['ten-hang'];
             
             // Lọc dữ liệu
             const filteredData = tableData.filter(item => {
-                // Lọc Mã hàng
-                if (selectedMaHang.length > 0) {
-                    if (!selectedMaHang.includes(item['Mã hàng'])) {
+                // Tìm kiếm Mã hàng
+                if (searchMaHang) {
+                    const maHang = (item['Mã hàng'] || '').toLowerCase();
+                    if (!maHang.includes(searchMaHang)) {
                         return false;
                     }
                 }
@@ -582,7 +574,7 @@
         // Hàm xóa tất cả bộ lọc
         function clearAllFilters() {
             // Reset selected filters
-            selectedFilters['ma-hang'] = [];
+            selectedFilters['ma-hang'] = '';
             selectedFilters['loai'] = [];
             selectedFilters['ten-hang'] = '';
             
@@ -592,10 +584,10 @@
             });
             
             // Reset dropdown displays
-            updateDropdownDisplay('ma-hang');
             updateDropdownDisplay('loai');
             
-            // Reset search input
+            // Reset search inputs
+            document.getElementById('ma-hang-search').value = '';
             document.getElementById('ten-hang-search').value = '';
             
             // Hiển thị lại tất cả dữ liệu
@@ -664,5 +656,5 @@
             }
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9769043f72d108a2',t:'MTc1NjQzODcxNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9769096570d108a2',t:'MTc1NjQzODkyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
