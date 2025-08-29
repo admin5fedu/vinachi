@@ -9,6 +9,29 @@
         @media print {
             body { margin: 0; }
             .no-print { display: none; }
+            
+            /* CSS cho in ấn - màu đen dễ nhìn */
+            th {
+                background: #000 !important;
+                color: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            td {
+                color: #000 !important;
+                background: #fff !important;
+            }
+            
+            tr:nth-child(even) td {
+                background: #f5f5f5 !important;
+                color: #000 !important;
+            }
+            
+            .bg-blue-100, .bg-green-100, .bg-yellow-100 {
+                background: #e5e5e5 !important;
+                color: #000 !important;
+            }
         }
         
         .a4-container {
@@ -219,35 +242,7 @@
         
         <!-- Khu vực bộ lọc -->
         <div class="filter-section bg-white p-4 rounded-lg shadow-md mb-6 no-print">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                <!-- Lọc Mã hàng -->
-                <div class="relative">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Mã hàng</label>
-                    <div class="custom-dropdown">
-                        <div class="dropdown-button" onclick="toggleDropdown('ma-hang')">
-                            <span id="ma-hang-display">Chọn mã hàng...</span>
-                            <span class="dropdown-arrow">▼</span>
-                        </div>
-                        <div class="dropdown-content" id="ma-hang-dropdown">
-                            <!-- Options sẽ được tạo tự động -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Lọc ĐVT -->
-                <div class="relative">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Đơn vị tính</label>
-                    <div class="custom-dropdown">
-                        <div class="dropdown-button" onclick="toggleDropdown('dvt')">
-                            <span id="dvt-display">Chọn ĐVT...</span>
-                            <span class="dropdown-arrow">▼</span>
-                        </div>
-                        <div class="dropdown-content" id="dvt-dropdown">
-                            <!-- Options sẽ được tạo tự động -->
-                        </div>
-                    </div>
-                </div>
-                
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- Lọc Loại sản phẩm -->
                 <div class="relative">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Loại sản phẩm</label>
@@ -257,6 +252,20 @@
                             <span class="dropdown-arrow">▼</span>
                         </div>
                         <div class="dropdown-content" id="loai-dropdown">
+                            <!-- Options sẽ được tạo tự động -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lọc Mã hàng -->
+                <div class="relative">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mã hàng</label>
+                    <div class="custom-dropdown">
+                        <div class="dropdown-button" onclick="toggleDropdown('ma-hang')">
+                            <span id="ma-hang-display">Chọn mã hàng...</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="dropdown-content" id="ma-hang-dropdown">
                             <!-- Options sẽ được tạo tự động -->
                         </div>
                     </div>
@@ -275,15 +284,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="flex justify-between items-center">
-                <button class="clear-filters-btn" onclick="clearAllFilters()">
-                    Bỏ lọc
-                </button>
                 
-                <div class="stats-bar">
-                    <span id="stats"><span id="visible-count">9</span>/<span id="total-count">9</span> sản phẩm</span>
+                <!-- Nút bỏ lọc -->
+                <div class="relative flex items-end">
+                    <button class="clear-filters-btn w-full" onclick="clearAllFilters()">
+                        Bỏ lọc
+                    </button>
                 </div>
             </div>
         </div>
@@ -292,12 +298,13 @@
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th style="width: 15%;">Mã hàng</th>
-                        <th style="width: 35%;">Tên hàng hóa</th>
+                        <th style="width: 5%; text-align: center;">TT</th>
+                        <th style="width: 15%; text-align: center;">Mã hàng</th>
+                        <th style="width: 35%; text-align: center;">Tên hàng hóa</th>
                         <th style="width: 8%; text-align: center;">ĐVT</th>
-                        <th style="width: 10%;">Số lượng tồn</th>
-                        <th style="width: 12%;">Thuế suất</th>
-                        <th style="width: 12%;">Loại sản phẩm</th>
+                        <th style="width: 10%; text-align: center;">SL</th>
+                        <th style="width: 12%; text-align: center;">Thuế suất</th>
+                        <th style="width: 12%; text-align: center;">Loại</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -344,7 +351,7 @@
             const tbody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
             tbody.innerHTML = '';
             
-            data.forEach(item => {
+            data.forEach((item, index) => {
                 const row = document.createElement('tr');
                 
                 // Xử lý dữ liệu
@@ -367,6 +374,7 @@
                 }
                 
                 row.innerHTML = `
+                    <td class="text-center font-semibold">${index + 1}</td>
                     <td>${maHang}</td>
                     <td>${tenHang}</td>
                     <td class="text-center">${dvt}</td>
@@ -384,7 +392,6 @@
         // Biến lưu trữ các giá trị đã chọn
         const selectedFilters = {
             'ma-hang': [],
-            'dvt': [],
             'loai': [],
             'ten-hang': []
         };
@@ -395,7 +402,6 @@
             
             // Tập hợp dữ liệu unique cho từng cột
             const maHangSet = new Set();
-            const dvtSet = new Set();
             const loaiSet = new Set();
             const tenHangSet = new Set();
             
@@ -403,11 +409,6 @@
                 // Mã hàng
                 if (item['Mã hàng']) {
                     maHangSet.add(item['Mã hàng']);
-                }
-                
-                // ĐVT
-                if (item['ĐVT']) {
-                    dvtSet.add(item['ĐVT']);
                 }
                 
                 // Loại sản phẩm
@@ -423,7 +424,6 @@
             
             // Tạo dropdown items
             createDropdownItems('ma-hang', Array.from(maHangSet));
-            createDropdownItems('dvt', Array.from(dvtSet));
             createDropdownItems('loai', Array.from(loaiSet));
             createDropdownItems('ten-hang', Array.from(tenHangSet));
         }
@@ -484,7 +484,6 @@
             if (selected.length === 0) {
                 const labels = {
                     'ma-hang': 'Chọn mã hàng...',
-                    'dvt': 'Chọn ĐVT...',
                     'loai': 'Chọn loại...',
                     'ten-hang': 'Chọn tên hàng...'
                 };
@@ -517,7 +516,6 @@
         function applyFilters() {
             // Lấy giá trị các bộ lọc
             const selectedMaHang = selectedFilters['ma-hang'];
-            const selectedDvt = selectedFilters['dvt'];
             const selectedLoai = selectedFilters['loai'];
             const selectedTenHang = selectedFilters['ten-hang'];
             
@@ -526,13 +524,6 @@
                 // Lọc Mã hàng
                 if (selectedMaHang.length > 0) {
                     if (!selectedMaHang.includes(item['Mã hàng'])) {
-                        return false;
-                    }
-                }
-                
-                // Lọc ĐVT
-                if (selectedDvt.length > 0) {
-                    if (!selectedDvt.includes(item['ĐVT'])) {
                         return false;
                     }
                 }
@@ -562,7 +553,6 @@
         function clearAllFilters() {
             // Reset selected filters
             selectedFilters['ma-hang'] = [];
-            selectedFilters['dvt'] = [];
             selectedFilters['loai'] = [];
             selectedFilters['ten-hang'] = [];
             
@@ -573,7 +563,6 @@
             
             // Reset dropdown displays
             updateDropdownDisplay('ma-hang');
-            updateDropdownDisplay('dvt');
             updateDropdownDisplay('loai');
             updateDropdownDisplay('ten-hang');
             
@@ -583,21 +572,8 @@
         
         // Hàm cập nhật thống kê
         function updateStats() {
-            const table = document.getElementById('dataTable');
-            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-            let visibleCount = rows.length;
-            
-            // Kiểm tra nếu có dòng loading hoặc error
-            if (rows.length === 1 && (
-                rows[0].textContent.includes('Đang tải dữ liệu') || 
-                rows[0].textContent.includes('Không thể tải dữ liệu')
-            )) {
-                visibleCount = 0;
-            }
-            
-            document.getElementById('visible-count').textContent = visibleCount;
-            document.getElementById('total-count').textContent = tableData.length;
+            // Không cần cập nhật thống kê nữa vì đã bỏ thanh thống kê
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9768ce77614d0962',t:'MTc1NjQzNjUxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9768dc4eb18b0962',t:'MTc1NjQzNzA4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
