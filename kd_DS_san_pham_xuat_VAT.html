@@ -60,12 +60,15 @@
             // URL của ứng dụng web Google Apps Script của bạn
             const webAppUrl = 'https://script.google.com/macros/s/AKfycbyeyxCfjyJk_JgZbDpt5Flwo0lDzt62Vr63sqRJxQOuMfCnmR_KLolV2hK6ig9MVI9g/exec';
 
-            // Hàm tạo bảng HTML từ dữ liệu
+            // Hàm tạo bảng HTML từ dữ liệu JSON
             function createTable(data) {
-                // Tách hàng tiêu đề và dữ liệu
-                const headers = data[0];
-                const rows = data.slice(1);
-
+                if (!data || data.length === 0) {
+                    return '';
+                }
+                
+                // Trích xuất tiêu đề từ các khóa của đối tượng đầu tiên
+                const headers = Object.keys(data[0]);
+                
                 let tableHtml = `
                     <table class="min-w-full">
                         <thead>
@@ -74,9 +77,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${rows.map(row => `
+                            ${data.map(item => `
                                 <tr>
-                                    ${row.map(cell => `<td class="px-6 py-4">${cell}</td>`).join('')}
+                                    ${headers.map(header => `<td class="px-6 py-4">${item[header]}</td>`).join('')}
                                 </tr>
                             `).join('')}
                         </tbody>
