@@ -3,279 +3,633 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DS sản phẩm xuất VAT</title>
-    <!-- Add Tailwind CSS library -->
+    <title>Bảng Dữ Liệu Hàng Hóa</title>
+    <!-- Tải Tailwind CSS để tạo kiểu -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            margin: 0;
-            padding: 0;
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
         }
-        .container {
-            /* A4 dimensions in pixels for a common screen DPI, adjusted for responsiveness */
-            width: 21cm;
-            height: 29.7cm;
-            margin: 2rem auto;
-            padding: 2cm;
-            background-color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden; /* Prevent horizontal scroll */
+        
+        .a4-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20mm;
             box-sizing: border-box;
         }
-
-        /* Responsive adjustments for smaller screens */
+        
         @media (max-width: 768px) {
-            .container {
+            .a4-container {
                 width: 100%;
-                height: auto;
-                margin: 1rem auto;
-                padding: 1rem;
+                min-height: 100vh;
+                padding: 10px;
                 box-shadow: none;
-                border-radius: 0;
             }
         }
         
-        table {
-            border-collapse: collapse;
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            position: relative; /* Dùng cho loading overlay */
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #4b5563;
+            font-weight: 500;
+            z-index: 2000;
         }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        
+        @media (max-width: 768px) {
+            table { font-size: 9px; }
+        }
+        
         th, td {
-            padding: 12px 15px;
+            border: 1px solid #d1d5db;
+            padding: 8px 6px;
             text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-            position: relative; /* For filter dropdown */
-            font-size: 14px; /* Default font size for better legibility */
+            vertical-align: top;
         }
+        
         th {
-            background-color: #4b5563;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             color: white;
             font-weight: 600;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
+        
         tr:nth-child(even) {
-            background-color: #f9fafb;
+            background-color: #f8fafc;
         }
+        
         tr:hover {
-            background-color: #f1f5f9;
+            background-color: #e0f2fe;
         }
-        .loading {
+        
+        .filter-input {
+            width: 100%;
+            padding: 4px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-top: 4px;
+        }
+        
+        .filter-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .clear-filters-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-bottom: 15px;
+        }
+        
+        .clear-filters-btn:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+        }
+        
+        .stats-bar {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
             text-align: center;
-            font-size: 1.25rem;
-            color: #6b7280;
-            margin-top: 2rem;
         }
-        .filter-dropdown {
-            display: none;
+        
+        .filter-section {
+            border: 2px solid #e5e7eb;
+        }
+        
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        
+        .dropdown-button {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            transition: all 0.2s;
+            height: 40px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        .dropdown-button span:first-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            margin-right: 8px;
+        }
+        
+        .dropdown-button:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .dropdown-arrow {
+            transition: transform 0.2s;
+            color: #6b7280;
+        }
+        
+        .dropdown-button.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-content {
             position: absolute;
             top: 100%;
             left: 0;
-            z-index: 10;
-            background-color: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 10px;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
             max-height: 200px;
             overflow-y: auto;
+            display: none;
         }
-        .filter-dropdown label {
+        
+        .dropdown-content.show {
             display: block;
-            white-space: nowrap;
-            margin-bottom: 5px;
         }
-        .filter-dropdown input[type="checkbox"] {
-            margin-right: 5px;
+        
+        .dropdown-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-
-        /* --- Print-specific styles for A4 format --- */
-        @media print {
-            html, body {
-                width: 210mm;
-                height: 297mm;
-                margin: 0;
-                padding: 0;
-                -webkit-print-color-adjust: exact;
-                box-sizing: border-box;
-            }
-            .container {
-                width: 210mm;
-                max-width: 210mm;
-                height: 297mm;
-                max-height: 297mm;
-                margin: 0;
-                padding: 2cm;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-            }
-            .container h1 {
-                font-size: 20pt !important;
-            }
-            table, th, td {
-                font-size: 9pt !important;
-            }
-            .filter-dropdown, .container button, .action-btn {
-                display: none !important; /* Hide UI elements for printing */
-            }
+        
+        .dropdown-item:hover {
+            background-color: #f8fafc;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item.selected {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 500;
+        }
+        
+        .dropdown-checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: #3b82f6;
         }
     </style>
 </head>
-<body>
-
-    <div class="container bg-white shadow-lg rounded-lg">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Danh sách sản phẩm xuất VAT</h1>
-        <div id="table-container" class="overflow-x-auto">
-            <!-- Table will be generated by JavaScript here -->
-            <div id="loading" class="loading">Đang tải dữ liệu...</div>
+<body class="bg-gray-100 font-sans">
+    <div class="a4-container">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-800 text-center mb-2">DANH SÁCH SẢN PHẨM XUẤT VAT</h1>
+            <p class="text-center text-sm text-gray-600">Dữ liệu được cập nhật tự động từ web app.</p>
         </div>
-        <div class="mt-6 text-center">
-            <button onclick="window.print()" class="action-btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                In trang (A4 Dọc)
-            </button>
+        
+        <!-- Khu vực bộ lọc -->
+        <div class="filter-section bg-white p-4 rounded-lg shadow-md mb-6 no-print">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <!-- Lọc Mã hàng -->
+                <div class="relative">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mã hàng</label>
+                    <div class="custom-dropdown">
+                        <div class="dropdown-button" onclick="toggleDropdown('ma-hang')">
+                            <span id="ma-hang-display">Chọn mã hàng...</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="dropdown-content" id="ma-hang-dropdown">
+                            <!-- Options sẽ được tạo tự động -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lọc ĐVT -->
+                <div class="relative">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Đơn vị tính</label>
+                    <div class="custom-dropdown">
+                        <div class="dropdown-button" onclick="toggleDropdown('dvt')">
+                            <span id="dvt-display">Chọn ĐVT...</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="dropdown-content" id="dvt-dropdown">
+                            <!-- Options sẽ được tạo tự động -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lọc Loại sản phẩm -->
+                <div class="relative">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Loại sản phẩm</label>
+                    <div class="custom-dropdown">
+                        <div class="dropdown-button" onclick="toggleDropdown('loai')">
+                            <span id="loai-display">Chọn loại...</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="dropdown-content" id="loai-dropdown">
+                            <!-- Options sẽ được tạo tự động -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tìm kiếm tên hàng -->
+                <div class="relative">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tên hàng hóa</label>
+                    <div class="custom-dropdown">
+                        <div class="dropdown-button" onclick="toggleDropdown('ten-hang')">
+                            <span id="ten-hang-display">Chọn tên hàng...</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="dropdown-content" id="ten-hang-dropdown">
+                            <!-- Options sẽ được tạo tự động -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center">
+                <button class="clear-filters-btn" onclick="clearAllFilters()">
+                    Bỏ lọc
+                </button>
+                
+                <div class="stats-bar">
+                    <span id="stats"><span id="visible-count">0</span>/<span id="total-count">0</span> sản phẩm</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <!-- Hiển thị thông báo đang tải -->
+            <div id="loading-message" class="loading-overlay">
+                Đang tải dữ liệu...
+            </div>
+            <table id="dataTable" class="hidden">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Mã hàng</th>
+                        <th style="width: 35%;">Tên hàng hóa</th>
+                        <th style="width: 8%; text-align: center;">ĐVT</th>
+                        <th style="width: 10%;">Số lượng tồn</th>
+                        <th style="width: 12%;">Thuế suất</th>
+                        <th style="width: 12%;">Loại sản phẩm</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dữ liệu sẽ được chèn vào đây từ JavaScript -->
+                </tbody>
+            </table>
         </div>
     </div>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // URL of your Google Apps Script web app
-            const webAppUrl = 'https://script.google.com/macros/s/AKfycbyeyxCfjyJk_JgZbDpt5Flwo0lDzt62Vr63sqRJxQOuMfCnmR_KLolV2hK6ig9MVI9g/exec';
-            let allData = [];
+        // Hàng đợi cho các yêu cầu fetch để tránh lỗi API
+        let fetchQueue = Promise.resolve();
+        
+        // Dữ liệu sản phẩm được lưu trữ sau khi tải
+        let allProducts = [];
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeyxCfjyJk_JgZbDpt5Flwo0lDzt62Vr63sqRJxQOuMfCnmR_KLolV2hK6ig9MVI9g/exec';
+        
+        // Biến lưu trữ các giá trị đã chọn
+        const selectedFilters = {
+            'ma-hang': [],
+            'dvt': [],
+            'loai': [],
+            'ten-hang': []
+        };
+        
+        /**
+         * Chuyển đổi một giá trị sang chuỗi và chuẩn hóa để so sánh.
+         * @param {any} value - Giá trị cần chuẩn hóa.
+         * @returns {string} Chuỗi đã chuẩn hóa.
+         */
+        const normalizeString = (value) => {
+            if (value === null || typeof value === 'undefined') {
+                return '';
+            }
+            return String(value).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        };
 
-            // Function to create an HTML table from JSON data
-            function createTable(data) {
-                if (!data || data.length === 0) {
-                    return '';
+        /**
+         * Hàm khởi tạo chính để tải dữ liệu và thiết lập giao diện.
+         */
+        document.addEventListener('DOMContentLoaded', async function() {
+            const loadingMessage = document.getElementById('loading-message');
+            const dataTable = document.getElementById('dataTable');
+
+            try {
+                // Tải dữ liệu từ web app
+                const response = await fetch(SCRIPT_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log("Dữ liệu đã tải:", data);
+                
+                // Lấy mảng dữ liệu từ phản hồi
+                const products = data.data; 
+
+                if (!Array.isArray(products) || products.length === 0) {
+                    loadingMessage.textContent = 'Không có dữ liệu để hiển thị.';
+                    return;
                 }
                 
-                // Extract headers from the keys of the first object
-                const headers = Object.keys(data[0]);
+                allProducts = products;
                 
-                let tableHtml = `
-                    <table class="min-w-full" id="product-table">
-                        <thead>
-                            <tr>
-                                ${headers.map((header, index) => `
-                                    <th class="px-6 py-3" onclick="toggleFilterDropdown(${index}, event)">
-                                        <div class="flex justify-between items-center">
-                                            <span>${header}</span>
-                                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                        </div>
-                                        <div id="filter-dropdown-${index}" class="filter-dropdown"></div>
-                                    </th>
-                                `).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.map(item => `
-                                <tr>
-                                    ${headers.map(header => `<td class="px-6 py-4">${item[header]}</td>`).join('')}
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-                return tableHtml;
+                // Ẩn overlay tải và hiển thị bảng
+                loadingMessage.classList.add('hidden');
+                dataTable.classList.remove('hidden');
+
+                // Khởi tạo các bộ lọc và hiển thị bảng ban đầu
+                populateFilters();
+                renderTable(allProducts);
+
+            } catch (error) {
+                console.error('Lỗi khi tải dữ liệu:', error);
+                loadingMessage.textContent = 'Lỗi khi tải dữ liệu. Vui lòng thử lại sau.';
             }
-
-            // Function to apply filters and re-render the table
-            function applyFilters() {
-                let filteredData = allData;
-                const headers = Object.keys(allData[0]);
-
-                headers.forEach((header, index) => {
-                    const dropdown = document.getElementById(`filter-dropdown-${index}`);
-                    if (dropdown && dropdown.style.display === 'block') {
-                        const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
-                        if (checkboxes.length > 0) {
-                            const selectedValues = Array.from(checkboxes).map(cb => cb.value);
-                            filteredData = filteredData.filter(item => selectedValues.includes(String(item[header])));
-                        }
-                    }
-                });
-
-                const tableContainer = document.getElementById('table-container');
-                tableContainer.innerHTML = createTable(filteredData);
-            }
-
-            // Function to toggle the filter dropdown
-            window.toggleFilterDropdown = function(columnIndex, event) {
-                event.stopPropagation();
-                const allDropdowns = document.querySelectorAll('.filter-dropdown');
-                allDropdowns.forEach(dropdown => {
-                    if (dropdown.id !== `filter-dropdown-${columnIndex}`) {
-                        dropdown.style.display = 'none';
-                    }
-                });
-
-                const dropdown = document.getElementById(`filter-dropdown-${columnIndex}`);
-                if (dropdown.style.display === 'block') {
-                    dropdown.style.display = 'none';
-                } else {
-                    dropdown.style.display = 'block';
-                    populateFilterDropdown(columnIndex);
-                }
-            };
-
-            // Function to populate the filter dropdown with unique values
-            function populateFilterDropdown(columnIndex) {
-                const headers = Object.keys(allData[0]);
-                const header = headers[columnIndex];
-                const dropdown = document.getElementById(`filter-dropdown-${columnIndex}`);
-                dropdown.innerHTML = '';
-                
-                const uniqueValues = [...new Set(allData.map(item => String(item[header])))].sort();
-                
-                uniqueValues.forEach(value => {
-                    const label = document.createElement('label');
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.value = value;
-                    checkbox.checked = true; // All values are selected by default
-                    checkbox.addEventListener('change', applyFilters);
-                    
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(value));
-                    dropdown.appendChild(label);
-                });
-            }
-
-            // Close dropdowns when clicking outside
-            document.addEventListener('click', function(event) {
-                const allDropdowns = document.querySelectorAll('.filter-dropdown');
-                allDropdowns.forEach(dropdown => {
-                    dropdown.style.display = 'none';
-                });
-            });
-
-            // Fetch data from the web app
-            fetch(webAppUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const tableContainer = document.getElementById('table-container');
-                    const loadingIndicator = document.getElementById('loading');
-                    
-                    if (data && data.length > 0) {
-                        allData = data;
-                        loadingIndicator.style.display = 'none';
-                        tableContainer.innerHTML = createTable(allData);
-                    } else {
-                        loadingIndicator.innerText = 'Không có dữ liệu để hiển thị.';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    const loadingIndicator = document.getElementById('loading');
-                    loadingIndicator.innerText = 'Lỗi khi tải dữ liệu. Vui lòng kiểm tra lại URL hoặc kết nối mạng.';
-                });
         });
+        
+        /**
+         * Chuyển đổi một giá trị sang chuỗi và chuẩn hóa để so sánh.
+         * @param {any} value - Giá trị cần chuẩn hóa.
+         * @returns {string} Chuỗi đã chuẩn hóa.
+         */
+        const getFilterValue = (product, filterType) => {
+            switch (filterType) {
+                case 'ma-hang': return normalizeString(product.MaHang);
+                case 'dvt': return normalizeString(product.DVT);
+                case 'loai': return normalizeString(product.LoaiSP);
+                case 'ten-hang': return normalizeString(product.TenHangHoa);
+                default: return '';
+            }
+        };
+
+        /**
+         * Hàm tạo các dropdown filter từ dữ liệu bảng.
+         */
+        function populateFilters() {
+            if (allProducts.length === 0) return;
+            
+            const maHangSet = new Set();
+            const dvtSet = new Set();
+            const loaiSet = new Set();
+            const tenHangSet = new Set();
+            
+            allProducts.forEach(product => {
+                if (product.MaHang) maHangSet.add(product.MaHang);
+                if (product.DVT) dvtSet.add(product.DVT);
+                if (product.LoaiSP) loaiSet.add(product.LoaiSP);
+                if (product.TenHangHoa) tenHangSet.add(product.TenHangHoa);
+            });
+            
+            createDropdownItems('ma-hang', Array.from(maHangSet));
+            createDropdownItems('dvt', Array.from(dvtSet));
+            createDropdownItems('loai', Array.from(loaiSet));
+            createDropdownItems('ten-hang', Array.from(tenHangSet));
+        }
+        
+        /**
+         * Hàm tạo dropdown items
+         * @param {string} dropdownId - ID của dropdown (ví dụ: 'ma-hang').
+         * @param {string[]} items - Mảng các chuỗi để tạo items.
+         */
+        function createDropdownItems(dropdownId, items) {
+            const dropdown = document.getElementById(dropdownId + '-dropdown');
+            dropdown.innerHTML = '';
+            
+            // Sắp xếp các mục theo thứ tự bảng chữ cái
+            items.sort().forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'dropdown-item';
+                div.innerHTML = `
+                    <input type="checkbox" class="dropdown-checkbox" value="${item}" 
+                        onchange="handleCheckboxChange('${dropdownId}', '${item}', this.checked)">
+                    <span>${item}</span>
+                `;
+                dropdown.appendChild(div);
+            });
+        }
+        
+        /**
+         * Hàm toggle dropdown
+         * @param {string} dropdownId - ID của dropdown để mở/đóng.
+         */
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId + '-dropdown');
+            const button = dropdown.previousElementSibling;
+            
+            // Đóng tất cả dropdown khác
+            document.querySelectorAll('.dropdown-content').forEach(d => {
+                if (d !== dropdown) {
+                    d.classList.remove('show');
+                    d.previousElementSibling.classList.remove('active');
+                }
+            });
+            
+            // Toggle dropdown hiện tại
+            dropdown.classList.toggle('show');
+            button.classList.toggle('active');
+        }
+        
+        /**
+         * Hàm xử lý khi checkbox thay đổi
+         * @param {string} dropdownId - ID của dropdown.
+         * @param {string} value - Giá trị của checkbox.
+         * @param {boolean} checked - Trạng thái của checkbox (true/false).
+         */
+        function handleCheckboxChange(dropdownId, value, checked) {
+            if (checked) {
+                if (!selectedFilters[dropdownId].includes(value)) {
+                    selectedFilters[dropdownId].push(value);
+                }
+            } else {
+                selectedFilters[dropdownId] = selectedFilters[dropdownId].filter(v => v !== value);
+            }
+            
+            updateDropdownDisplay(dropdownId);
+            applyFilters();
+        }
+        
+        /**
+         * Hàm cập nhật hiển thị dropdown
+         * @param {string} dropdownId - ID của dropdown.
+         */
+        function updateDropdownDisplay(dropdownId) {
+            const display = document.getElementById(dropdownId + '-display');
+            const selected = selectedFilters[dropdownId];
+            
+            if (selected.length === 0) {
+                const labels = {
+                    'ma-hang': 'Chọn mã hàng...',
+                    'dvt': 'Chọn ĐVT...',
+                    'loai': 'Chọn loại...',
+                    'ten-hang': 'Chọn tên hàng...'
+                };
+                display.textContent = labels[dropdownId];
+            } else if (selected.length === 1) {
+                let displayText = selected[0];
+                if (dropdownId === 'ma-hang' && displayText.length > 20) {
+                    displayText = displayText.substring(0, 20) + '...';
+                } else if (dropdownId === 'ten-hang' && displayText.length > 25) {
+                    displayText = displayText.substring(0, 25) + '...';
+                }
+                display.textContent = displayText;
+            } else {
+                display.textContent = `${selected.length} mục`;
+            }
+        }
+        
+        // Đóng dropdown khi click bên ngoài
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.custom-dropdown')) {
+                document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+                    dropdown.classList.remove('show');
+                    dropdown.previousElementSibling.classList.remove('active');
+                });
+            }
+        });
+        
+        /**
+         * Hàm áp dụng tất cả bộ lọc và hiển thị lại bảng.
+         */
+        function applyFilters() {
+            const filteredProducts = allProducts.filter(product => {
+                // Lọc Mã hàng
+                const maHangFilter = selectedFilters['ma-hang'];
+                if (maHangFilter.length > 0 && !maHangFilter.includes(product.MaHang)) {
+                    return false;
+                }
+
+                // Lọc ĐVT
+                const dvtFilter = selectedFilters['dvt'];
+                if (dvtFilter.length > 0 && !dvtFilter.includes(product.DVT)) {
+                    return false;
+                }
+                
+                // Lọc Loại sản phẩm
+                const loaiFilter = selectedFilters['loai'];
+                if (loaiFilter.length > 0 && !loaiFilter.includes(product.LoaiSP)) {
+                    return false;
+                }
+
+                // Lọc Tên hàng hóa
+                const tenHangFilter = selectedFilters['ten-hang'];
+                if (tenHangFilter.length > 0 && !tenHangFilter.includes(product.TenHangHoa)) {
+                    return false;
+                }
+
+                return true;
+            });
+            
+            renderTable(filteredProducts);
+            updateStats(filteredProducts.length);
+        }
+        
+        /**
+         * Hàm render bảng với dữ liệu đã lọc.
+         * @param {object[]} data - Mảng các đối tượng sản phẩm để hiển thị.
+         */
+        function renderTable(data) {
+            const tbody = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+            
+            data.forEach(product => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.MaHang || ''}</td>
+                    <td>${product.TenHangHoa || ''}</td>
+                    <td class="text-center">${product.DVT || ''}</td>
+                    <td class="text-center font-semibold">${product.SoLuongTon || ''}</td>
+                    <td class="text-center">${product.ThueSuat ? product.ThueSuat + '%' : ''}</td>
+                    <td class="text-center">
+                        <span class="${product.LoaiSP === 'Loại A' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'} 
+                            px-2 py-1 rounded text-xs">
+                            ${product.LoaiSP || ''}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateStats(data.length);
+        }
+        
+        /**
+         * Hàm xóa tất cả bộ lọc.
+         */
+        function clearAllFilters() {
+            selectedFilters['ma-hang'] = [];
+            selectedFilters['dvt'] = [];
+            selectedFilters['loai'] = [];
+            selectedFilters['ten-hang'] = [];
+            
+            document.querySelectorAll('.dropdown-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            updateDropdownDisplay('ma-hang');
+            updateDropdownDisplay('dvt');
+            updateDropdownDisplay('loai');
+            updateDropdownDisplay('ten-hang');
+            
+            renderTable(allProducts);
+        }
+        
+        /**
+         * Hàm cập nhật thống kê số lượng sản phẩm.
+         * @param {number} visibleCount - Số lượng sản phẩm hiển thị.
+         */
+        function updateStats(visibleCount) {
+            document.getElementById('visible-count').textContent = visibleCount;
+            document.getElementById('total-count').textContent = allProducts.length;
+        }
     </script>
 </body>
 </html>
