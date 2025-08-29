@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiển thị dữ liệu từ Google Sheets</title>
+    <!-- Thêm thư viện Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #4b5563;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+        }
+        tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+        .loading {
+            text-align: center;
+            font-size: 1.25rem;
+            color: #6b7280;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container bg-white shadow-lg rounded-lg">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Dữ liệu hàng hóa</h1>
+        <div id="table-container" class="overflow-x-auto">
+            <!-- Bảng sẽ được tạo bởi JavaScript tại đây -->
+            <div id="loading" class="loading">Đang tải dữ liệu...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // URL của ứng dụng web Google Apps Script của bạn
+            const webAppUrl = 'https://script.google.com/macros/s/AKfycbyeyxCfjyJk_JgZbDpt5Flwo0lDzt62Vr63sqRJxQOuMfCnmR_KLolV2hK6ig9MVI9g/exec';
+
+            // Hàm tạo bảng HTML từ dữ liệu
+            function createTable(data) {
+                // Tách hàng tiêu đề và dữ liệu
+                const headers = data[0];
+                const rows = data.slice(1);
+
+                let tableHtml = `
+                    <table class="min-w-full">
+                        <thead>
+                            <tr>
+                                ${headers.map(header => `<th class="px-6 py-3">${header}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map(row => `
+                                <tr>
+                                    ${row.map(cell => `<td class="px-6 py-4">${cell}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                return tableHtml;
+            }
+
+            // Gửi yêu cầu fetch để lấy dữ liệu từ Web App
+            fetch(webAppUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Lỗi mạng hoặc server');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const tableContainer = document.getElementById('table-container');
+                    const loadingIndicator = document.getElementById('loading');
+                    
+                    if (data && data.length > 0) {
+                        // Ẩn thông báo đang tải
+                        loadingIndicator.style.display = 'none';
+                        // Tạo và hiển thị bảng
+                        tableContainer.innerHTML = createTable(data);
+                    } else {
+                        // Hiển thị thông báo nếu không có dữ liệu
+                        loadingIndicator.innerText = 'Không có dữ liệu để hiển thị.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu:', error);
+                    const loadingIndicator = document.getElementById('loading');
+                    loadingIndicator.innerText = 'Lỗi khi tải dữ liệu. Vui lòng kiểm tra lại URL hoặc kết nối mạng.';
+                });
+        });
+    </script>
+</body>
+</html>
