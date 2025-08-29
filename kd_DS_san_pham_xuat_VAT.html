@@ -382,7 +382,7 @@
                 const loaiSP = item['Loại sản phẩm'] || '';
                 
                 // Chuyển đổi thuế suất từ decimal sang phần trăm
-                const thueXuatPercent = (thueXuat).toFixed(2) + '%';
+                const thueXuatPercent = (thueXuat * 100).toFixed(2) + '%';
                 
                 // Định dạng giá xuất với phân tách hàng nghìn
                 const giaXuatFormatted = giaXuat.toLocaleString('vi-VN');
