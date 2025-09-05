@@ -75,6 +75,14 @@
             margin-bottom: 15px;
             font-size: 14px;
         }
+        
+        .phieu-info {
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
 
         .section-title {
             font-weight: bold;
@@ -234,6 +242,10 @@
     <div class="section-title">
         PHIẾU ĐÁNH GIÁ PHỎNG VẤN
     </div>
+    
+    <div class="phieu-info">
+        <p>Mã phiếu: <span id="ma_phieu_data"></span></p>
+    </div>
 
     <!-- A. THÔNG TIN ỨNG VIÊN -->
     <h3 class="section-heading">A. THÔNG TIN ỨNG VIÊN</h3>
@@ -359,11 +371,12 @@
 
         // Cập nhật các trường thông tin
         // Sử dụng các tên biến này khi truyền dữ liệu qua URL:
-        // Ngay_danh_gia, Ten_ung_vien, Nam_sinh, So_dien_thoai, Vi_tri_ung_tuyen,
+        // Ngay_danh_gia, Ma_phieu, Ten_ung_vien, Nam_sinh, So_dien_thoai, Vi_tri_ung_tuyen,
         // Tinh_than_thai_do, Kien_thuc_chuyen_mon, Ky_nang_ca_nhan,
         // Diem_manh, Diem_yeu, Danh_gia_khac, Ket_luan,
         // Luong_ung_vien, Luong_quan_ly, Ngay_di_lam, 
         updateElementText('ngay_danh_gia_data', 'Ngay_danh_gia');
+        updateElementText('ma_phieu_data', 'Ma_phieu');
         updateElementText('ten_ung_vien_data', 'Ten_ung_vien');
         updateElementText('nam_sinh_data', 'Nam_sinh');
         updateElementText('so_dien_thoai_data', 'So_dien_thoai');
