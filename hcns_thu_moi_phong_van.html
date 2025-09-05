@@ -4,25 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thư mời phỏng vấn</title>
+    <!-- Thư viện Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện để chuyển HTML sang Canvas/Hình ảnh -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Thư viện để tạo file PDF từ Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
+        /* Cài đặt cho in ấn: Khổ giấy A4 và lề 1.5cm */
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             line-height: 1.6;
             margin: 0;
             padding: 0;
             color: #333;
             background-color: #f0f0f0;
+            font-size: 11pt;
         }
 
-        .container {
+        .document-container {
             width: 21cm;
             min-height: 29.7cm;
+            max-width: 21cm;
             margin: 30px auto;
-            border: 1px solid #ddd;
-            padding: 2cm;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5cm;
             background-color: #fff;
-            box-sizing: border-box;
+            box-sizing: content-box;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .header-table {
@@ -30,51 +44,55 @@
             border-collapse: collapse;
             margin-bottom: 20px;
         }
+
         .header-table td {
             vertical-align: top;
             padding: 0;
         }
+
         .header-table .company-info {
             text-align: left;
         }
-        /* Tùy chỉnh cỡ chữ cho thông tin công ty */
+
         .company-info h2 {
             margin: 0;
-            font-size: 14px; /* Cỡ chữ nhỏ hơn một chút */
+            font-size: 14px;
             line-height: 1.2;
             color: #555;
+            font-weight: bold;
         }
+
         .company-info .address {
             font-style: italic;
             margin: 0;
-            font-size: 12px; /* Cỡ chữ nhỏ hơn */
+            font-size: 12px;
             line-height: 1.2;
         }
+
         .location {
             font-style: italic;
             text-align: right;
             margin-bottom: 15px;
-            font-size: 12px; /* Cỡ chữ nhỏ hơn */
+            font-size: 12px;
         }
 
-        /* Tùy chỉnh cỡ chữ cho tiêu đề */
         .section-title {
             font-weight: bold;
-            font-size: 16px; /* Cỡ chữ nhỏ hơn */
+            font-size: 16px;
             text-align: center;
             margin-bottom: 15px;
+            text-transform: uppercase;
         }
-        
-        /* Tùy chỉnh cỡ chữ cho nội dung chính */
+
         .content {
             margin-bottom: 20px;
-            font-size: 13px; /* Cỡ chữ nhỏ hơn */
+            font-size: 13px;
         }
 
         .content p {
             margin: 5px 0;
         }
-        
+
         .details ul {
             list-style-type: none;
             padding: 0;
@@ -87,11 +105,11 @@
         .contact-info {
             text-align: justify;
             margin-top: 20px;
-            font-size: 13px; /* Cỡ chữ nhỏ hơn */
+            font-size: 13px;
         }
 
         .footer p {
-            font-size: 13px; /* Tùy chỉnh cỡ chữ cho "Trân trọng kính mời!" */
+            font-size: 13px;
             margin-top: 10px;
         }
 
@@ -102,61 +120,60 @@
         .signature {
             text-align: right;
             margin-top: 50px;
-            font-size: 13px; /* Cỡ chữ nhỏ hơn */
+            font-size: 13px;
         }
 
-        /* Styles for the print button */
-        .print-button {
+        /* Ẩn nút "Xuất PDF" khi in */
+        .no-print {
             display: block;
-            margin: 20px auto;
-            padding: 15px 40px;
-            font-size: 18px;
-            cursor: pointer;
-            border: 2px solid red;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            font-weight: bold;
-            color: red;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-        .print-button:hover {
-            background-color: #e8e8e8;
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px);
         }
 
-        /* Print-specific styles for A4 format and hiding elements */
+        /* CSS cho in ấn - đảm bảo giống hệt hiển thị màn hình */
         @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color: #000 !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                background: white !important;
+            }
+
             body {
-                background-color: #fff;
-                margin: 0;
-                padding: 0;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
             }
-            .container {
-                width: 21cm;
-                min-height: 29.7cm;
-                padding: 1.5cm 2cm;
-                margin: 0;
-                box-shadow: none;
-                border: none;
+
+            .document-container {
+                width: 100% !important;
+                min-height: 29.7cm !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 1.5cm !important;
+                box-shadow: none !important;
+                border: none !important;
+                box-sizing: content-box;
             }
-            /* Hide the print button when printing */
-            .print-button {
-                display: none;
+
+            .no-print {
+                display: none !important;
             }
-        }
-        
-        .red-text {
-            color: red;
         }
     </style>
 </head>
 <body>
 
-    <button class="print-button" onclick="window.print()">IN</button>
+<div class="flex justify-end p-4 no-print">
+    <!-- Nút "Xuất PDF" -->
+    <button id="downloadPdfButton" 
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            data-html2canvas-ignore="true" onclick="downloadPDF()">
+        Xuất PDF
+    </button>
+</div>
 
-<div class="container">
+<div class="document-container" id="documentContainer">
     <!-- Header Section as a table -->
     <table class="header-table">
         <tr>
@@ -208,33 +225,64 @@
 </div>
 
 <script>
+    // Hàm này sẽ lấy dữ liệu từ URL và hiển thị lên form
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
 
-        // Function to update element content based on URL parameter
-        const updateElement = (id, paramName, fallbackText = '') => {
+        function updateElementText(id, paramName) {
             const element = document.getElementById(id);
-            if (element) {
-                const paramValue = params.get(paramName);
-                if (paramValue) {
-                    element.innerHTML = paramValue;
-                } else {
-                    element.innerHTML = fallbackText;
-                }
+            if (element && params.has(paramName)) {
+                const text = decodeURIComponent(params.get(paramName)).replace(/\\n/g, '\n');
+                element.textContent = text;
             }
-        };
-
-        // Update main content fields
-        updateElement('ngay_thang', 'ngay');
-        updateElement('ungvien_data', 'ungvien');
-        updateElement('vitriungtuyen_data', 'vitriungtuyen');
-        updateElement('vitrikhac_data', 'vitrikhac');
-        updateElement('thoigian_data', 'thoigian');
-        updateElement('diadiem_data', 'diadiem');
-        updateElement('noiphongvan_data', 'noiphongvan');
-        updateElement('sdt_data', 'sdt');
-        updateElement('email_data', 'email');
+        }
+        
+        // Cập nhật các trường thông tin
+        updateElementText('ngay_thang', 'ngay');
+        updateElementText('ungvien_data', 'ungvien');
+        updateElementText('vitriungtuyen_data', 'vitriungtuyen');
+        updateElementText('vitrikhac_data', 'vitrikhac');
+        updateElementText('thoigian_data', 'thoigian');
+        updateElementText('diadiem_data', 'diadiem');
+        updateElementText('noiphongvan_data', 'noiphongvan');
+        updateElementText('sdt_data', 'sdt');
+        updateElementText('email_data', 'email');
     });
+
+    // Hàm chuyển đổi HTML sang PDF
+    async function downloadPDF() {
+        const element = document.getElementById('documentContainer');
+        
+        // Tạo canvas từ HTML
+        const canvas = await html2canvas(element, {
+            scale: 2, 
+            useCORS: true,
+        });
+
+        // Kích thước trang A4
+        const A4_WIDTH = 210; // mm
+        const A4_HEIGHT = 297; // mm
+        const margin = 15; // 1.5cm
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        
+        // Tạo instance jsPDF với định dạng A4
+        const doc = new jspdf.jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+        });
+        
+        // Tính toán kích thước ảnh để vừa với lề 1.5cm
+        const imgProps = doc.getImageProperties(imgData);
+        const finalImgWidth = A4_WIDTH - 2 * margin;
+        const finalImgHeight = (imgProps.height * finalImgWidth) / imgProps.width;
+
+        // Thêm ảnh vào PDF
+        doc.addImage(imgData, 'JPEG', margin, (A4_HEIGHT - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
+
+        // Lưu file PDF
+        doc.save('Thu_moi_phong_van.pdf');
+    }
 </script>
 
 </body>
