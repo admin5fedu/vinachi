@@ -498,7 +498,9 @@
         function updateElementText(id, paramName) {
             const element = document.getElementById(id);
             if (element && params.has(paramName)) {
-                element.textContent = decodeURIComponent(params.get(paramName));
+                // Xử lý xuống dòng: thay thế \n thành ký tự xuống dòng thực
+                const text = decodeURIComponent(params.get(paramName)).replace(/\\n/g, '\n');
+                element.textContent = text;
             }
         }
 
