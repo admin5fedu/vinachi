@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Đánh Giá Hết Thử Việc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+        }
+        .label {
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .static-data {
+            padding: 0.75rem 1rem;
+            width: 100%;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            display: block;
+            min-height: 2.75rem;
+        }
+        .static-textarea {
+            padding: 0.75rem 1rem;
+            width: 100%;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            display: block;
+            min-height: 10rem;
+            white-space: pre-wrap;
+        }
+        th, td {
+            padding: 12px 24px;
+        }
+
+        /* CSS cho việc in ra khổ A4 */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background: none;
+            }
+            .form-container {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                padding: 1cm !important;
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 auto !important;
+                min-height: auto !important;
+                height: auto !important;
+                font-size: 0.75em;
+                line-height: 1.1;
+                transform: none !important;
+                transform-origin: top left;
+            }
+            .no-print {
+                display: none;
+            }
+            .section-title, .mb-6 {
+                page-break-inside: avoid;
+            }
+            .form-container h1 { font-size: 1.5em !important; }
+            .form-container p, .form-container span, .form-container td, .form-container th { font-size: 0.75em !important; }
+            .form-container .text-xs { font-size: 0.6em !important; }
+            .form-container .text-sm { font-size: 0.7em !important; }
+            .form-container .text-base { font-size: 0.75em !important; }
+            .form-container .text-lg { font-size: 0.8em !important; }
+            .form-container .text-xl { font-size: 0.9em !important; }
+            .flex-col.md\:flex-row {
+                flex-direction: row !important;
+            }
+            .static-data, .static-textarea {
+                background-color: transparent;
+                border: none;
+            }
+            .border-b {
+                border-bottom: 1px solid #e5e7eb;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <div class="flex items-center mb-4">
+        <table class="w-full">
+            <tr>
+                <td class="w-1/6">
+                    <img src="https://drive.google.com/thumbnail?id=12VL0Dxkj5d8xwLFVRslpHdtlWd4MHF5a" alt="Company Logo" class="w-full h-auto rounded-full">
+                </td>
+                <td class="w-5/6">
+                    <p class="font-bold text-base text-gray-800">CÔNG TY TNHH VINACHI VIỆT NAM</p>
+                    <p class="text-xs text-gray-500 italic">Địa chỉ: Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="flex flex-col items-center mb-2">
+        <h1 class="text-xl font-bold text-gray-800 mb-1">PHIẾU ĐÁNH GIÁ NHÂN SỰ</h1>
+        <p class="text-sm text-gray-500">Mã phiếu: <span id="maPhieu">VIN2023-01</span></p>
+    </div>
+
+    <!-- Thông tin chung -->
+    <div class="mb-4">
+        <div class="section-title">I. Thông tin chung</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+                <span class="label">Mã nhân viên và Họ tên:</span>
+                <span class="static-data" id="maNhanVienHoTen">NV001 - Nguyễn Văn A</span>
+            </div>
+            <div>
+                <span class="label">Phòng:</span>
+                <span class="static-data" id="phong">Phòng Marketing</span>
+            </div>
+            <div>
+                <span class="label">Vị trí:</span>
+                <span class="static-data" id="viTri">Nhân viên Content</span>
+            </div>
+            <div>
+                <span class="label">Ngày thử việc:</span>
+                <span class="static-data" id="ngayThuViec">01-06-2025</span>
+            </div>
+            <div>
+                <span class="label">Ngày hết thử việc:</span>
+                <span class="static-data" id="ngayHetThuViec">01-09-2025</span>
+            </div>
+            <div>
+                <span class="label">Ngày đánh giá:</span>
+                <span class="static-data" id="ngayDanhGia">05-09-2025</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Đánh giá chi tiết -->
+    <div class="mb-4">
+        <div class="section-title">II. Đánh giá chi tiết</div>
+        <p class="font-semibold text-gray-700 mb-2">A. Kết quả công việc</p>
+        <table class="w-full text-left table-auto">
+            <thead>
+                <tr class="bg-gray-100 text-gray-600 uppercase text-xs leading-normal">
+                    <th class="py-2 px-4">Tên công việc</th>
+                    <th class="py-2 px-4 text-center">Mức độ hoàn thành</th>
+                    <th class="py-2 px-4">Nhận xét</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-600 text-sm font-light">
+                <tr class="border-b border-gray-200">
+                    <td class="py-2 px-4"><span class="static-data" id="tenCongViec_1">Viết 5 bài blog mỗi tuần</span></td>
+                    <td class="py-2 px-4 text-center"><span class="static-data" id="hoanThanh_1">Tốt</span></td>
+                    <td class="py-2 px-4"><span class="static-data" id="nhanXet_1">Đảm bảo số lượng và chất lượng bài viết.</span></td>
+                </tr>
+                <tr class="border-b border-gray-200">
+                    <td class="py-2 px-4"><span class="static-data" id="tenCongViec_2">Lên kế hoạch content cho tháng 9</span></td>
+                    <td class="py-2 px-4 text-center"><span class="static-data" id="hoanThanh_2">Khá</span></td>
+                    <td class="py-2 px-4"><span class="static-data" id="nhanXet_2">Kế hoạch đã có, cần cải thiện thêm về tính sáng tạo.</span></td>
+                </tr>
+                <tr class="border-b border-gray-200">
+                    <td class="py-2 px-4"><span class="static-data" id="tenCongViec_3">Phân tích từ khóa SEO</span></td>
+                    <td class="py-2 px-4 text-center"><span class="static-data" id="hoanThanh_3">TB</span></td>
+                    <td class="py-2 px-4"><span class="static-data" id="nhanXet_3">Cần học hỏi và cải thiện thêm kỹ năng này.</span></td>
+                </tr>
+                <tr class="border-b border-gray-200">
+                    <td class="py-2 px-4"><span class="static-data" id="tenCongViec_4"></span></td>
+                    <td class="py-2 px-4 text-center"><span class="static-data" id="hoanThanh_4"></span></td>
+                    <td class="py-2 px-4"><span class="static-data" id="nhanXet_4"></span></td>
+                </tr>
+                <tr class="border-b border-gray-200">
+                    <td class="py-2 px-4"><span class="static-data" id="tenCongViec_5"></span></td>
+                    <td class="py-2 px-4 text-center"><span class="static-data" id="hoanThanh_5"></span></td>
+                    <td class="py-2 px-4"><span class="static-data" id="nhanXet_5"></span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Thái độ - Tinh thần -->
+    <div class="mb-4">
+        <p class="font-semibold text-gray-700 mb-2">B. Thái độ - Tinh thần</p>
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+            <div class="w-full md:w-1/2">
+                <p class="font-medium text-sm text-gray-700 mb-2 md:mb-0">Gợi ý đánh giá:</p>
+                <ul class="list-disc list-inside text-xs text-gray-600">
+                    <li>Trung thực và trách nhiệm</li>
+                    <li>Chuyên cần và tuân thủ nội quy</li>
+                    <li>Tác phong làm việc chuyên nghiệp</li>
+                    <li>Chủ động, tự giác trong công việc</li>
+                    <li>Ham học hỏi và cầu tiến</li>
+                </ul>
+            </div>
+            <div class="w-full md:w-1/4">
+                <span class="label">Đánh giá chung:</span>
+                <span class="static-data" id="tt_danhgia">Tốt</span>
+            </div>
+            <div class="w-full md:w-1/4">
+                <span class="label">Nhận xét:</span>
+                <span class="static-textarea" id="tt_nhanxet">Thái độ làm việc rất tốt, luôn chủ động tìm hiểu và hoàn thành công việc được giao. Tinh thần học hỏi cao.</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Kiến thức - Hiểu biết -->
+    <div class="mb-4">
+        <p class="font-semibold text-gray-700 mb-2">C. Kiến thức - Hiểu biết</p>
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+            <div class="w-full md:w-1/2">
+                <p class="font-medium text-sm text-gray-700 mb-2 md:mb-0">Gợi ý đánh giá:</p>
+                <ul class="list-disc list-inside text-xs text-gray-600">
+                    <li>Nắm vững quy trình nội bộ</li>
+                    <li>Kiến thức chuyên môn và nghiệp vụ</li>
+                    <li>Hiểu biết về sản phẩm/dịch vụ của công ty</li>
+                    <li>Hiểu biết về khách hàng và thị trường</li>
+                </ul>
+            </div>
+            <div class="w-full md:w-1/4">
+                <span class="label">Đánh giá chung:</span>
+                <span class="static-data" id="kt_danhgia">Khá</span>
+            </div>
+            <div class="w-full md:w-1/4">
+                <span class="label">Nhận xét:</span>
+                <span class="static-textarea" id="kt_nhanxet">Nắm bắt kiến thức cơ bản về sản phẩm tốt. Cần trau dồi thêm kiến thức chuyên sâu về SEO và thị trường.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kỹ năng -->
+    <div class="mb-4">
+        <p class="font-semibold text-gray-700 mb-2">D. Kỹ năng</p>
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
+            <div class="w-full md:w-1/2">
+                <p class="font-medium text-sm text-gray-700 mb-2 md:mb-0">Gợi ý đánh giá:</p>
+                <ul class="list-disc list-inside text-xs text-gray-600">
+                    <li>Sử dụng công cụ phần mềm</li>
+                    <li>Lập kế hoạch</li>
+                    <li>Ứng biến & xử lý sự cố</li>
+                    <li>Làm việc đa năng</li>
+                    <li>Phối hợp làm việc nhóm</li>
+                    <li>Giao tiếp</li>
+                </ul>
+            </div>
+            <div class="w-full md:w-1/4">
+                <span class="label">Đánh giá chung:</span>
+                <span class="static-data" id="kn_danhgia">Khá</span>
+            </div>
+            <div class="w-full md:w-1/4">
+                <span class="label">Nhận xét:</span>
+                <span class="static-textarea" id="kn_nhanxet">Kỹ năng làm việc nhóm tốt, hòa đồng. Kỹ năng lập kế hoạch và xử lý tình huống cần được rèn luyện thêm.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Đánh giá tổng thể -->
+    <div class="mb-4">
+        <div class="section-title">III. Đánh giá tổng thể và Kết luận</div>
+        <p class="font-semibold text-gray-700 mb-2">A. Đánh giá tổng thể</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div>
+                <span class="label">Điểm mạnh:</span>
+                <span class="static-data" id="diemManh">Nhiệt tình, có trách nhiệm, luôn chủ động trong công việc.</span>
+            </div>
+            <div>
+                <span class="label">Điểm yếu:</span>
+                <span class="static-data" id="diemYeu">Kinh nghiệm chuyên môn còn hạn chế, cần thời gian để trau dồi.</span>
+            </div>
+            <div>
+                <span class="label">Đánh giá khác:</span>
+                <span class="static-data" id="danhGiaKhac">Nhìn chung, đây là một nhân viên tiềm năng, có thể phát triển tốt trong tương lai.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kết luận -->
+    <div class="mb-4">
+        <p class="font-semibold text-gray-700 mb-2">B. Kết luận</p>
+        <div class="text-sm">
+            <span class="static-data" id="ketLuan">Vào chính thức</span>
+        </div>
+        <div class="mb-4 text-sm mt-4">
+            <span class="label">Kết luận khác:</span>
+            <span class="static-data" id="ketLuanKhac"></span>
+        </div>
+    </div>
+
+    <!-- Chữ ký -->
+    <div class="section-title mt-8">IV. Xác nhận của các bên</div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mt-6 text-sm">
+        <div>
+            <p class="font-bold mb-1">Quản lý trực tiếp</p>
+            <p class="text-gray-500 italic mb-2 text-xs">(Ký, ghi rõ họ tên)</p>
+            <div class="h-10 border-b border-gray-300 mx-12"></div>
+            <p class="label mt-2">Ý kiến:</p>
+            <div class="h-16 border-b border-gray-300 mx-4"></div>
+        </div>
+        <div>
+            <p class="font-bold mb-1">HCNS</p>
+            <p class="text-gray-500 italic mb-2 text-xs">(Ký, ghi rõ họ tên)</p>
+            <div class="h-10 border-b border-gray-300 mx-12"></div>
+            <p class="label mt-2">Ý kiến:</p>
+            <div class="h-16 border-b border-gray-300 mx-4"></div>
+        </div>
+        <div>
+            <p class="font-bold mb-1">Ban Giám Đốc</p>
+            <p class="text-gray-500 italic mb-2 text-xs">(Ký, ghi rõ họ tên)</p>
+            <div class="h-10 border-b border-gray-300 mx-12"></div>
+            <p class="label mt-2">Ý kiến:</p>
+            <div class="h-16 border-b border-gray-300 mx-4"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+
+        function updateElementText(id, paramName) {
+            const element = document.getElementById(id);
+            if (element && params.has(paramName)) {
+                element.textContent = decodeURIComponent(params.get(paramName));
+            }
+        }
+
+        // Thông tin chung
+        updateElementText('maPhieu', 'maPhieu');
+        updateElementText('maNhanVienHoTen', 'maNhanVienHoTen');
+        updateElementText('phong', 'phong');
+        updateElementText('viTri', 'viTri');
+        updateElementText('ngayThuViec', 'ngayThuViec');
+        updateElementText('ngayHetThuViec', 'ngayHetThuViec');
+        updateElementText('ngayDanhGia', 'ngayDanhGia');
+
+        // Kết quả công việc
+        for (let i = 1; i <= 5; i++) {
+            updateElementText(`tenCongViec_${i}`, `tenCongViec_${i}`);
+            updateElementText(`hoanThanh_${i}`, `hoanThanh_${i}`);
+            updateElementText(`nhanXet_${i}`, `nhanXet_${i}`);
+        }
+
+        // Các mục đánh giá khác
+        updateElementText('tt_danhgia', 'tt_danhgia');
+        updateElementText('tt_nhanxet', 'tt_nhanxet');
+        updateElementText('kt_danhgia', 'kt_danhgia');
+        updateElementText('kt_nhanxet', 'kt_nhanxet');
+        updateElementText('kn_danhgia', 'kn_danhgia');
+        updateElementText('kn_nhanxet', 'kn_nhanxet');
+        updateElementText('diemManh', 'diemManh');
+        updateElementText('diemYeu', 'diemYeu');
+        updateElementText('danhGiaKhac', 'danhGiaKhac');
+        updateElementText('ketLuan', 'ketLuan');
+        updateElementText('ketLuanKhac', 'ketLuanKhac');
+    });
+</script>
+
+</body>
+</html>
