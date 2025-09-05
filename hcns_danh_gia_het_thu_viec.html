@@ -74,8 +74,8 @@
                 margin: 0 !important;
                 min-height: auto !important;
                 height: auto !important;
-                font-size: 9pt;
-                line-height: 1.2;
+                font-size: 6pt;
+                line-height: 1;
             }
             .no-print {
                 display: none !important;
@@ -87,10 +87,10 @@
                 page-break-inside: avoid;
             }
             
-            .form-container h1 { font-size: 1.2em !important; }
-            .form-container p, .form-container span, .form-container td, .form-container th { font-size: 0.8em !important; }
-            .form-container .text-xs { font-size: 0.7em !important; }
-            .form-container .text-sm { font-size: 0.8em !important; }
+            .form-container h1 { font-size: 0.8em !important; }
+            .form-container p, .form-container span, .form-container td, .form-container th { font-size: 0.55em !important; }
+            .form-container .text-xs { font-size: 0.45em !important; }
+            .form-container .text-sm { font-size: 0.55em !important; }
 
             .flex-col.md\:flex-row {
                 flex-direction: row !important;
@@ -98,7 +98,7 @@
             .static-data, .static-textarea {
                 background-color: transparent !important;
                 border: none !important;
-                padding: 0.2rem 0.5rem !important;
+                padding: 0.1rem 0.2rem !important;
             }
             .border-b {
                 border-bottom: 1px solid #e5e7eb !important;
@@ -107,7 +107,7 @@
                 table-layout: fixed;
             }
             .table-auto th, .table-auto td {
-                padding: 4px;
+                padding: 1px !important;
                 vertical-align: top;
             }
             .table-auto thead th:nth-child(1) { width: 30%; }
@@ -115,20 +115,20 @@
             .table-auto thead th:nth-child(3) { width: 50%; }
             
             .static-textarea {
-                min-height: 2rem !important;
+                min-height: 1.5rem !important;
             }
             
             .flex.items-start.md\:items-center {
                 align-items: flex-start !important;
             }
             .grid.grid-cols-1.md\:grid-cols-3.gap-8.text-center.mt-6.text-sm {
-                gap: 1rem !important;
+                gap: 0.15rem !important;
             }
             .h-10.border-b {
-                height: 1.5rem !important;
+                height: 0.6rem !important;
             }
             .h-16.border-b {
-                height: 2rem !important;
+                height: 0.8rem !important;
             }
         }
     </style>
@@ -160,8 +160,8 @@
         <div class="section-title">I. Thông tin chung</div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-                <span class="label">Mã nhân viên và Họ tên:</span>
-                <span class="static-data" id="maNhanVienHoTen">NV001 - Nguyễn Văn A</span>
+                <span class="label">Nhân viên:</span>
+                <span class="static-data" id="nhanVien">NV001 - Nguyễn Văn A</span>
             </div>
             <div>
                 <span class="label">Phòng:</span>
@@ -378,7 +378,7 @@
 
         // Thông tin chung
         updateElementText('maPhieu', 'maPhieu');
-        updateElementText('maNhanVienHoTen', 'maNhanVienHoTen');
+        updateElementText('nhanVien', 'nhanVien');
         updateElementText('phong', 'phong');
         updateElementText('viTri', 'viTri');
         updateElementText('ngayThuViec', 'ngayThuViec');
