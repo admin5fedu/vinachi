@@ -35,13 +35,14 @@
             display: block;
         }
         .static-data {
-            padding: 0.5rem;
+            padding: 0.25rem;
             width: 100%;
             background-color: #f9fafb;
             border: 1px solid #e5e7eb;
             border-radius: 4px;
             display: block;
-            min-height: 1.75rem;
+            min-height: 1.5rem;
+            white-space: pre-wrap;
         }
         .static-textarea {
             padding: 0.5rem;
@@ -137,38 +138,28 @@
     <!-- Thông tin chung -->
     <div class="mb-2">
         <div class="section-title">I. Thông tin chung</div>
-        <div class="flex flex-col gap-2">
-            <div class="flex flex-col md:flex-row gap-2">
-                <div class="w-full md:w-1/2">
-                    <span class="label">Nhân viên:</span>
-                    <span class="static-data" id="nhanVien"></span>
-                </div>
-                <div class="w-full md:w-1/2">
-                    <span class="label">Phòng:</span>
-                    <span class="static-data" id="phong"></span>
-                </div>
-            </div>
-            <div class="flex flex-col md:flex-row gap-2">
-                <div class="w-full md:w-1/2">
-                    <span class="label">Vị trí:</span>
-                    <span class="static-data" id="viTri"></span>
-                </div>
-                <div class="w-full md:w-1/2">
-                    <span class="label">Ngày thử việc:</span>
-                    <span class="static-data" id="ngayThuViec"></span>
-                </div>
-            </div>
-            <div class="flex flex-col md:flex-row gap-2">
-                <div class="w-full md:w-1/2">
-                    <span class="label">Ngày hết thử việc:</span>
-                    <span class="static-data" id="ngayHetThuViec"></span>
-                </div>
-                <div class="w-full md:w-1/2">
-                    <span class="label">Ngày đánh giá:</span>
-                    <span class="static-data" id="ngayDanhGia"></span>
-                </div>
-            </div>
-        </div>
+        <table class="w-full text-left table-auto">
+            <tbody class="text-gray-600 font-light">
+                <tr>
+                    <td class="py-0.5 px-1 w-1/4 font-medium">Nhân viên:</td>
+                    <td class="py-0.5 px-1 w-1/4"><span class="static-data" id="nhanVien"></span></td>
+                    <td class="py-0.5 px-1 w-1/4 font-medium">Phòng:</td>
+                    <td class="py-0.5 px-1 w-1/4"><span class="static-data" id="phong"></span></td>
+                </tr>
+                <tr>
+                    <td class="py-0.5 px-1 w-1/4 font-medium">Vị trí:</td>
+                    <td class="py-0.5 px-1 w-1/4"><span class="static-data" id="viTri"></span></td>
+                    <td class="py-0.5 px-1 w-1/4 font-medium">Ngày thử việc:</td>
+                    <td class="py-0.5 px-1 w-1/4"><span class="static-data" id="ngayThuViec"></span></td>
+                </tr>
+                <tr>
+                    <td class="py-0.5 px-1 w-1/4 font-medium">Ngày hết thử việc:</td>
+                    <td class="py-0.5 px-1 w-1/4"><span class="static-data" id="ngayHetThuViec"></span></td>
+                    <td class="py-0.5 px-1 w-1/4 font-medium">Ngày đánh giá:</td>
+                    <td class="py-0.5 px-1 w-1/4"><span class="static-data" id="ngayDanhGia"></span></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <!-- Đánh giá chi tiết -->
