@@ -9,54 +9,55 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            background-color: #ffffff;
+            font-size: 13px; /* Tương đương 9pt */
+            line-height: 1.3;
         }
         .form-container {
             max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
+            margin: 0 auto;
+            padding: 1.5cm;
             background-color: #ffffff;
-            border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .section-title {
-            font-size: 1.25rem;
+            font-size: 1.1em;
             font-weight: 600;
             color: #1f2937;
-            margin-bottom: 1rem;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.25rem;
         }
         .label {
             font-weight: 500;
             color: #4b5563;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             display: block;
         }
         .static-data {
-            padding: 0.75rem 1rem;
+            padding: 0.5rem;
             width: 100%;
             background-color: #f9fafb;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border-radius: 4px;
             display: block;
-            min-height: 2.75rem;
+            min-height: 1.75rem;
         }
         .static-textarea {
-            padding: 0.75rem 1rem;
+            padding: 0.5rem;
             width: 100%;
             background-color: #f9fafb;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border-radius: 4px;
             display: block;
-            min-height: 10rem;
+            min-height: 4rem;
             white-space: pre-wrap;
         }
         th, td {
-            padding: 12px 24px;
+            padding: 4px 8px;
         }
 
-        /* CSS cho việc in ra khổ A4 */
+        /* Đồng nhất CSS cho cả màn hình và in ấn */
         @media print {
             body {
                 margin: 0;
@@ -64,71 +65,34 @@
                 background: none;
                 color: #000;
                 -webkit-print-color-adjust: exact;
+                font-size: 13px !important; /* Tương đương 9pt */
+                line-height: 1.3 !important;
             }
             .form-container {
                 box-shadow: none !important;
                 border-radius: 0 !important;
-                padding: 1cm !important;
-                width: 100% !important;
+                padding: 1.5cm !important;
                 max-width: none !important;
                 margin: 0 !important;
-                min-height: auto !important;
-                height: auto !important;
-                font-size: 6pt;
-                line-height: 1;
             }
             .no-print {
                 display: none !important;
             }
-            .section-title, 
-            .mb-4, 
-            .mb-6, 
-            .mb-8 {
-                page-break-inside: avoid;
-            }
-            
-            .form-container h1 { font-size: 0.8em !important; }
-            .form-container p, .form-container span, .form-container td, .form-container th { font-size: 0.55em !important; }
-            .form-container .text-xs { font-size: 0.45em !important; }
-            .form-container .text-sm { font-size: 0.55em !important; }
-
-            .flex-col.md\:flex-row {
-                flex-direction: row !important;
-            }
             .static-data, .static-textarea {
                 background-color: transparent !important;
                 border: none !important;
-                padding: 0.1rem 0.2rem !important;
-            }
-            .border-b {
-                border-bottom: 1px solid #e5e7eb !important;
-            }
-            .table-auto {
-                table-layout: fixed;
-            }
-            .table-auto th, .table-auto td {
-                padding: 1px !important;
-                vertical-align: top;
-            }
-            .table-auto thead th:nth-child(1) { width: 30%; }
-            .table-auto thead th:nth-child(2) { width: 20%; }
-            .table-auto thead th:nth-child(3) { width: 50%; }
-            
-            .static-textarea {
-                min-height: 1.5rem !important;
-            }
-            
-            .flex.items-start.md\:items-center {
-                align-items: flex-start !important;
-            }
-            .grid.grid-cols-1.md\:grid-cols-3.gap-8.text-center.mt-6.text-sm {
-                gap: 0.15rem !important;
+                padding: 0 !important;
             }
             .h-10.border-b {
-                height: 0.6rem !important;
+                height: 1.5rem !important;
+                margin: 0 1rem;
             }
             .h-16.border-b {
-                height: 0.8rem !important;
+                height: 2rem !important;
+                margin: 0 1rem;
+            }
+            .section-title {
+                margin-bottom: 0.5rem !important;
             }
         }
     </style>
@@ -136,7 +100,7 @@
 <body>
 
 <div class="form-container">
-    <div class="flex items-center mb-4">
+    <div class="flex items-center mb-2">
         <table class="w-full">
             <tr>
                 <td class="w-1/6">
@@ -152,88 +116,88 @@
 
     <div class="flex flex-col items-center mb-2">
         <h1 class="text-xl font-bold text-gray-800 mb-1">PHIẾU ĐÁNH GIÁ NHÂN SỰ</h1>
-        <p class="text-sm text-gray-500">Mã phiếu: <span id="maPhieu">VIN2023-01</span></p>
+        <p class="text-sm text-gray-500">Mã phiếu: <span id="maPhieu"></span></p>
     </div>
 
     <!-- Thông tin chung -->
-    <div class="mb-4">
+    <div class="mb-2">
         <div class="section-title">I. Thông tin chung</div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div>
                 <span class="label">Nhân viên:</span>
-                <span class="static-data" id="nhanVien">NV001 - Nguyễn Văn A</span>
+                <span class="static-data" id="nhanVien"></span>
             </div>
             <div>
                 <span class="label">Phòng:</span>
-                <span class="static-data" id="phong">Phòng Marketing</span>
+                <span class="static-data" id="phong"></span>
             </div>
             <div>
                 <span class="label">Vị trí:</span>
-                <span class="static-data" id="viTri">Nhân viên Content</span>
+                <span class="static-data" id="viTri"></span>
             </div>
             <div>
                 <span class="label">Ngày thử việc:</span>
-                <span class="static-data" id="ngayThuViec">01-06-2025</span>
+                <span class="static-data" id="ngayThuViec"></span>
             </div>
             <div>
                 <span class="label">Ngày hết thử việc:</span>
-                <span class="static-data" id="ngayHetThuViec">01-09-2025</span>
+                <span class="static-data" id="ngayHetThuViec"></span>
             </div>
             <div>
                 <span class="label">Ngày đánh giá:</span>
-                <span class="static-data" id="ngayDanhGia">05-09-2025</span>
+                <span class="static-data" id="ngayDanhGia"></span>
             </div>
         </div>
     </div>
 
     <!-- Đánh giá chi tiết -->
-    <div class="mb-4">
+    <div class="mb-2">
         <div class="section-title">II. Đánh giá chi tiết</div>
-        <p class="font-semibold text-gray-700 mb-2">A. Kết quả công việc</p>
+        <p class="font-semibold text-gray-700 mb-1">A. Kết quả công việc</p>
         <table class="w-full text-left table-auto">
             <thead>
                 <tr class="bg-gray-100 text-gray-600 uppercase text-xs leading-normal">
-                    <th class="py-2 px-4">Tên công việc</th>
-                    <th class="py-2 px-4 text-center">Mức độ hoàn thành</th>
-                    <th class="py-2 px-4">Nhận xét</th>
+                    <th class="py-1 px-2">Tên công việc</th>
+                    <th class="py-1 px-2 text-center">Mức độ hoàn thành</th>
+                    <th class="py-1 px-2">Nhận xét</th>
                 </tr>
             </thead>
-            <tbody class="text-gray-600 text-sm font-light">
+            <tbody class="text-gray-600 font-light">
                 <tr class="border-b border-gray-200">
-                    <td class="py-2 px-4"><span class="static-data" id="tenCongViec_1">Viết 5 bài blog mỗi tuần</span></td>
-                    <td class="py-2 px-4 text-center"><span class="static-data" id="hoanThanh_1">Tốt</span></td>
-                    <td class="py-2 px-4"><span class="static-data" id="nhanXet_1">Đảm bảo số lượng và chất lượng bài viết.</span></td>
+                    <td class="py-1 px-2"><span class="static-data" id="tenCongViec_1"></span></td>
+                    <td class="py-1 px-2 text-center"><span class="static-data" id="hoanThanh_1"></span></td>
+                    <td class="py-1 px-2"><span class="static-data" id="nhanXet_1"></span></td>
                 </tr>
                 <tr class="border-b border-gray-200">
-                    <td class="py-2 px-4"><span class="static-data" id="tenCongViec_2">Lên kế hoạch content cho tháng 9</span></td>
-                    <td class="py-2 px-4 text-center"><span class="static-data" id="hoanThanh_2">Khá</span></td>
-                    <td class="py-2 px-4"><span class="static-data" id="nhanXet_2">Kế hoạch đã có, cần cải thiện thêm về tính sáng tạo.</span></td>
+                    <td class="py-1 px-2"><span class="static-data" id="tenCongViec_2"></span></td>
+                    <td class="py-1 px-2 text-center"><span class="static-data" id="hoanThanh_2"></span></td>
+                    <td class="py-1 px-2"><span class="static-data" id="nhanXet_2"></span></td>
                 </tr>
                 <tr class="border-b border-gray-200">
-                    <td class="py-2 px-4"><span class="static-data" id="tenCongViec_3">Phân tích từ khóa SEO</span></td>
-                    <td class="py-2 px-4 text-center"><span class="static-data" id="hoanThanh_3">TB</span></td>
-                    <td class="py-2 px-4"><span class="static-data" id="nhanXet_3">Cần học hỏi và cải thiện thêm kỹ năng này.</span></td>
+                    <td class="py-1 px-2"><span class="static-data" id="tenCongViec_3"></span></td>
+                    <td class="py-1 px-2 text-center"><span class="static-data" id="hoanThanh_3"></span></td>
+                    <td class="py-1 px-2"><span class="static-data" id="nhanXet_3"></span></td>
                 </tr>
                 <tr class="border-b border-gray-200">
-                    <td class="py-2 px-4"><span class="static-data" id="tenCongViec_4"></span></td>
-                    <td class="py-2 px-4 text-center"><span class="static-data" id="hoanThanh_4"></span></td>
-                    <td class="py-2 px-4"><span class="static-data" id="nhanXet_4"></span></td>
+                    <td class="py-1 px-2"><span class="static-data" id="tenCongViec_4"></span></td>
+                    <td class="py-1 px-2 text-center"><span class="static-data" id="hoanThanh_4"></span></td>
+                    <td class="py-1 px-2"><span class="static-data" id="nhanXet_4"></span></td>
                 </tr>
                 <tr class="border-b border-gray-200">
-                    <td class="py-2 px-4"><span class="static-data" id="tenCongViec_5"></span></td>
-                    <td class="py-2 px-4 text-center"><span class="static-data" id="hoanThanh_5"></span></td>
-                    <td class="py-2 px-4"><span class="static-data" id="nhanXet_5"></span></td>
+                    <td class="py-1 px-2"><span class="static-data" id="tenCongViec_5"></span></td>
+                    <td class="py-1 px-2 text-center"><span class="static-data" id="hoanThanh_5"></span></td>
+                    <td class="py-1 px-2"><span class="static-data" id="nhanXet_5"></span></td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <!-- Thái độ - Tinh thần -->
-    <div class="mb-4">
-        <p class="font-semibold text-gray-700 mb-2">B. Thái độ - Tinh thần</p>
-        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
-            <div class="w-full md:w-1/5">
-                <p class="font-medium text-sm text-gray-700 mb-2 md:mb-0">Gợi ý đánh giá:</p>
+    <div class="mb-2">
+        <p class="font-semibold text-gray-700 mb-1">B. Thái độ - Tinh thần</p>
+        <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
+            <div class="w-full md:w-1/4">
+                <p class="font-medium text-sm text-gray-700 mb-1 md:mb-0">Gợi ý đánh giá:</p>
                 <ul class="list-disc list-inside text-xs text-gray-600">
                     <li>Trung thực và trách nhiệm</li>
                     <li>Chuyên cần và tuân thủ nội quy</li>
@@ -244,21 +208,21 @@
             </div>
             <div class="w-full md:w-1/5">
                 <span class="label">Đánh giá chung:</span>
-                <span class="static-data" id="tt_danhgia">Tốt</span>
+                <span class="static-data" id="tt_danhgia"></span>
             </div>
             <div class="w-full md:w-3/5">
                 <span class="label">Nhận xét:</span>
-                <span class="static-textarea" id="tt_nhanxet">Thái độ làm việc rất tốt, luôn chủ động tìm hiểu và hoàn thành công việc được giao. Tinh thần học hỏi cao.</span>
+                <span class="static-textarea" id="tt_nhanxet"></span>
             </div>
         </div>
     </div>
     
     <!-- Kiến thức - Hiểu biết -->
-    <div class="mb-4">
-        <p class="font-semibold text-gray-700 mb-2">C. Kiến thức - Hiểu biết</p>
-        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
-            <div class="w-full md:w-1/5">
-                <p class="font-medium text-sm text-gray-700 mb-2 md:mb-0">Gợi ý đánh giá:</p>
+    <div class="mb-2">
+        <p class="font-semibold text-gray-700 mb-1">C. Kiến thức - Hiểu biết</p>
+        <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
+            <div class="w-full md:w-1/4">
+                <p class="font-medium text-sm text-gray-700 mb-1 md:mb-0">Gợi ý đánh giá:</p>
                 <ul class="list-disc list-inside text-xs text-gray-600">
                     <li>Nắm vững quy trình nội bộ</li>
                     <li>Kiến thức chuyên môn và nghiệp vụ</li>
@@ -268,21 +232,21 @@
             </div>
             <div class="w-full md:w-1/5">
                 <span class="label">Đánh giá chung:</span>
-                <span class="static-data" id="kt_danhgia">Khá</span>
+                <span class="static-data" id="kt_danhgia"></span>
             </div>
             <div class="w-full md:w-3/5">
                 <span class="label">Nhận xét:</span>
-                <span class="static-textarea" id="kt_nhanxet">Nắm bắt kiến thức cơ bản về sản phẩm tốt. Cần trau dồi thêm kiến thức chuyên sâu về SEO và thị trường.</span>
+                <span class="static-textarea" id="kt_nhanxet"></span>
             </div>
         </div>
     </div>
 
     <!-- Kỹ năng -->
-    <div class="mb-4">
-        <p class="font-semibold text-gray-700 mb-2">D. Kỹ năng</p>
-        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center">
-            <div class="w-full md:w-1/5">
-                <p class="font-medium text-sm text-gray-700 mb-2 md:mb-0">Gợi ý đánh giá:</p>
+    <div class="mb-2">
+        <p class="font-semibold text-gray-700 mb-1">D. Kỹ năng</p>
+        <div class="flex flex-col md:flex-row gap-2 items-start md:items-center">
+            <div class="w-full md:w-1/4">
+                <p class="font-medium text-sm text-gray-700 mb-1 md:mb-0">Gợi ý đánh giá:</p>
                 <ul class="list-disc list-inside text-xs text-gray-600">
                     <li>Sử dụng công cụ phần mềm</li>
                     <li>Lập kế hoạch</li>
@@ -294,42 +258,42 @@
             </div>
             <div class="w-full md:w-1/5">
                 <span class="label">Đánh giá chung:</span>
-                <span class="static-data" id="kn_danhgia">Khá</span>
+                <span class="static-data" id="kn_danhgia"></span>
             </div>
             <div class="w-full md:w-3/5">
                 <span class="label">Nhận xét:</span>
-                <span class="static-textarea" id="kn_nhanxet">Kỹ năng làm việc nhóm tốt, hòa đồng. Kỹ năng lập kế hoạch và xử lý tình huống cần được rèn luyện thêm.</span>
+                <span class="static-textarea" id="kn_nhanxet"></span>
             </div>
         </div>
     </div>
 
     <!-- Đánh giá tổng thể -->
-    <div class="mb-4">
+    <div class="mb-2">
         <div class="section-title">III. Đánh giá tổng thể và Kết luận</div>
-        <p class="font-semibold text-gray-700 mb-2">A. Đánh giá tổng thể</p>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <p class="font-semibold text-gray-700 mb-1">A. Đánh giá tổng thể</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
             <div>
                 <span class="label">Điểm mạnh:</span>
-                <span class="static-data" id="diemManh">Nhiệt tình, có trách nhiệm, luôn chủ động trong công việc.</span>
+                <span class="static-data" id="diemManh"></span>
             </div>
             <div>
                 <span class="label">Điểm yếu:</span>
-                <span class="static-data" id="diemYeu">Kinh nghiệm chuyên môn còn hạn chế, cần thời gian để trau dồi.</span>
+                <span class="static-data" id="diemYeu"></span>
             </div>
             <div>
                 <span class="label">Đánh giá khác:</span>
-                <span class="static-data" id="danhGiaKhac">Nhìn chung, đây là một nhân viên tiềm năng, có thể phát triển tốt trong tương lai.</span>
+                <span class="static-data" id="danhGiaKhac"></span>
             </div>
         </div>
     </div>
 
     <!-- Kết luận -->
-    <div class="mb-4">
-        <p class="font-semibold text-gray-700 mb-2">B. Kết luận</p>
-        <div class="flex flex-col md:flex-row gap-4 text-sm">
+    <div class="mb-2">
+        <p class="font-semibold text-gray-700 mb-1">B. Kết luận</p>
+        <div class="flex flex-col md:flex-row gap-2">
             <div class="w-full md:w-1/3">
                 <span class="label">Kết luận:</span>
-                <span class="static-data" id="ketLuan">Vào chính thức</span>
+                <span class="static-data" id="ketLuan"></span>
             </div>
             <div class="w-full md:w-2/3">
                 <span class="label">Kết luận khác:</span>
@@ -339,28 +303,28 @@
     </div>
 
     <!-- Chữ ký -->
-    <div class="section-title mt-8">IV. Xác nhận của các bên</div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mt-6 text-sm">
+    <div class="section-title mt-4">IV. Xác nhận của các bên</div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-center mt-2">
         <div>
             <p class="font-bold mb-1">Quản lý trực tiếp</p>
-            <p class="text-gray-500 italic mb-2 text-xs">(Ký, ghi rõ họ tên)</p>
-            <div class="h-10 border-b border-gray-300 mx-12"></div>
+            <p class="text-gray-500 italic text-xs">(Ký, ghi rõ họ tên)</p>
+            <div class="h-10 border-b border-gray-300 mx-6"></div>
             <p class="label mt-2">Ý kiến:</p>
-            <div class="h-16 border-b border-gray-300 mx-4"></div>
+            <div class="h-16 border-b border-gray-300 mx-2"></div>
         </div>
         <div>
             <p class="font-bold mb-1">HCNS</p>
-            <p class="text-gray-500 italic mb-2 text-xs">(Ký, ghi rõ họ tên)</p>
-            <div class="h-10 border-b border-gray-300 mx-12"></div>
+            <p class="text-gray-500 italic text-xs">(Ký, ghi rõ họ tên)</p>
+            <div class="h-10 border-b border-gray-300 mx-6"></div>
             <p class="label mt-2">Ý kiến:</p>
-            <div class="h-16 border-b border-gray-300 mx-4"></div>
+            <div class="h-16 border-b border-gray-300 mx-2"></div>
         </div>
         <div>
             <p class="font-bold mb-1">Ban Giám Đốc</p>
-            <p class="text-gray-500 italic mb-2 text-xs">(Ký, ghi rõ họ tên)</p>
-            <div class="h-10 border-b border-gray-300 mx-12"></div>
+            <p class="text-gray-500 italic text-xs">(Ký, ghi rõ họ tên)</p>
+            <div class="h-10 border-b border-gray-300 mx-6"></div>
             <p class="label mt-2">Ý kiến:</p>
-            <div class="h-16 border-b border-gray-300 mx-4"></div>
+            <div class="h-16 border-b border-gray-300 mx-2"></div>
         </div>
     </div>
 </div>
