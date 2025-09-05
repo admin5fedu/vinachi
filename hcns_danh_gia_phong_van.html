@@ -29,7 +29,7 @@
             min-height: 29.7cm;
             max-width: 21cm;
             margin: 30px auto;
-            padding: 1.5cm;
+            padding: 1cm;
             background-color: #fff;
             box-sizing: border-box; /* Quan trọng: Đảm bảo padding không làm tăng kích thước */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -38,7 +38,7 @@
         /* Cài đặt cho in ấn */
         @page {
             size: A4;
-            margin: 1.5cm;
+            margin: 1cm;
         }
 
         /* CSS chỉ áp dụng khi in */
@@ -63,7 +63,7 @@
                 min-height: 29.7cm !important;
                 max-width: none !important;
                 margin: 0 !important;
-                padding: 1.5cm !important;
+                padding: 1cm !important;
                 box-shadow: none !important;
                 border: none !important;
                 box-sizing: border-box;
@@ -432,7 +432,7 @@
         // Kích thước trang A4
         const A4_WIDTH = 210; // mm
         const A4_HEIGHT = 297; // mm
-        const margin = 15; // 1.5cm
+        const margin = 10; // 1cm
         const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
         // Tạo instance jsPDF với định dạng A4
@@ -442,7 +442,7 @@
             format: 'a4',
         });
 
-        // Tính toán kích thước ảnh để vừa với lề 1.5cm
+        // Tính toán kích thước ảnh để vừa với lề 1cm
         const imgProps = doc.getImageProperties(imgData);
         const finalImgWidth = A4_WIDTH - 2 * margin;
         const finalImgHeight = (imgProps.height * finalImgWidth) / imgProps.width;
