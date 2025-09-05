@@ -12,12 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* Cài đặt cho in ấn: Khổ giấy A4 và lề 1.5cm */
-        @page {
-            size: A4;
-            margin: 1.5cm;
-        }
-
+        /* Cài đặt chung cho toàn bộ tài liệu */
         body {
             font-family: 'Times New Roman', Times, serif;
             line-height: 1.6;
@@ -28,6 +23,7 @@
             font-size: 11pt;
         }
 
+        /* Container của tài liệu, cố định kích thước A4 để đồng nhất trên mọi nền tảng */
         .document-container {
             width: 21cm;
             min-height: 29.7cm;
@@ -35,10 +31,55 @@
             margin: 30px auto;
             padding: 1.5cm;
             background-color: #fff;
-            box-sizing: content-box;
+            box-sizing: border-box; /* Quan trọng: Đảm bảo padding không làm tăng kích thước */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+        
+        /* Cài đặt cho in ấn */
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
 
+        /* CSS chỉ áp dụng khi in */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color: #000 !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                background: white !important;
+            }
+
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+
+            .document-container {
+                width: 100% !important;
+                min-height: 29.7cm !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 1.5cm !important;
+                box-shadow: none !important;
+                border: none !important;
+                box-sizing: border-box;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .remarks-box {
+                /* Đảm bảo nội dung tự động xuống dòng trong in ấn */
+                word-wrap: break-word;
+            }
+        }
+
+        /* Các lớp CSS khác giữ nguyên */
         .header-table {
             width: 100%;
             border-collapse: collapse;
@@ -176,44 +217,6 @@
             border-bottom: 1px dashed #333;
             display: block;
             min-height: 1.5em;
-        }
-        
-        /* Cải thiện hiển thị khi in từ điện thoại */
-        @media print {
-            * {
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color: #000 !important;
-                font-family: 'Times New Roman', Times, serif !important;
-                background: white !important;
-            }
-
-            body {
-                margin: 0 !important;
-                padding: 0 !important;
-                background: white !important;
-            }
-
-            .document-container {
-                width: 100% !important;
-                min-height: 29.7cm !important;
-                max-width: none !important;
-                margin: 0 !important;
-                padding: 1.5cm !important;
-                box-shadow: none !important;
-                border: none !important;
-                box-sizing: content-box;
-            }
-
-            .no-print {
-                display: none !important;
-            }
-
-            .remarks-box {
-                /* Đảm bảo nội dung tự động xuống dòng trong in ấn */
-                word-wrap: break-word;
-            }
         }
     </style>
 </head>
