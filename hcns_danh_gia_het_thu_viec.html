@@ -12,17 +12,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        /* Cài đặt cơ bản cho A4 */
+        /* Cài đặt cho in ấn: Khổ giấy A4 và lề 1.5cm */
         @page {
             size: A4;
-            margin: 1cm;
+            margin: 1.5cm;
         }
         
         body {
-            /* Đã cập nhật font chữ thành Times New Roman */
-            font-family: 'Times New Roman', serif;
+            font-family: 'Times New Roman', Times, serif;
             background-color: #ffffff;
-            /* Đã tăng cỡ chữ cơ bản lên 1px */
             font-size: 11px;
             line-height: 1.2;
             color: #000;
@@ -31,17 +29,17 @@
         }
         
         .form-container {
-            width: 21cm;
-            min-height: 29.7cm;
-            max-width: 21cm;
+            /* Bố cục giống A4 với lề 1.5cm */
+            width: 18cm; 
+            min-height: 26.7cm;
+            max-width: 18cm;
             margin: 0 auto;
-            padding: 1cm;
+            padding: 1.5cm;
             background-color: #ffffff;
-            box-sizing: border-box;
+            box-sizing: content-box; /* padding được thêm vào kích thước */
         }
         
         .section-title {
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 13px;
             font-weight: 600;
             color: #1f2937;
@@ -51,7 +49,6 @@
         }
         
         .subsection-title {
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 12px;
             font-weight: 600;
             color: #374151;
@@ -63,20 +60,18 @@
             color: #4b5563;
             margin-bottom: 2px;
             display: block;
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 10px;
         }
         
         .static-data {
             padding: 2px 4px;
             width: 100%;
-            background-color: #f9fafb;
+            background-color: #f9fafb; /* Nền xám nhạt cho hiển thị trên màn hình */
             border: 1px solid #d1d5db;
             border-radius: 2px;
             display: block;
             min-height: 16px;
             white-space: pre-wrap;
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 10px;
             line-height: 1.3;
         }
@@ -84,13 +79,12 @@
         .static-textarea {
             padding: 3px 4px;
             width: 100%;
-            background-color: #f9fafb;
+            background-color: #f9fafb; /* Nền xám nhạt cho hiển thị trên màn hình */
             border: 1px solid #d1d5db;
             border-radius: 2px;
             display: block;
             min-height: 24px;
             white-space: pre-wrap;
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 10px;
             line-height: 1.3;
         }
@@ -107,7 +101,6 @@
         }
         
         .company-name {
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 15px;
             font-weight: 700;
             color: #1f2937;
@@ -115,7 +108,6 @@
         }
         
         .company-address {
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 10px;
             color: #6b7280;
             font-style: italic;
@@ -128,7 +120,6 @@
         }
         
         .form-title h1 {
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 18px;
             font-weight: 700;
             color: #1f2937;
@@ -136,7 +127,6 @@
         }
         
         .form-code {
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 11px;
             color: #6b7280;
             margin: 0;
@@ -152,7 +142,6 @@
         .info-table td {
             padding: 2px 4px;
             vertical-align: top;
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 10px;
         }
         
@@ -177,13 +166,12 @@
         .evaluation-table td {
             border: 1px solid #d1d5db;
             padding: 3px;
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 10px;
             vertical-align: top;
         }
         
         .evaluation-table th {
-            background-color: #f3f4f6;
+            background-color: #f3f4f6; /* Nền xám nhạt cho hiển thị trên màn hình */
             font-weight: 600;
             color: #000;
             text-align: center;
@@ -204,7 +192,6 @@
         }
         
         .evaluation-card .card-title {
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 11px;
             font-weight: 600;
             color: #374151;
@@ -226,14 +213,12 @@
         }
         
         .signature-title {
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 11px;
             font-weight: 600;
             margin-bottom: 2px;
         }
         
         .signature-subtitle {
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 9px;
             color: #6b7280;
             font-style: italic;
@@ -247,7 +232,6 @@
         }
         
         .opinion-label {
-            /* Đã tăng cỡ chữ lên 1px */
             font-size: 10px;
             font-weight: 500;
             margin: 4px 0 2px 0;
@@ -276,20 +260,20 @@
             }
         }
         
-        /* CSS cho in ấn - đảm bảo giống hệt hiển thị màn hình */
+        /* CSS cho in ấn - đảm bảo giống hệt hiển thị màn hình và loại bỏ nền xám */
         @media print {
             * {
                 -webkit-print-color-adjust: exact !important;
                 color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                color: #000 !important; /* Đảm bảo tất cả chữ đều là màu đen khi in */
+                color: #000 !important;
+                font-family: 'Times New Roman', Times, serif !important;
             }
             
             body {
                 margin: 0 !important;
                 padding: 0 !important;
                 background: white !important;
-                /* Đã tăng cỡ chữ để in rõ hơn */
                 font-size: 11px !important;
                 line-height: 1.2 !important;
             }
@@ -298,7 +282,7 @@
                 width: 100% !important;
                 max-width: none !important;
                 margin: 0 !important;
-                padding: 1cm !important;
+                padding: 1.5cm !important;
                 box-shadow: none !important;
                 page-break-inside: avoid;
             }
@@ -315,15 +299,15 @@
                 page-break-inside: avoid;
             }
             
-            /* Đảm bảo màu nền được in */
+            /* Loại bỏ nền xám khi in */
             .static-data,
             .static-textarea {
-                background-color: #f9fafb !important;
+                background-color: transparent !important;
                 border: 1px solid #d1d5db !important;
             }
             
             .evaluation-table th {
-                background-color: #f3f4f6 !important;
+                background-color: transparent !important;
             }
             
             /* Ẩn nút tải xuống khi in */
@@ -334,12 +318,12 @@
     </style>
 </head>
 <body>
-<div class="flex justify-end p-4">
-    <!-- Nút Tải xuống PDF, sẽ bị bỏ qua khi chuyển đổi sang PDF -->
+<div class="flex justify-end p-4 no-print">
+    <!-- Nút "Xuất PDF", được đặt ngoài vùng form để không bị bao gồm trong file PDF -->
     <button id="downloadPdfButton" 
-            class="no-print bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             data-html2canvas-ignore="true" onclick="downloadPDF()">
-        Tải xuống PDF
+        Xuất PDF
     </button>
 </div>
 
@@ -545,7 +529,6 @@
 
         // Thông tin chung
         updateElementText('maPhieu', 'maPhieu');
-        // Đã sửa 'maNhanVienHoTen' thành 'nhanVien' để khớp với ID trong HTML
         updateElementText('nhanVien', 'maNhanVienHoTen'); 
         updateElementText('phong', 'phong');
         updateElementText('viTri', 'viTri');
@@ -576,17 +559,33 @@
 
     // Hàm chuyển đổi HTML sang PDF
     async function downloadPDF() {
-        // Lấy nội dung form
         const element = document.getElementById('formContainer');
 
+        // Tạm thời loại bỏ màu nền cho các phần tử cụ thể trước khi chụp ảnh
+        const elementsToRemoveBg = [
+            ...element.querySelectorAll('.static-data'),
+            ...element.querySelectorAll('.static-textarea'),
+            ...element.querySelectorAll('.evaluation-table th')
+        ];
+
+        const originalBackgrounds = elementsToRemoveBg.map(el => el.style.backgroundColor);
+        elementsToRemoveBg.forEach(el => el.style.backgroundColor = 'transparent');
+        
         // Tạo canvas từ HTML
         const canvas = await html2canvas(element, {
-            scale: 2, // Tăng độ phân giải để chất lượng tốt hơn
-            useCORS: true, // Cho phép tải ảnh từ CDN
+            scale: 2, 
+            useCORS: true,
+        });
+
+        // Khôi phục lại màu nền ban đầu sau khi chụp ảnh
+        elementsToRemoveBg.forEach((el, index) => {
+            el.style.backgroundColor = originalBackgrounds[index];
         });
         
         // Kích thước trang A4
         const A4_WIDTH = 210; // mm
+        const A4_HEIGHT = 297; // mm
+        const margin = 15; // 1.5cm
         const imgData = canvas.toDataURL('image/jpeg', 1.0);
         
         // Tạo instance jsPDF với định dạng A4
@@ -596,18 +595,13 @@
             format: 'a4',
         });
         
-        // Tính toán kích thước ảnh để vừa trang
+        // Tính toán kích thước ảnh để vừa với lề 1.5cm
         const imgProps = doc.getImageProperties(imgData);
-        const imgWidth = A4_WIDTH;
-        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-        
-        // Đặt lề để trông đẹp hơn
-        const margin = 10;
         const finalImgWidth = A4_WIDTH - 2 * margin;
         const finalImgHeight = (imgProps.height * finalImgWidth) / imgProps.width;
 
-        // Thêm ảnh vào PDF. Nó sẽ tự động co dãn để vừa 1 trang
-        doc.addImage(imgData, 'JPEG', margin, margin, finalImgWidth, finalImgHeight);
+        // Thêm ảnh vào PDF
+        doc.addImage(imgData, 'JPEG', margin, (A4_HEIGHT - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
 
         // Lưu file PDF
         doc.save('Phieu_danh_gia_het_thu_viec.pdf');
