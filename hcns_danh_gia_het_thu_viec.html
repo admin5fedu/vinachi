@@ -56,8 +56,8 @@
         th, td {
             padding: 4px 8px;
         }
-
-        /* Đồng nhất CSS cho cả màn hình và in ấn */
+        
+        /* Cải thiện CSS cho in ấn */
         @media print {
             body {
                 margin: 0;
@@ -65,7 +65,7 @@
                 background: none;
                 color: #000;
                 -webkit-print-color-adjust: exact;
-                font-size: 10px !important; /* Cỡ chữ 10px */
+                font-size: 10px !important; 
                 line-height: 1.3 !important;
             }
             .form-container {
@@ -88,6 +88,26 @@
             }
             .section-title {
                 margin-bottom: 0.5rem !important;
+            }
+            /* Đảm bảo bố cục grid và flex hoạt động chính xác khi in */
+            .grid-cols-1, .grid-cols-3 {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+            .md\:grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            .flex-col, .md\:flex-row {
+                display: flex;
+                flex-direction: row;
+                gap: 0.5rem; /* Giảm khoảng cách để tối ưu trên bản in */
+            }
+            .w-1\/2, .w-1\/3, .w-2\/3 {
+                width: 100% !important; /* Đảm bảo chiều rộng không bị giới hạn */
+            }
+            .static-data, .static-textarea {
+                min-height: 1.5rem !important;
+                padding: 0.25rem !important;
             }
         }
     </style>
