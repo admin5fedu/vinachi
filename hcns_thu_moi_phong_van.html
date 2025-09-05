@@ -25,7 +25,7 @@
             padding: 0;
             color: #333;
             background-color: #f0f0f0;
-            font-size: 11pt;
+            font-size: 13pt; /* Tăng cỡ chữ */
         }
 
         .document-container {
@@ -56,7 +56,7 @@
 
         .company-info h2 {
             margin: 0;
-            font-size: 14px;
+            font-size: 16px; /* Tăng cỡ chữ */
             line-height: 1.2;
             color: #555;
             font-weight: bold;
@@ -65,7 +65,7 @@
         .company-info .address {
             font-style: italic;
             margin: 0;
-            font-size: 12px;
+            font-size: 14px; /* Tăng cỡ chữ */
             line-height: 1.2;
         }
 
@@ -73,12 +73,12 @@
             font-style: italic;
             text-align: right;
             margin-bottom: 15px;
-            font-size: 12px;
+            font-size: 14px; /* Tăng cỡ chữ */
         }
 
         .section-title {
             font-weight: bold;
-            font-size: 16px;
+            font-size: 18px; /* Tăng cỡ chữ */
             text-align: center;
             margin-bottom: 15px;
             text-transform: uppercase;
@@ -86,7 +86,7 @@
 
         .content {
             margin-bottom: 20px;
-            font-size: 13px;
+            font-size: 15px; /* Tăng cỡ chữ */
         }
 
         .content p {
@@ -105,11 +105,11 @@
         .contact-info {
             text-align: justify;
             margin-top: 20px;
-            font-size: 13px;
+            font-size: 15px; /* Tăng cỡ chữ */
         }
 
         .footer p {
-            font-size: 13px;
+            font-size: 15px; /* Tăng cỡ chữ */
             margin-top: 10px;
         }
 
@@ -120,7 +120,7 @@
         .signature {
             text-align: right;
             margin-top: 50px;
-            font-size: 13px;
+            font-size: 15px; /* Tăng cỡ chữ */
         }
 
         /* Ẩn nút "Xuất PDF" khi in */
@@ -202,13 +202,16 @@
         <div class="details">
             <ul>
                 <li>o <strong>Vị trí ứng tuyển:</strong> <span id="vitriungtuyen_data"></span></li>
+                <li>o <strong>Số điện thoại:</strong> <span id="sodienthoai_data"></span></li>
+                <li>o <strong>Năm sinh:</strong> <span id="namsinh_data"></span></li>
                 <li>o <strong>Vị trí khác:</strong> <span id="vitrikhac_data"></span></li>
                 <li>o <strong>Thời gian:</strong> <span id="thoigian_data"></span></li>
                 <li>o <strong>Địa điểm:</strong> <span id="diadiem_data"></span></li>
                 <li>o <strong>Nơi phỏng vấn:</strong> <span id="noiphongvan_data"></span></li>
+                <li>o <strong>Ghi chú:</strong> <span id="ghichu_data"></span></li>
             </ul>
         </div>
-        <p class="contact-info">Mọi chi tiết xin liên hệ P.HCNS Vinachi <strong id="sdt_data"></strong> <strong id="email_data"></strong>. Rất mong anh (chị) thu xếp thời gian tham gia. Trường hợp anh (chị) không thu xếp được thời gian, xin vui lòng liên hệ lại với chúng tôi theo số điện thoại và địa chỉ như trên để xác nhận lại.</p>
+        <p class="contact-info">Mọi chi tiết xin liên hệ P.HCNS Vinachi 0976.831.226 hcns@vinachi.vn. Rất mong anh (chị) thu xếp thời gian tham gia. Trường hợp anh (chị) không thu xếp được thời gian, xin vui lòng liên hệ lại với chúng tôi theo số điện thoại và địa chỉ như trên để xác nhận lại.</p>
     </div>
     
     <div class="footer">
@@ -242,12 +245,13 @@
         updateElementText('ngay_thang', 'Ngay');
         updateElementText('ungvien_data', 'Than_gui');
         updateElementText('vitriungtuyen_data', 'Vi_tri_ung_tuyen');
+        updateElementText('sodienthoai_data', 'So_dien_thoai');
+        updateElementText('namsinh_data', 'Nam_sinh');
         updateElementText('vitrikhac_data', 'Vi_tri_khac');
         updateElementText('thoigian_data', 'Thoi_gian');
         updateElementText('diadiem_data', 'Dia_diem');
         updateElementText('noiphongvan_data', 'Noi_phong_van');
-        updateElementText('sdt_data', 'sdt');
-        updateElementText('email_data', 'email');
+        updateElementText('ghichu_data', 'Ghi_chu');
     });
 
     // Hàm chuyển đổi HTML sang PDF
