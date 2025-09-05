@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Đánh giá phỏng vấn</title>
+    <!-- Thư viện Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện để chuyển HTML sang Canvas/Hình ảnh -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Thư viện để tạo file PDF từ Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        /* Cài đặt cho in ấn: Khổ giấy A4 và lề 1.5cm */
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f0f0f0;
+            font-size: 11pt;
+        }
+
+        .document-container {
+            width: 21cm;
+            min-height: 29.7cm;
+            max-width: 21cm;
+            margin: 30px auto;
+            padding: 1.5cm;
+            background-color: #fff;
+            box-sizing: content-box;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .header-table td {
+            vertical-align: top;
+            padding: 0;
+        }
+
+        .header-table .company-info {
+            text-align: left;
+        }
+
+        .company-info h2 {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.2;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .company-info .address {
+            font-style: italic;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        .location {
+            font-style: italic;
+            text-align: right;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .assessment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .assessment-table th, .assessment-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .assessment-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .criteria-col {
+            width: 30%;
+            text-align: left;
+        }
+        
+        .score-col {
+            width: 15%;
+        }
+
+        .comment-col {
+            width: 55%;
+            text-align: left;
+        }
+
+        .remarks-box {
+            width: 100%;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            min-height: 100px;
+            background-color: #f9f9f9;
+        }
+        
+        .section-heading {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .sub-section-list {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .signature-wrapper {
+            margin-top: 30px;
+        }
+
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .signature-table td {
+            padding: 20px 0 0 0;
+            vertical-align: top;
+        }
+
+        .signature-table .name {
+            font-weight: bold;
+            margin-top: 50px;
+        }
+
+        .no-print {
+            display: block;
+        }
+
+        .input-field {
+            padding: 4px 8px;
+            border-bottom: 1px dashed #333;
+            display: block;
+            min-height: 1.5em;
+        }
+        
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color: #000 !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                background: white !important;
+            }
+
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+
+            .document-container {
+                width: 100% !important;
+                min-height: 29.7cm !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 1.5cm !important;
+                box-shadow: none !important;
+                border: none !important;
+                box-sizing: content-box;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="flex justify-end p-4 no-print">
+    <button id="downloadPdfButton"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            data-html2canvas-ignore="true" onclick="downloadPDF()">
+        Xuất PDF
+    </button>
+</div>
+
+<div class="document-container" id="documentContainer">
+    <!-- Header Section -->
+    <table class="header-table">
+        <tr>
+            <td style="width: 20%;">
+                <img src="https://drive.google.com/thumbnail?id=12VL0Dxkj5d8xwLFVRslpHdtlWd4MHF5a" alt="VINACHI Logo" style="max-width: 100px; height: auto;">
+            </td>
+            <td class="company-info" style="width: 80%;">
+                <h2>CÔNG TY TNHH VINACHI VIỆT NAM</h2>
+                <p class="address">Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</p>
+            </td>
+        </tr>
+    </table>
+
+    <div class="location">
+        <p>Bắc Ninh, <span id="ngay_danh_gia_data"></span></p>
+    </div>
+
+    <div class="section-title">
+        PHIẾU ĐÁNH GIÁ PHỎNG VẤN
+    </div>
+
+    <!-- A. THÔNG TIN ỨNG VIÊN -->
+    <h3 class="section-heading">A. THÔNG TIN ỨNG VIÊN</h3>
+    <table class="w-full border border-gray-300">
+        <tbody>
+            <tr>
+                <td class="p-2 border border-gray-300 w-1/4 bg-gray-100"><strong>- Tên:</strong></td>
+                <td class="p-2 border border-gray-300 w-1/4"><span id="ten_ung_vien_data"></span></td>
+                <td class="p-2 border border-gray-300 w-1/4 bg-gray-100"><strong>- Năm sinh:</strong></td>
+                <td class="p-2 border border-gray-300 w-1/4"><span id="nam_sinh_data"></span></td>
+            </tr>
+            <tr>
+                <td class="p-2 border border-gray-300 w-1/4 bg-gray-100"><strong>- Số điện thoại:</strong></td>
+                <td class="p-2 border border-gray-300 w-1/4"><span id="so_dien_thoai_data"></span></td>
+                <td class="p-2 border border-gray-300 w-1/4 bg-gray-100"><strong>- Vị trí ứng tuyển:</strong></td>
+                <td class="p-2 border border-gray-300 w-1/4"><span id="vi_tri_ung_tuyen_data"></span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- B. TINH THẦN - THÁI ĐỘ -->
+    <h3 class="section-heading">B. TINH THẦN - THÁI ĐỘ</h3>
+    <div class="remarks-box border border-gray-300 whitespace-pre-wrap"><div id="tinh_than_thai_do_data"></div></div>
+
+    <!-- C. KIẾN THỨC CHUYÊN MÔN -->
+    <h3 class="section-heading">C. KIẾN THỨC CHUYÊN MÔN</h3>
+    <div class="remarks-box border border-gray-300 whitespace-pre-wrap"><div id="kien_thuc_chuyen_mon_data"></div></div>
+
+    <!-- D. KỸ NĂNG CÁ NHÂN -->
+    <h3 class="section-heading">D. KỸ NĂNG CÁ NHÂN</h3>
+    <div class="remarks-box border border-gray-300 whitespace-pre-wrap"><div id="ky_nang_ca_nhan_data"></div></div>
+
+    <!-- E. ĐÁNH GIÁ CHUNG -->
+    <h3 class="section-heading">E. ĐÁNH GIÁ CHUNG</h3>
+    <table class="w-full border border-gray-300">
+        <tbody>
+            <tr class="bg-gray-100">
+                <td class="p-2 border border-gray-300 w-1/3"><strong>- Điểm mạnh:</strong></td>
+                <td class="p-2 border border-gray-300 w-1/3"><strong>- Điểm yếu:</strong></td>
+                <td class="p-2 border border-gray-300 w-1/3"><strong>- Đánh giá khác:</strong></td>
+            </tr>
+            <tr>
+                <td class="p-2 border border-gray-300 w-1/3"><div id="diem_manh_data" class="whitespace-pre-wrap"></div></td>
+                <td class="p-2 border border-gray-300 w-1/3"><div id="diem_yeu_data" class="whitespace-pre-wrap"></div></td>
+                <td class="p-2 border border-gray-300 w-1/3"><div id="danh_gia_khac_data" class="whitespace-pre-wrap"></div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4 class="font-bold mt-4">Kết luận:</h4>
+    <table class="w-full">
+        <tbody>
+            <tr>
+                <td class="py-2 pr-4"><input type="checkbox" id="ket_qua_dat_yeu_cau_checkbox"> Đạt yêu cầu</td>
+                <td class="py-2 pr-4"><input type="checkbox" id="ket_qua_khong_dat_yeu_cau_checkbox"> Không đạt yêu cầu</td>
+                <td class="py-2 pr-4"><input type="checkbox" id="ket_qua_danh_gia_lai_checkbox"> Đánh giá lại</td>
+                <td class="py-2 pr-4"><input type="checkbox" id="ket_qua_phong_van_lan_2_checkbox"> Phỏng vấn lần 2</td>
+                <td class="py-2"><input type="checkbox" id="ket_qua_de_xuat_vi_tri_khac_checkbox"> Đề xuất vị trí khác</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <!-- F. ĐÀM PHÁN CƠ CHẾ -->
+    <h3 class="section-heading">F. ĐÀM PHÁN CƠ CHẾ</h3>
+    <table class="w-full border border-gray-300">
+        <tbody>
+            <tr>
+                <td class="p-2 border border-gray-300 w-1/3 bg-gray-100"><strong>- Mức lương ứng viên yêu cầu:</strong></td>
+                <td class="p-2 border border-gray-300 w-1/3 bg-gray-100"><strong>- Mức lương quản lý đề xuất:</strong></td>
+                <td class="p-2 border border-gray-300 w-1/3 bg-gray-100"><strong>- Ngày đi làm:</strong></td>
+            </tr>
+            <tr>
+                <td class="p-2 border border-gray-300 w-1/3"><span id="luong_ung_vien_data"></span></td>
+                <td class="p-2 border border-gray-300 w-1/3"><span id="luong_quan_ly_data"></span></td>
+                <td class="p-2 border border-gray-300 w-1/3"><span id="ngay_di_lam_data"></span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="signature-wrapper">
+        <table class="signature-table">
+            <tr>
+                <td style="width: 33.3%;">
+                    <p><strong>Quản lý bộ phận đánh giá</strong></p>
+                    <p style="margin-top: 50px;">(Ký và ghi rõ họ tên)</p>
+                </td>
+                <td style="width: 33.3%;">
+                    <p><strong>Hành chính nhân sự</strong></p>
+                    <p style="margin-top: 50px;">(Ký và ghi rõ họ tên)</p>
+                </td>
+                <td style="width: 33.3%;">
+                    <p><strong>Ban Giám đốc</strong></p>
+                    <p style="margin-top: 50px;">(Ký và ghi rõ họ tên)</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    // Hàm này sẽ lấy dữ liệu từ URL và hiển thị lên form
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+
+        function updateElementText(id, paramName) {
+            const element = document.getElementById(id);
+            if (element && params.has(paramName)) {
+                const text = decodeURIComponent(params.get(paramName)).replace(/\\n/g, '\n');
+                element.textContent = text;
+            }
+        }
+        
+        function updateCheckbox(paramName, checkboxIdMap) {
+            const ket_qua = params.get(paramName);
+            if (ket_qua && checkboxIdMap[ket_qua]) {
+                const checkbox = document.getElementById(checkboxIdMap[ket_qua]);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            }
+        }
+
+        // Cập nhật các trường thông tin
+        // Sử dụng các tên biến này khi truyền dữ liệu qua URL:
+        // Ngay_danh_gia, Ten_ung_vien, Nam_sinh, So_dien_thoai, Vi_tri_ung_tuyen,
+        // Tinh_than_thai_do, Kien_thuc_chuyen_mon, Ky_nang_ca_nhan,
+        // Diem_manh, Diem_yeu, Danh_gia_khac, Ket_luan,
+        // Luong_ung_vien, Luong_quan_ly, Ngay_di_lam, 
+        updateElementText('ngay_danh_gia_data', 'Ngay_danh_gia');
+        updateElementText('ten_ung_vien_data', 'Ten_ung_vien');
+        updateElementText('nam_sinh_data', 'Nam_sinh');
+        updateElementText('so_dien_thoai_data', 'So_dien_thoai');
+        updateElementText('vi_tri_ung_tuyen_data', 'Vi_tri_ung_tuyen');
+        updateElementText('tinh_than_thai_do_data', 'Tinh_than_thai_do');
+        updateElementText('kien_thuc_chuyen_mon_data', 'Kien_thuc_chuyen_mon');
+        updateElementText('ky_nang_ca_nhan_data', 'Ky_nang_ca_nhan');
+        updateElementText('diem_manh_data', 'Diem_manh');
+        updateElementText('diem_yeu_data', 'Diem_yeu');
+        updateElementText('danh_gia_khac_data', 'Danh_gia_khac');
+        updateElementText('luong_ung_vien_data', 'Luong_ung_vien');
+        updateElementText('luong_quan_ly_data', 'Luong_quan_ly');
+        updateElementText('ngay_di_lam_data', 'Ngay_di_lam');
+
+        // Cập nhật checkbox Kết luận
+        updateCheckbox('Ket_luan', {
+            'Đạt yêu cầu': 'ket_qua_dat_yeu_cau_checkbox',
+            'Không đạt yêu cầu': 'ket_qua_khong_dat_yeu_cau_checkbox',
+            'Đánh giá lại': 'ket_qua_danh_gia_lai_checkbox',
+            'Phỏng vấn lần 2': 'ket_qua_phong_van_lan_2_checkbox',
+            'Đề xuất vị trí khác': 'ket_qua_de_xuat_vi_tri_khac_checkbox'
+        });
+    });
+
+    // Hàm chuyển đổi HTML sang PDF
+    async function downloadPDF() {
+        const element = document.getElementById('documentContainer');
+
+        // Tạo canvas từ HTML
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+        });
+
+        // Kích thước trang A4
+        const A4_WIDTH = 210; // mm
+        const A4_HEIGHT = 297; // mm
+        const margin = 15; // 1.5cm
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+        // Tạo instance jsPDF với định dạng A4
+        const doc = new jspdf.jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+        });
+
+        // Tính toán kích thước ảnh để vừa với lề 1.5cm
+        const imgProps = doc.getImageProperties(imgData);
+        const finalImgWidth = A4_WIDTH - 2 * margin;
+        const finalImgHeight = (imgProps.height * finalImgWidth) / imgProps.width;
+
+        // Thêm ảnh vào PDF
+        doc.addImage(imgData, 'JPEG', margin, (A4_HEIGHT - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
+
+        // Lưu file PDF
+        doc.save('Phieu_danh_gia_phong_van.pdf');
+    }
+</script>
+
+</body>
+</html>
