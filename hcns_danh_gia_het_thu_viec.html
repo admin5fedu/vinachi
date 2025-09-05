@@ -62,6 +62,8 @@
                 margin: 0;
                 padding: 0;
                 background: none;
+                color: #000;
+                -webkit-print-color-adjust: exact;
             }
             .form-container {
                 box-shadow: none !important;
@@ -69,67 +71,64 @@
                 padding: 1cm !important;
                 width: 100% !important;
                 max-width: none !important;
-                margin: 0 auto !important;
+                margin: 0 !important;
                 min-height: auto !important;
                 height: auto !important;
-                font-size: 0.75em;
-                line-height: 1.1;
-                transform: none !important;
-                transform-origin: top left;
+                font-size: 9pt;
+                line-height: 1.2;
             }
             .no-print {
-                display: none;
+                display: none !important;
             }
-            .section-title, .mb-6 {
+            .section-title, 
+            .mb-4, 
+            .mb-6, 
+            .mb-8 {
                 page-break-inside: avoid;
             }
             
-            /* Tinh chỉnh lại cỡ chữ để phù hợp với một trang */
-            .form-container h1 { font-size: 1.25em !important; }
-            .form-container p, .form-container span, .form-container td, .form-container th { font-size: 0.65em !important; }
-            .form-container .text-xs { font-size: 0.6em !important; }
-            .form-container .text-sm { font-size: 0.65em !important; }
-            .form-container .text-base { font-size: 0.65em !important; }
-            .form-container .text-lg { font-size: 0.75em !important; }
-            .form-container .text-xl { font-size: 0.8em !important; }
-            
+            .form-container h1 { font-size: 1.2em !important; }
+            .form-container p, .form-container span, .form-container td, .form-container th { font-size: 0.8em !important; }
+            .form-container .text-xs { font-size: 0.7em !important; }
+            .form-container .text-sm { font-size: 0.8em !important; }
+
             .flex-col.md\:flex-row {
                 flex-direction: row !important;
             }
             .static-data, .static-textarea {
-                background-color: transparent;
-                border: none;
+                background-color: transparent !important;
+                border: none !important;
+                padding: 0.2rem 0.5rem !important;
             }
             .border-b {
-                border-bottom: 1px solid #e5e7eb;
+                border-bottom: 1px solid #e5e7eb !important;
             }
-            /* Cải tiến cho in ấn */
             .table-auto {
-                table-layout: fixed; /* Đảm bảo các cột có độ rộng cố định */
+                table-layout: fixed;
             }
             .table-auto th, .table-auto td {
-                padding: 4px; /* Giảm padding để tối ưu không gian */
+                padding: 4px;
                 vertical-align: top;
             }
             .table-auto thead th:nth-child(1) { width: 30%; }
-            .table-auto thead th:nth-child(2) { width: 15%; }
-            .table-auto thead th:nth-child(3) { width: 55%; }
+            .table-auto thead th:nth-child(2) { width: 20%; }
+            .table-auto thead th:nth-child(3) { width: 50%; }
             
             .static-textarea {
-                min-height: 2rem; /* Giảm chiều cao tối thiểu khi in */
+                min-height: 2rem !important;
             }
             
             .flex.items-start.md\:items-center {
-                align-items: flex-start; /* Sắp xếp các mục ở trên cùng khi in */
+                align-items: flex-start !important;
             }
             .grid.grid-cols-1.md\:grid-cols-3.gap-8.text-center.mt-6.text-sm {
-                gap: 1rem; /* Giảm khoảng cách giữa các cột chữ ký */
+                gap: 1rem !important;
             }
             .h-10.border-b {
-                height: 1.5rem; /* Giảm chiều cao của dòng ký tên */
+                height: 1.5rem !important;
             }
             .h-16.border-b {
-                height: 2rem; /* Giảm chiều cao của dòng ý kiến */
+                height: 2rem !important;
             }
         }
     </style>
