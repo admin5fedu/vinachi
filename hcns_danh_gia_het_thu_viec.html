@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phiếu Đánh Giá Hết Thử Việc</title>
+    <!-- Thư viện Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện để chuyển HTML sang Canvas/Hình ảnh -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Thư viện để tạo file PDF từ Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
         /* Cài đặt cơ bản cho A4 */
         @page {
@@ -319,12 +325,25 @@
             .evaluation-table th {
                 background-color: #f3f4f6 !important;
             }
+            
+            /* Ẩn nút tải xuống khi in */
+            .no-print {
+                display: none !important;
+            }
         }
     </style>
 </head>
 <body>
+<div class="flex justify-end p-4">
+    <!-- Nút Tải xuống PDF, sẽ bị bỏ qua khi chuyển đổi sang PDF -->
+    <button id="downloadPdfButton" 
+            class="no-print bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            data-html2canvas-ignore="true" onclick="downloadPDF()">
+        Tải xuống PDF
+    </button>
+</div>
 
-<div class="form-container">
+<div class="form-container" id="formContainer">
     <!-- Header công ty -->
     <div class="company-header">
         <table style="width: 100%; border-collapse: collapse;">
@@ -500,7 +519,7 @@
             <div class="opinion-area"></div>
         </div>
         
-        <div class="signature-item">
+        <div class="signature-card">
             <div class="signature-title">Ban Giám Đốc</div>
             <div class="signature-subtitle">(Ký, ghi rõ họ tên)</div>
             <div class="signature-line"></div>
@@ -511,6 +530,7 @@
 </div>
 
 <script>
+    // Hàm này sẽ lấy dữ liệu từ URL và hiển thị lên form
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
 
@@ -553,6 +573,71 @@
         updateElementText('ketLuan', 'ketLuan');
         updateElementText('ketLuanKhac', 'ketLuanKhac');
     });
+
+    // Hàm chuyển đổi HTML sang PDF
+    async function downloadPDF() {
+        // Lấy nội dung form
+        const element = document.getElementById('formContainer');
+
+        // Tạo canvas từ HTML
+        const canvas = await html2canvas(element, {
+            scale: 2, // Tăng độ phân giải
+            useCORS: true, // Cho phép tải ảnh từ CDN
+            scrollY: -window.scrollY, // Đảm bảo toàn bộ trang được chụp
+        });
+        
+        // Kích thước trang A4
+        const A4_WIDTH = 210; // mm
+        const A4_HEIGHT = 297; // mm
+        const imgData = canvas.toDataURL('image/png');
+        
+        // Tạo instance jsPDF với định dạng A4
+        const doc = new jspdf.jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+        });
+        
+        // Tính toán kích thước ảnh để vừa trang
+        const imgProps= doc.getImageProperties(imgData);
+        const imgWidth = A4_WIDTH - 20; // 10mm padding mỗi bên
+        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+        let position = 10; // Vị trí y bắt đầu, 10mm padding
+        
+        // Thêm ảnh vào PDF và xử lý ngắt trang
+        if (imgHeight < A4_HEIGHT) {
+            doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        } else {
+            let heightLeft = imgHeight;
+            let pageData = imgData;
+            let currentPage = 1;
+            while (heightLeft >= 0) {
+                // Thêm trang mới nếu không phải trang đầu tiên
+                if (currentPage > 1) {
+                    doc.addPage();
+                }
+                
+                // Cắt ảnh để vừa một trang
+                const clipHeight = Math.min(heightLeft, A4_HEIGHT - 20);
+                const ratio = clipHeight / imgHeight;
+                const canvasClipped = document.createElement('canvas');
+                canvasClipped.width = canvas.width;
+                canvasClipped.height = canvas.height * ratio;
+                const ctx = canvasClipped.getContext('2d');
+                ctx.drawImage(canvas, 0, (currentPage - 1) * (canvas.height * (A4_HEIGHT - 20) / imgHeight), canvas.width, canvas.height * ratio, 0, 0, canvas.width, canvasClipped.height);
+                
+                const clippedImgData = canvasClipped.toDataURL('image/png');
+                
+                doc.addImage(clippedImgData, 'PNG', 10, 10, imgWidth, clipHeight);
+                
+                heightLeft -= (A4_HEIGHT - 20);
+                currentPage++;
+            }
+        }
+        
+        // Lưu file PDF
+        doc.save('Phieu_danh_gia_het_thu_viec.pdf');
+    }
 </script>
 
 </body>
