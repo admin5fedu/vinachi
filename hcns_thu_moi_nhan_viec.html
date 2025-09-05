@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư mời nhận việc</title>
+    <!-- Thư viện Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện để chuyển HTML sang Canvas/Hình ảnh -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Thư viện để tạo file PDF từ Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f0f0f0;
+            font-size: 11pt;
+        }
+
+        .document-container {
+            width: 21cm;
+            padding: 1.5cm; /* Lề đồng bộ 1.5cm */
+            margin: 30px auto;
+            background-color: #fff;
+            box-sizing: border-box;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Các lớp CSS cho header */
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .header-table td {
+            vertical-align: top;
+            padding: 0;
+        }
+
+        .header-table .company-info {
+            text-align: left;
+        }
+
+        .company-info h2 {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.2;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .company-info .address {
+            font-style: italic;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        @page {
+            size: A4;
+            margin: 1.5cm; /* Lề đồng bộ 1.5cm khi in */
+        }
+
+        @media print {
+            .document-container {
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 1.5cm;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color: #000 !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                background: white !important;
+            }
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section-heading {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .list-style-none {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .indent-1 {
+            padding-left: 20px;
+        }
+
+        .signature-table {
+            width: 100%;
+            margin-top: 50px;
+        }
+
+        .signature-table td {
+            width: 50%;
+            text-align: center;
+            vertical-align: top;
+        }
+        
+        .signature-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="flex justify-end p-4 no-print">
+    <button id="downloadPdfButton"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            data-html2canvas-ignore="true" onclick="downloadPDF()">
+        Xuất PDF
+    </button>
+</div>
+
+<div class="document-container" id="documentContainer">
+    <!-- Header Section -->
+    <table class="header-table">
+        <tr>
+            <td style="width: 20%;">
+                <img src="https://drive.google.com/thumbnail?id=12VL0Dxkj5d8xwLFVRslpHdtlWd4MHF5a" alt="VINACHI Logo" style="max-width: 100px; height: auto;">
+            </td>
+            <td class="company-info" style="width: 80%;">
+                <h2>CÔNG TY TNHH VINACHI VIỆT NAM</h2>
+                <p class="address">Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</p>
+            </td>
+        </tr>
+    </table>
+    
+    <div class="location-date text-right mb-8">
+        Bắc Ninh, ngày <span id="ngay_data"></span> tháng <span id="thang_data"></span> năm <span id="nam_data"></span>
+    </div>
+
+    <div class="section-title">THƯ MỜI NHẬN VIỆC</div>
+    
+    <p class="mb-4">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Công ty TNHH Vinachi Việt Nam gửi đến Anh/chị <span id="ten_ung_vien_data" class="font-bold uppercase"></span> thư mời hợp tác với nội dung như sau:
+    </p>
+
+    <h3 class="section-heading">I - THỜI GIAN VÀ ĐỊA ĐIỂM</h3>
+    <ul class="list-style-none">
+        <li class="mb-2">
+            - Lúc: <span id="gio_data"></span>h<span id="phut_data"></span> ngày <span id="ngay_nhan_viec_data"></span> tháng <span id="thang_nhan_viec_data"></span> năm <span id="nam_nhan_viec_data"></span> Tại: <span id="dia_diem_data"></span>
+        </li>
+        <li class="mb-2">
+            - Vị trí công việc: <span id="vi_tri_ung_tuyen_data"></span> thuộc phòng <span id="phong_ban_data"></span>
+        </li>
+        <li class="mb-2">
+            - Thời gian làm việc: 8h/ 1 ngày. Từ thứ 2 đến thứ 7 (nghỉ <span id="nghi_thu_7_data"></span> chiều thứ 7 có lương)
+        </li>
+        <li class="mb-2">
+            - Thời gian thử việc: tối đa <span id="thoi_gian_thu_viec_data"></span> với khối gián tiếp, 4 tháng với khối kinh doanh. Nhận 100% lương vị trí trong quá trình thử việc.
+        </li>
+    </ul>
+
+    <h3 class="section-heading">II - THU NHẬP</h3>
+    <ul class="list-style-none">
+        <li class="mb-2">
+            <strong>TỔNG THU NHẬP</strong> = Lương CB + Lương KPI + Đàm phán + Phụ cấp + Thưởng
+        </li>
+        <li class="mb-2">
+            <span id="tong_thu_nhap_data"></span> = <span id="luong_cb_data"></span> + <span id="luong_kpi_data"></span> + <span id="dam_phan_data"></span> + <span id="phu_cap_data"></span> + Từ <span id="thuong_tu_data"></span> đến <span id="thuong_den_data"></span>
+        </li>
+    </ul>
+    
+    <p class="mb-2">Trong đó:</p>
+    <ul class="list-style-none indent-1">
+        <li class="mb-2">
+            - Lương cơ bản, Lương đàm phán và phụ cấp tính theo số ngày đi làm thực tế
+        </li>
+        <li class="mb-2">
+            - Lương KPI tính theo kết quả công việc (Điểm OLE) (Khối gián tiếp: Các công việc được giao, Khối kinh doanh: Hoàn thành doanh thu)
+        </li>
+        <li class="mb-2">
+            - Các khoản thưởng:
+            <ul class="list-style-none indent-1">
+                <li>+) Khối gián tiếp: được nhận khi doanh thu toàn công ty đạt từ 85% trở lên và điểm OLE cá nhân đạt 85 trở lên.</li>
+                <li>+) Khối trực tiếp: được nhận khi doanh thu cá nhân đạt từ 85% trở lên. Tỷ lệ trích thưởng đạt càng lớn khi đăng ký bậc càng cao. Các khoản thưởng kinh doanh khác: Chiết khấu, Bán cao hơn giá niêm yết, Bán hàng tồn kho, . . . (Từ 3% đến 8% theo giá trị đơn hàng).</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3 class="section-heading">III - CHẾ ĐỘ ĐÃI NGỘ</h3>
+    <ul class="list-style-none indent-1">
+        <li class="mb-2">
+            - Bữa trưa tại công ty. Nếu không ăn được trả phụ cấp theo khu vực (từ 700k - 1 triệu)
+        </li>
+        <li class="mb-2">
+            - Nghỉ phép 12 ngày/1 năm. Nghỉ lễ theo quy định của nhà nước. Đóng BHXH theo quy định của nhà nước.
+        </li>
+        <li class="mb-2">
+            - Tặng quà hoặc tiền thưởng vào ngày lễ, tết, sinh nhật, hỷ sự. Hỗ trợ ốm đau, tai nạn, tử tuất.
+        </li>
+        <li class="mb-2">
+            - Thưởng lương tháng 13, 14 theo kết quả kinh doanh của công ty.
+        </li>
+        <li class="mb-2">
+            - Du lịch hàng năm. Liên hoan 3 tháng/1 lần đối với cấp Trưởng nhóm trở lên.
+        </li>
+        <li class="mb-2">
+            - <span id="ghi_chu_data"></span>
+        </li>
+    </ul>
+    
+    <h3 class="section-heading">IV - THỦ TỤC NHẬN VIỆC</h3>
+    <p>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Khi đến mang theo bộ hồ sơ bao gồm:
+    </p>
+    <ul class="list-style-none indent-1">
+        <li>
+            (1) Sơ yếu lý lịch có dấu đỏ UBND Xã / Phường,
+        </li>
+        <li>
+            (2) Giấy khai sinh bản photo (không công chứng),
+        </li>
+        <li>
+            (3) Sổ hộ khẩu photo không công chứng (nếu còn),
+        </li>
+        <li>
+            (4) Giấy xác nhận dân sự dấu đỏ của công an xã/phường,
+        </li>
+        <li>
+            (5) Căn cước công dân photo công chứng,
+        </li>
+        <li>
+            (6) Photo công chứng bằng cấp (nếu có)
+        </li>
+    </ul>
+
+    <p class="mt-4">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Mọi thắc mắc xin liên hệ: P.HCNS Vinachi 0976.831.226 hcns@vinachi.vn.
+    </p>
+    <p class="mt-4">
+        Trân trọng!
+    </p>
+    
+    <table class="signature-table">
+        <tr>
+            <td>
+                <p class="signature-title">TM GIÁM ĐỐC</p>
+            </td>
+            <td>
+                <p class="signature-title">PHÒNG HCNS</p>
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+
+        function updateElementText(id, paramName) {
+            const element = document.getElementById(id);
+            if (element && params.has(paramName)) {
+                element.textContent = decodeURIComponent(params.get(paramName));
+            }
+        }
+        
+        // Lấy ngày hiện tại
+        const today = new Date();
+        document.getElementById('ngay_data').textContent = today.getDate().toString();
+        document.getElementById('thang_data').textContent = (today.getMonth() + 1).toString();
+        document.getElementById('nam_data').textContent = today.getFullYear().toString();
+
+        // Cập nhật các trường thông tin dựa trên tham số URL
+        // Tên tham số được lấy từ file Word và quy ước của AppSheet
+        const tgNhanViec = params.get('Tg in moi nhan viec');
+        if (tgNhanViec) {
+            const date = new Date(tgNhanViec);
+            document.getElementById('ngay_nhan_viec_data').textContent = date.getDate().toString();
+            document.getElementById('thang_nhan_viec_data').textContent = (date.getMonth() + 1).toString();
+            document.getElementById('nam_nhan_viec_data').textContent = date.getFullYear().toString();
+            document.getElementById('gio_data').textContent = date.getHours().toString();
+            document.getElementById('phut_data').textContent = date.getMinutes().toString();
+        }
+
+        const upperCaseParams = ['Tên ứng viên'];
+        upperCaseParams.forEach(param => {
+            const element = document.getElementById(param.toLowerCase().replace(/ /g, '_') + '_data');
+            if (element && params.has(param)) {
+                element.textContent = decodeURIComponent(params.get(param)).toUpperCase();
+            }
+        });
+        
+        updateElementText('dia_diem_data', 'Địa điểm nhận việc');
+        updateElementText('vi_tri_ung_tuyen_data', 'Vị trí ứng tuyển');
+        updateElementText('phong_ban_data', 'Phòng');
+        updateElementText('nghi_thu_7_data', 'Nghỉ thứ 7');
+        updateElementText('thoi_gian_thu_viec_data', 'Thời gian thử việc');
+        updateElementText('luong_cb_data', 'Lương cơ bản');
+        updateElementText('luong_kpi_data', 'Lương KPI');
+        updateElementText('dam_phan_data', 'Đàm phán thêm');
+        updateElementText('phu_cap_data', 'Phụ cấp thêm');
+        updateElementText('thuong_tu_data', 'Thưởng đạt từ');
+        updateElementText('thuong_den_data', 'Thưởng đạt đến');
+        updateElementText('ghi_chu_data', 'Ghi chú mời nhận việc');
+
+        // Tính tổng thu nhập
+        const luong_cb = parseFloat(params.get('Lương cơ bản')) || 0;
+        const luong_kpi = parseFloat(params.get('Lương KPI')) || 0;
+        const dam_phan = parseFloat(params.get('Đàm phán thêm')) || 0;
+        const phu_cap = parseFloat(params.get('Phụ cấp thêm')) || 0;
+        const tong_thu_nhap = luong_cb + luong_kpi + dam_phan + phu_cap;
+        document.getElementById('tong_thu_nhap_data').textContent = tong_thu_nhap.toLocaleString('vi-VN');
+        document.getElementById('luong_cb_data').textContent = luong_cb.toLocaleString('vi-VN');
+        document.getElementById('luong_kpi_data').textContent = luong_kpi.toLocaleString('vi-VN');
+        document.getElementById('dam_phan_data').textContent = dam_phan.toLocaleString('vi-VN');
+        document.getElementById('phu_cap_data').textContent = phu_cap.toLocaleString('vi-VN');
+    });
+
+    async function downloadPDF() {
+        const element = document.getElementById('documentContainer');
+        const canvas = await html2canvas(element, { scale: 2 });
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+        const A4_WIDTH = 210; // mm
+        const A4_HEIGHT = 297; // mm
+        const margin = 15; // 1.5cm
+        const doc = new jspdf.jsPDF('p', 'mm', 'a4');
+        const imgProps = doc.getImageProperties(imgData);
+        const finalImgWidth = A4_WIDTH - 2 * margin;
+        const finalImgHeight = (imgProps.height * finalImgWidth) / imgProps.width;
+
+        doc.addImage(imgData, 'JPEG', margin, (A4_HEIGHT - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
+        doc.save('Thu_moi_nhan_viec.pdf');
+    }
+</script>
+
+</body>
+</html>
