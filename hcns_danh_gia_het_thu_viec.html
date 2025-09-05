@@ -581,15 +581,13 @@
 
         // Tạo canvas từ HTML
         const canvas = await html2canvas(element, {
-            scale: 2, // Tăng độ phân giải
+            scale: 2, // Tăng độ phân giải để chất lượng tốt hơn
             useCORS: true, // Cho phép tải ảnh từ CDN
-            scrollY: -window.scrollY, // Đảm bảo toàn bộ trang được chụp
         });
         
         // Kích thước trang A4
         const A4_WIDTH = 210; // mm
-        const A4_HEIGHT = 297; // mm
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
         
         // Tạo instance jsPDF với định dạng A4
         const doc = new jspdf.jsPDF({
@@ -599,42 +597,18 @@
         });
         
         // Tính toán kích thước ảnh để vừa trang
-        const imgProps= doc.getImageProperties(imgData);
-        const imgWidth = A4_WIDTH - 20; // 10mm padding mỗi bên
+        const imgProps = doc.getImageProperties(imgData);
+        const imgWidth = A4_WIDTH;
         const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-        let position = 10; // Vị trí y bắt đầu, 10mm padding
         
-        // Thêm ảnh vào PDF và xử lý ngắt trang
-        if (imgHeight < A4_HEIGHT) {
-            doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        } else {
-            let heightLeft = imgHeight;
-            let pageData = imgData;
-            let currentPage = 1;
-            while (heightLeft >= 0) {
-                // Thêm trang mới nếu không phải trang đầu tiên
-                if (currentPage > 1) {
-                    doc.addPage();
-                }
-                
-                // Cắt ảnh để vừa một trang
-                const clipHeight = Math.min(heightLeft, A4_HEIGHT - 20);
-                const ratio = clipHeight / imgHeight;
-                const canvasClipped = document.createElement('canvas');
-                canvasClipped.width = canvas.width;
-                canvasClipped.height = canvas.height * ratio;
-                const ctx = canvasClipped.getContext('2d');
-                ctx.drawImage(canvas, 0, (currentPage - 1) * (canvas.height * (A4_HEIGHT - 20) / imgHeight), canvas.width, canvas.height * ratio, 0, 0, canvas.width, canvasClipped.height);
-                
-                const clippedImgData = canvasClipped.toDataURL('image/png');
-                
-                doc.addImage(clippedImgData, 'PNG', 10, 10, imgWidth, clipHeight);
-                
-                heightLeft -= (A4_HEIGHT - 20);
-                currentPage++;
-            }
-        }
-        
+        // Đặt lề để trông đẹp hơn
+        const margin = 10;
+        const finalImgWidth = A4_WIDTH - 2 * margin;
+        const finalImgHeight = (imgProps.height * finalImgWidth) / imgProps.width;
+
+        // Thêm ảnh vào PDF. Nó sẽ tự động co dãn để vừa 1 trang
+        doc.addImage(imgData, 'JPEG', margin, margin, finalImgWidth, finalImgHeight);
+
         // Lưu file PDF
         doc.save('Phieu_danh_gia_het_thu_viec.pdf');
     }
