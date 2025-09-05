@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư thông báo kết quả phỏng vấn</title>
+    <!-- Thư viện Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện để chuyển HTML sang Canvas/Hình ảnh -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Thư viện để tạo file PDF từ Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        /* Cài đặt cho in ấn: Khổ giấy A4 và lề 1.5cm */
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f0f0f0;
+            font-size: 13pt;
+        }
+
+        .document-container {
+            width: 21cm;
+            min-height: 29.7cm;
+            max-width: 21cm;
+            margin: 30px auto;
+            padding: 1.5cm;
+            background-color: #fff;
+            box-sizing: content-box;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .header-table td {
+            vertical-align: top;
+            padding: 0;
+        }
+
+        .header-table .company-info {
+            text-align: left;
+        }
+
+        .company-info h2 {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.2;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .company-info .address {
+            font-style: italic;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        .location {
+            font-style: italic;
+            text-align: right;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .content {
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .content p {
+            margin: 5px 0;
+            text-indent: 2em;
+        }
+
+        .details ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .details li {
+            margin-bottom: 5px;
+        }
+
+        .contact-info {
+            text-align: justify;
+            margin-top: 20px;
+            font-size: 15px;
+        }
+
+        .footer p {
+            font-size: 15px;
+            margin-top: 10px;
+            text-indent: 2em;
+        }
+
+        .signature-wrapper {
+            margin-top: 30px;
+        }
+
+        .signature {
+            text-align: right;
+            margin-top: 50px;
+            font-size: 15px;
+        }
+
+        .no-print {
+            display: block;
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color: #000 !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                background: white !important;
+            }
+
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+
+            .document-container {
+                width: 100% !important;
+                min-height: 29.7cm !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 1.5cm !important;
+                box-shadow: none !important;
+                border: none !important;
+                box-sizing: content-box;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="flex justify-end p-4 no-print">
+    <button id="downloadPdfButton"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            data-html2canvas-ignore="true" onclick="downloadPDF()">
+        Xuất PDF
+    </button>
+</div>
+
+<div class="document-container" id="documentContainer">
+    <!-- Header Section -->
+    <table class="header-table">
+        <tr>
+            <td style="width: 20%;">
+                <img src="https://drive.google.com/thumbnail?id=12VL0Dxkj5d8xwLFVRslpHdtlWd4MHF5a" alt="VINACHI Logo" style="max-width: 100px; height: auto;">
+            </td>
+            <td class="company-info" style="width: 80%;">
+                <h2>CÔNG TY TNHH VINACHI VIỆT NAM</h2>
+                <p class="address">Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</p>
+            </td>
+        </tr>
+    </table>
+
+    <div class="location">
+        <p>Bắc Ninh, <span id="ngay_thong_bao_data"></span></p>
+    </div>
+
+    <div class="section-title">
+        THƯ THÔNG BÁO KẾT QUẢ PHỎNG VẤN
+    </div>
+
+    <div class="content">
+        <p>Thân gửi ứng viên: <strong id="ten_ung_vien_upper_data"></strong></p>
+        <p>Trước hết, Vinachi cảm ơn anh (chị) <span id="ten_ung_vien_data"></span> đã dành thời gian tham gia phỏng vấn cho vị trí <span id="vi_tri_ung_tuyen_data"></span> tại công ty chúng tôi. Thông qua buổi phỏng vấn, chúng tôi đánh giá cao tinh thần chuyên nghiệp và các kiến thức, kinh nghiệm của anh (chị).</p>
+        <p>Tuy nhiên, sau khi bàn bạc và thống nhất, chúng tôi thấy rằng anh chị vẫn chưa thật sự phù hợp với các tiêu chí mà công ty đang tìm kiếm. Vì vậy, văn bản này để thông báo cho anh (chị) chủ động tìm kiếm một công việc khác phù hợp hơn. Chúc anh (chị) <span id="ten_ung_vien_data_2"></span> sớm tìm được công việc để phát huy sở trường và đam mê của mình. Chúng tôi sẽ lưu lại thông tin của anh (chị) để có thể liên hệ lại trong tương lai nếu có một vị trí khác phù hợp hơn.</p>
+        <p>Mọi thắc mắc hoặc ý kiến đóng góp, anh (chị) hãy liên lạc với: P.HCNS Vinachi 0976.831.226 hcns@vinachi.vn</p>
+    </div>
+
+    <div class="footer">
+        <p>Trân trọng!</p>
+    </div>
+
+    <div class="signature-wrapper">
+        <div class="signature">
+            <p><strong>TM GIÁM ĐỐC</strong></p>
+            <p><strong>PHÒNG HCNS</strong></p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Hàm này sẽ lấy dữ liệu từ URL và hiển thị lên form
+    document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+
+        function updateElementText(id, paramName, isUppercase = false) {
+            const element = document.getElementById(id);
+            if (element && params.has(paramName)) {
+                let text = decodeURIComponent(params.get(paramName)).replace(/\\n/g, '\n');
+                if (isUppercase) {
+                    text = text.toUpperCase();
+                }
+                element.textContent = text;
+            }
+        }
+
+        // Cập nhật các trường thông tin
+        // Sử dụng các tên biến này khi truyền dữ liệu qua URL:
+        // Ngay_thong_bao, Ten_ung_vien, Vi_tri_ung_tuyen
+        updateElementText('ngay_thong_bao_data', 'Ngay_thong_bao');
+        updateElementText('ten_ung_vien_upper_data', 'Ten_ung_vien', true);
+        updateElementText('ten_ung_vien_data', 'Ten_ung_vien');
+        updateElementText('ten_ung_vien_data_2', 'Ten_ung_vien');
+        updateElementText('vi_tri_ung_tuyen_data', 'Vi_tri_ung_tuyen');
+    });
+
+    // Hàm chuyển đổi HTML sang PDF
+    async function downloadPDF() {
+        const element = document.getElementById('documentContainer');
+
+        // Tạo canvas từ HTML
+        const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+        });
+
+        // Kích thước trang A4
+        const A4_WIDTH = 210; // mm
+        const A4_HEIGHT = 297; // mm
+        const margin = 15; // 1.5cm
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+        // Tạo instance jsPDF với định dạng A4
+        const doc = new jspdf.jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+        });
+
+        // Tính toán kích thước ảnh để vừa với lề 1.5cm
+        const imgProps = doc.getImageProperties(imgData);
+        const finalImgWidth = A4_WIDTH - 2 * margin;
+        const finalImgHeight = (imgProps.height * finalImgWidth) / imgProps.width;
+
+        // Thêm ảnh vào PDF
+        doc.addImage(imgData, 'JPEG', margin, (A4_HEIGHT - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
+
+        // Lưu file PDF
+        doc.save('Thu_thong_bao_ket_qua_phong_van.pdf');
+    }
+</script>
+
+</body>
+</html>
