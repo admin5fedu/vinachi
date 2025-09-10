@@ -164,7 +164,7 @@
         <li class="mb-2">
             - Thời gian làm việc: <span id="thoi_gian_lam_viec_data"></span>.
         </li>
-        <li class="mb-2">
+        <li class="mb-2" id="tg_tv_li">
             - Thời gian thử việc: tối đa <span id="thoi_gian_thu_viec_data"></span> với khối gián tiếp, 4 tháng với khối kinh doanh. Nhận 100% lương vị trí trong quá trình thử việc.
         </li>
     </ul>
@@ -201,25 +201,28 @@
     <p class="mb-2">Trong đó:</p>
     <ul class="list-style-none indent-1">
         <li class="mb-2">
-            - Lương cơ bản, Lương đàm phán và phụ cấp tính theo số ngày đi làm thực tế
+            - <span class="font-bold">Lương cơ bản</span>: Tính theo số ngày đi làm thực tế
         </li>
         <li class="mb-2">
-            - Lương KPI tính theo tỷ lệ hoàn thành doanh số mức áp
+            - <span class="font-bold">Lương KPI</span>: Tính theo tỷ lệ hoàn thành doanh số mức áp
         </li>
         <li class="mb-2">
-            - Lương đàm phán (nếu có): Khoản đàm phán riêng với ứng viên, tính theo ngày đi làm
+            - <span class="font-bold">Lương đàm phán</span> (nếu có): Khoản đàm phán riêng với ứng viên, tính theo ngày đi làm
         </li>
         <li class="mb-2">
-            - Phụ cấp chức vụ (nếu có): Tùy theo vị trí công việc, tính theo ngày đi làm
+            - <span class="font-bold">Phụ cấp chức vụ</span> (nếu có): Tùy theo vị trí công việc, tính theo ngày đi làm
         </li>
         <li class="mb-2">
-            - Phụ cấp vùng miền (nếu có): Công ty hỗ trợ thêm cho nhân sự làm việc tại các khu vực đặc thù, tính theo ngày đi làm
+            - <span class="font-bold">Phụ cấp vùng miền</span> (nếu có): Công ty hỗ trợ thêm cho nhân sự làm việc tại các khu vực đặc thù, tính theo ngày đi làm
         </li>
         <li class="mb-2">
-            - Phụ cấp khác (nếu có): Tùy theo vị trí công việc, tính theo ngày đi làm
+            - <span class="font-bold">Phụ cấp khác</span> (nếu có): Tùy theo vị trí công việc, tính theo ngày đi làm
         </li>
         <li class="mb-2">
-            - Thưởng doanh số: Được nhận khi hoàn thành doanh số mức áp từ 85% trở lên. Tỷ lệ trích thưởng đạt càng lớn khi đăng ký bậc càng cao
+            - Nhận 100% lương trong quá trình thử việc (không có thưởng)
+        </li>
+        <li class="mb-2">
+            - <span class="font-bold">Thưởng doanh số</span>: Được nhận khi hoàn thành doanh số mức áp từ 85% trở lên. Tỷ lệ trích thưởng đạt càng lớn khi đăng ký bậc càng cao
         </li>
         <li class="mb-2">
             - Các khoản thưởng kinh doanh khác: Chiết khấu, Bán cao hơn giá niêm yết, Bán hàng tồn kho, . . . (Từ 3% đến 8% theo giá trị đơn hàng). Việc này giúp tổng thu nhập hàng tháng có thể cao hơn dự kiến như ở trên
@@ -304,22 +307,16 @@
         }
 
         // Parse and format dates (DD/MM/YYYY)
-        function parseAndFormatDate(paramName) {
+        function parseAndFormatDate(paramName, dayId, monthId, yearId) {
             if (params.has(paramName)) {
                 const dateStr = decodeURIComponent(params.get(paramName));
                 const parts = dateStr.split('/');
                 if (parts.length === 3) {
                     const [day, month, year] = parts;
-                    document.getElementById('ngay_data').textContent = day;
-                    document.getElementById('thang_data').textContent = month;
-                    document.getElementById('nam_data').textContent = year;
+                    document.getElementById(dayId).textContent = day;
+                    document.getElementById(monthId).textContent = month;
+                    document.getElementById(yearId).textContent = year;
                 }
-            } else {
-                // Default to current date if no URL param is provided
-                const today = new Date();
-                document.getElementById('ngay_data').textContent = today.getDate().toString();
-                document.getElementById('thang_data').textContent = (today.getMonth() + 1).toString();
-                document.getElementById('nam_data').textContent = today.getFullYear().toString();
             }
         }
         
@@ -343,13 +340,6 @@
                     document.getElementById('thang_nhan_viec_data').textContent = month;
                     document.getElementById('nam_nhan_viec_data').textContent = year;
                 }
-            } else {
-                 // Fallback to existing logic
-                 updateElementText('gio_data', 'Tg in moi nhan viec', (val) => new Date(val).getHours().toString());
-                 updateElementText('phut_data', 'Tg in moi nhan viec', (val) => new Date(val).getMinutes().toString());
-                 updateElementText('ngay_nhan_viec_data', 'Tg in moi nhan viec', (val) => new Date(val).getDate().toString());
-                 updateElementText('thang_nhan_viec_data', 'Tg in moi nhan viec', (val) => (new Date(val).getMonth() + 1).toString());
-                 updateElementText('nam_nhan_viec_data', 'Tg in moi nhan viec', (val) => new Date(val).getFullYear().toString());
             }
         }
         
@@ -360,11 +350,18 @@
         updateElementText('vi_tri_ung_tuyen_data', 'viTri');
         updateElementText('phong_ban_data', 'phong');
         updateElementText('thoi_gian_lam_viec_data', 'tgLV');
-        updateElementText('thoi_gian_thu_viec_data', 'tgTV');
         updateElementText('ghi_chu_data', 'ghichu');
+        
+        // Conditional handling for "thoi gian thu viec"
+        const tgTvLi = document.getElementById('tg_tv_li');
+        if (params.has('tgTV')) {
+            updateElementText('thoi_gian_thu_viec_data', 'tgTV');
+        } else {
+            tgTvLi.style.display = 'none';
+        }
 
         // Special fields with custom logic
-        parseAndFormatDate('ngayPH');
+        parseAndFormatDate('ngayPH', 'ngay_data', 'thang_data', 'nam_data');
         parseAndFormatFullDateTime('tgNV');
 
         // Salary and allowance fields
