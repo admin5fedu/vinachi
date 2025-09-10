@@ -13,12 +13,12 @@
     <style>
         body {
             font-family: 'Times New Roman', Times, serif;
-            line-height: 1.3;
+            line-height: 1.2;
             margin: 0;
             padding: 0;
             color: #333;
             background-color: #f0f0f0;
-            font-size: 11pt;
+            font-size: 10pt;
         }
 
         .document-container {
@@ -116,7 +116,7 @@
             padding-left: 20px;
         }
         .list-item-spacing {
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
     </style>
 </head>
@@ -205,47 +205,46 @@
         </tbody>
     </table>
     
-    <p class="mb-2">Trong đó:</p>
     <ul class="list-style-none indent-1">
-        <li class="mb-2">
+        <li class="mb-1">
             - <span class="font-bold">Lương cơ bản, Lương đàm phán</span> (nếu có), <span class="font-bold">Các loại phụ cấp</span> (nếu có): Tính theo số ngày đi làm
         </li>
-        <li class="mb-2">
+        <li class="mb-1">
             - <span class="font-bold">Lương KPI</span>: Tính theo tỷ lệ hoàn thành doanh số mức áp
         </li>
-        <li class="mb-2">
+        <li class="mb-1">
             - <span class="font-bold">Thưởng doanh số</span>: Được nhận khi hoàn thành doanh số mức áp từ 85% trở lên. Tỷ lệ trích thưởng đạt càng lớn khi đăng ký bậc càng cao
         </li>
-        <li class="mb-2">
+        <li class="mb-1">
             - <span class="font-bold">Các khoản thưởng kinh doanh khác</span>: Chiết khấu, Bán cao hơn giá niêm yết, Bán hàng tồn kho, . . . (Từ 3% đến 8% theo giá trị đơn hàng). Việc này giúp tổng thu nhập hàng tháng có thể cao hơn dự kiến như ở trên
         </li>
-        <li class="mb-2">
+        <li class="mb-1">
             - <span class="font-bold">Nhận 100% lương trong quá trình thử việc (không có thưởng)</span>
         </li>
     </ul>
 
     <h3 class="section-heading">III - CHẾ ĐỘ ĐÃI NGỘ</h3>
     <ul class="list-style-none indent-1">
-        <li class="mb-2">
+        <li class="mb-1">
             - Bữa trưa tại công ty. Nếu không ăn được trả phụ cấp theo khu vực (từ 700k - 1 triệu)
         </li>
-        <li class="mb-2">
+        <li class="mb-1">
             - Nghỉ phép 12 ngày/1 năm. Nghỉ lễ theo quy định của nhà nước. Đóng BHXH theo quy định của nhà nước.
         </li>
-        <li class="mb-2">
+        <li class="mb-1">
             - Tặng quà hoặc tiền thưởng vào ngày lễ, tết, sinh nhật, hỷ sự. Hỗ trợ ốm đau, tai nạn, tử tuất.
         </li>
-        <li class="mb-2">
+        <li class="mb-1">
             - Thưởng lương tháng 13, 14 theo kết quả kinh doanh của công ty.
         </li>
-        <li class="mb-2">
+        <li class="mb-1">
             - Du lịch hàng năm. Liên hoan 3 tháng/1 lần đối với cấp Trưởng nhóm trở lên.
         </li>
-        <li class="mb-2" id="ghi_chu_data"></li>
+        <li class="mb-1" id="ghi_chu_data"></li>
     </ul>
     
     <h3 class="section-heading">IV - THỦ TỤC NHẬN VIỆC</h3>
-    <p class="mb-2">
+    <p class="mb-1">
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         Khi đến mang theo bộ hồ sơ bao gồm:
     </p>
@@ -274,12 +273,9 @@
         </ul>
     </div>
 
-    <p class="mt-2">
+    <p class="mt-1">
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        Mọi thắc mắc xin liên hệ: P.HCNS Vinachi 0976.831.226 hcns@vinachi.vn.
-    </p>
-    <p class="mt-2">
-        Trân trọng!
+        Mọi thắc mắc xin liên hệ: P.HCNS Vinachi 0976.831.226 hcns@vinachi.vn. Trân trọng!
     </p>
     
     <div class="flex justify-end mt-10 mr-8">
@@ -338,7 +334,8 @@
                 
                 // Parse time
                 if (timeStr) {
-                    const [hour, minute] = timeStr.getElementById('gio_data').textContent = hour;
+                    const [hour, minute] = timeStr.split(':');
+                    document.getElementById('gio_data').textContent = hour;
                     document.getElementById('phut_data').textContent = minute;
                 }
 
@@ -364,9 +361,7 @@
         // Conditional handling for "thoi gian thu viec"
         // This is updated to always display the line
         updateElementText('thoi_gian_thu_viec_data', 'tgTV', (val) => {
-            const prefix = (val.includes('tối đa') || val.includes('tháng')) ? '' : 'tối đa ';
-            const suffix = (val.includes('gián tiếp') || val.includes('kinh doanh')) ? '' : ' với khối gián tiếp, 4 tháng với khối kinh doanh.';
-            return `${prefix}${val}${suffix}`;
+             return decodeURIComponent(val);
         });
 
         // Special fields with custom logic
