@@ -6,503 +6,223 @@
     <title>Thư mời nhận việc</title>
     <!-- Thư viện Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Thư viện để chuyển HTML sang Canvas/Hình ảnh -->
+    <!-- html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Thư viện để tạo file PDF từ Canvas -->
+    <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         body {
             font-family: 'Times New Roman', Times, serif;
-            line-height: 1.1; /* Giảm khoảng cách dòng */
+            line-height: 1.3;
             margin: 0;
             padding: 0;
-            color: #333;
-            background-color: #f0f0f0;
-            font-size: 10pt;
+            background: #f0f0f0;
+            font-size: 11pt;
         }
 
+        /* Khung chuẩn A4 */
         .document-container {
-            width: 21cm;
-            padding: 1.5cm;
-            margin: 30px auto;
-            background-color: #fff;
+            width: 210mm;         /* đúng chuẩn ngang A4 */
+            min-height: 297mm;    /* đúng chuẩn cao A4 */
+            padding: 20mm;        /* margin 2cm */
+            margin: 20px auto;
+            background: white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
             box-sizing: border-box;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Các lớp CSS cho header */
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        .header-table td {
-            vertical-align: top;
-            padding: 0;
-        }
-
-        .header-table .company-info {
-            text-align: left;
-        }
-
-        .company-info h2 {
-            margin: 0;
-            font-size: 16px;
-            line-height: 1.2;
-            color: #555;
-            font-weight: bold;
-        }
-
-        .company-info .address {
-            font-style: italic;
-            margin: 0;
-            font-size: 14px;
-            line-height: 1.2;
         }
 
         @page {
             size: A4;
-            margin: 1.5cm;
+            margin: 0; /* padding đã nằm trong .document-container */
         }
 
         @media print {
+            body {
+                background: white !important;
+            }
             .document-container {
-                width: 100% !important;
-                max-width: none !important;
-                margin: 0 !important;
-                padding: 1.5cm;
+                margin: 0 auto !important;
                 box-shadow: none !important;
                 border: none !important;
-            }
-            body {
-                margin: 0 !important;
-                padding: 0 !important;
-                background: white !important;
+                page-break-after: always;
             }
             .no-print {
                 display: none !important;
             }
-            * {
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color: #000 !important;
-                font-family: 'Times New Roman', Times, serif !important;
-                background: white !important;
-            }
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        .header-table td {
+            vertical-align: top;
         }
 
         .section-title {
             font-weight: bold;
-            font-size: 20px;
+            font-size: 18px;
             text-align: center;
-            margin-bottom: 10px; /* Giảm margin bottom */
+            margin-bottom: 10px;
         }
 
         .section-heading {
             font-weight: bold;
             text-transform: uppercase;
-            margin-top: 10px; /* Giảm margin top */
-            margin-bottom: 3px; /* Giảm margin bottom */
+            margin-top: 10px;
+            margin-bottom: 5px;
         }
-        
+
         .list-style-none {
             list-style-type: none;
             padding-left: 0;
         }
-        
         .indent-1 {
             padding-left: 20px;
         }
-        .list-item-spacing {
-            margin-bottom: 0; /* Giảm khoảng cách giữa các mục */
-        }
-
-        .mb-2 {
-            margin-bottom: 5px; /* Giảm khoảng cách cho các đoạn văn */
-        }
-        
+        .mb-2 { margin-bottom: 6px; }
+        .mb-1 { margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
+<!-- Nút thao tác -->
 <div class="flex justify-end gap-2 p-4 no-print">
-    <button id="printButton"
-            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-            data-html2canvas-ignore="true" onclick="printDocument()">
+    <button onclick="printDocument()" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
         In
     </button>
-    <button id="downloadExcelButton"
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            data-html2canvas-ignore="true" onclick="downloadExcel()">
+    <button onclick="downloadExcel()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
         Xuất Excel
     </button>
-    <button id="downloadPdfButton"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            data-html2canvas-ignore="true" onclick="downloadPDF()">
+    <button onclick="downloadPDF()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Xuất PDF
     </button>
 </div>
 
+<!-- Nội dung chính -->
 <div class="document-container" id="documentContainer">
-    <!-- Header Section -->
     <table class="header-table">
         <tr>
             <td style="width: 20%;">
-                <img src="https://drive.google.com/thumbnail?id=12VL0Dxkj5d8xwLFVRslpHdtlWd4MHF5a" alt="VINACHI Logo" style="max-width: 100px; height: auto;">
+                <img src="https://drive.google.com/thumbnail?id=12VL0Dxkj5d8xwLFVRslpHdtlWd4MHF5a" 
+                     alt="VINACHI Logo" style="max-width: 100px; height: auto;">
             </td>
-            <td class="company-info" style="width: 80%;">
-                <h2>CÔNG TY TNHH VINACHI VIỆT NAM</h2>
-                <p class="address">Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</p>
+            <td style="width: 80%; text-align:left;">
+                <h2 style="margin:0;font-size:16px;font-weight:bold;">CÔNG TY TNHH VINACHI VIỆT NAM</h2>
+                <p style="margin:0;font-size:14px;font-style:italic;">Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</p>
             </td>
         </tr>
     </table>
-    
-    <div class="location-date text-right mb-4">
+
+    <div class="text-right mb-2">
         Bắc Ninh, ngày <span id="ngay_data"></span> tháng <span id="thang_data"></span> năm <span id="nam_data"></span>
     </div>
 
     <div class="section-title">THƯ MỜI NHẬN VIỆC</div>
-    
+
     <p class="mb-2">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        Công ty TNHH Vinachi Việt Nam gửi đến Anh/chị <span id="ten_ung_vien_data" class="font-bold uppercase"></span> thư mời hợp tác với nội dung như sau:
+        Công ty TNHH Vinachi Việt Nam gửi đến Anh/chị <span id="ten_ung_vien_data" class="font-bold uppercase"></span> 
+        thư mời hợp tác với nội dung như sau:
     </p>
 
     <h3 class="section-heading">I - THỜI GIAN VÀ ĐỊA ĐIỂM</h3>
     <ul class="list-style-none indent-1">
-        <li class="list-item-spacing">
-            - <strong>Lúc:</strong> <span id="gio_data"></span>h<span id="phut_data"></span> ngày <span id="ngay_nhan_viec_data"></span> tháng <span id="thang_nhan_viec_data"></span> năm <span id="nam_nhan_viec_data"></span>
-        </li>
-        <li class="list-item-spacing">
-            - <strong>Tại:</strong> <span id="dia_diem_data"></span>
-        </li>
-        <li class="list-item-spacing">
-            - <strong>Vị trí công việc:</strong> <span id="vi_tri_ung_tuyen_data"></span> thuộc phòng <span id="phong_ban_data"></span>
-        </li>
-        <li class="list-item-spacing">
-            - <strong>Thời gian làm việc:</strong> <span id="thoi_gian_lam_viec_data"></span>.
-        </li>
-        <li class="list-item-spacing">
-            - <strong>Thời gian thử việc:</strong> <span id="thoi_gian_thu_viec_data"></span>.
-        </li>
+        <li>- <b>Lúc:</b> <span id="gio_data"></span>h<span id="phut_data"></span> ngày <span id="ngay_nhan_viec_data"></span>/<span id="thang_nhan_viec_data"></span>/<span id="nam_nhan_viec_data"></span></li>
+        <li>- <b>Tại:</b> <span id="dia_diem_data"></span></li>
+        <li>- <b>Vị trí công việc:</b> <span id="vi_tri_ung_tuyen_data"></span>, Phòng <span id="phong_ban_data"></span></li>
+        <li>- <b>Thời gian làm việc:</b> <span id="thoi_gian_lam_viec_data"></span></li>
+        <li>- <b>Thời gian thử việc:</b> <span id="thoi_gian_thu_viec_data"></span></li>
     </ul>
 
     <h3 class="section-heading">II - THU NHẬP</h3>
-    <!-- Bảng thu nhập đã được cập nhật theo yêu cầu -->
     <table class="w-full border-collapse border border-gray-400 mb-2 text-sm" id="incomeTable">
         <thead>
             <tr class="bg-gray-100 text-center font-bold">
-                <th class="border border-gray-400 p-2 font-bold">Tổng thu nhập</th>
-                <th class="border border-gray-400 p-2">Lương CB</th>
-                <th class="border border-gray-400 p-2">Lương KPI</th>
-                <th class="border border-gray-400 p-2">Đàm phán</th>
-                <th class="border border-gray-400 p-2">PC chức vụ</th>
-                <th class="border border-gray-400 p-2">Phụ cấp vùng miền</th>
-                <th class="border border-gray-400 p-2">Phụ cấp khác</th>
-                <th class="border border-gray-400 p-2">Tổng thu nhập từ lương</th>
-                <th class="border border-gray-400 p-2">Thưởng</th>
+                <th class="border p-2">Tổng thu nhập</th>
+                <th class="border p-2">Lương CB</th>
+                <th class="border p-2">Lương KPI</th>
+                <th class="border p-2">Đàm phán</th>
+                <th class="border p-2">PC chức vụ</th>
+                <th class="border p-2">PC vùng miền</th>
+                <th class="border p-2">PC khác</th>
+                <th class="border p-2">Tổng từ lương</th>
+                <th class="border p-2">Thưởng</th>
             </tr>
         </thead>
         <tbody>
             <tr class="text-center">
-                <td id="tong_thu_nhap_data" class="border border-gray-400 p-2 font-bold"></td>
-                <td id="luong_cb_data" class="border border-gray-400 p-2"></td>
-                <td id="luong_kpi_data" class="border border-gray-400 p-2"></td>
-                <td id="dam_phan_data" class="border border-gray-400 p-2"></td>
-                <td id="pc_chuc_vu_data" class="border border-gray-400 p-2"></td>
-                <td id="phu_cap_vung_mien_data" class="border border-gray-400 p-2"></td>
-                <td id="phu_cap_khac_data" class="border border-gray-400 p-2"></td>
-                <td id="tong_thu_nhap_tu_luong_data" class="border border-gray-400 p-2"></td>
-                <td id="thuong_data" class="border border-gray-400 p-2"></td>
+                <td id="tong_thu_nhap_data" class="border p-2 font-bold"></td>
+                <td id="luong_cb_data" class="border p-2"></td>
+                <td id="luong_kpi_data" class="border p-2"></td>
+                <td id="dam_phan_data" class="border p-2"></td>
+                <td id="pc_chuc_vu_data" class="border p-2"></td>
+                <td id="phu_cap_vung_mien_data" class="border p-2"></td>
+                <td id="phu_cap_khac_data" class="border p-2"></td>
+                <td id="tong_thu_nhap_tu_luong_data" class="border p-2"></td>
+                <td id="thuong_data" class="border p-2"></td>
             </tr>
         </tbody>
     </table>
-    
-    <ul class="list-style-none indent-1">
-        <li class="mb-1">
-            - <span class="font-bold">Lương cơ bản, Lương đàm phán</span> (nếu có), <span class="font-bold">Các loại phụ cấp</span> (nếu có): Tính theo số ngày đi làm
-        </li>
-        <li class="mb-1">
-            - <span class="font-bold">Lương KPI</span>: Tính theo tỷ lệ hoàn thành doanh số mức áp
-        </li>
-        <li class="mb-1">
-            - <span class="font-bold">Thưởng doanh số</span>: Được nhận khi hoàn thành doanh số mức áp từ 85% trở lên. Tỷ lệ trích thưởng đạt càng lớn khi đăng ký bậc càng cao
-        </li>
-        <li class="mb-1">
-            - <span class="font-bold">Các khoản thưởng kinh doanh khác</span>: Chiết khấu, Bán cao hơn giá niêm yết, Bán hàng tồn kho, . . . (Từ 3% đến 8% theo giá trị đơn hàng). Việc này giúp tổng thu nhập hàng tháng có thể cao hơn dự kiến như ở trên
-        </li>
-        <li class="mb-1">
-            - <span class="font-bold">Nhận 100% lương trong quá trình thử việc (không có thưởng)</span>
-        </li>
-    </ul>
+
+    <p>- Nhận 100% lương trong quá trình thử việc (không có thưởng)</p>
 
     <h3 class="section-heading">III - CHẾ ĐỘ ĐÃI NGỘ</h3>
     <ul class="list-style-none indent-1">
-        <li class="mb-1">
-            - Bữa trưa tại công ty. Nếu không ăn được trả phụ cấp theo khu vực (từ 700k - 1 triệu)
-        </li>
-        <li class="mb-1">
-            - Nghỉ phép 12 ngày/1 năm. Nghỉ lễ theo quy định của nhà nước. Đóng BHXH theo quy định của nhà nước.
-        </li>
-        <li class="mb-1">
-            - Tặng quà hoặc tiền thưởng vào ngày lễ, tết, sinh nhật, hỷ sự. Hỗ trợ ốm đau, tai nạn, tử tuất.
-        </li>
-        <li class="mb-1">
-            - Thưởng lương tháng 13, 14 theo kết quả kinh doanh của công ty.
-        </li>
-        <li class="mb-1">
-            - Du lịch hàng năm. Liên hoan 3 tháng/1 lần đối với cấp Trưởng nhóm trở lên.
-        </li>
-        <li class="mb-1" id="ghi_chu_data"></li>
+        <li>- Bữa trưa tại công ty hoặc phụ cấp (700k - 1tr)</li>
+        <li>- Nghỉ phép 12 ngày/năm, lễ tết theo luật, BHXH đầy đủ</li>
+        <li>- Quà, thưởng ngày lễ, sinh nhật, hỗ trợ ốm đau</li>
+        <li>- Thưởng lương tháng 13, 14 theo kết quả kinh doanh</li>
+        <li>- Du lịch hàng năm, liên hoan 3 tháng/lần</li>
+        <li id="ghi_chu_data"></li>
     </ul>
-    
-    <h3 class="section-heading">IV - THỦ TỤC NHẬN VIỆC</h3>
-    <p class="mb-1">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        Khi đến mang theo bộ hồ sơ bao gồm:
-    </p>
-    <div class="grid grid-cols-2 gap-2 indent-1">
-        <ul class="list-style-none">
-            <li>
-                (1) Sơ yếu lý lịch có dấu đỏ UBND Xã / Phường,
-            </li>
-            <li>
-                (2) Giấy khai sinh bản photo (không công chứng),
-            </li>
-            <li>
-                (3) Sổ hộ khẩu photo không công chứng (nếu còn),
-            </li>
-        </ul>
-        <ul class="list-style-none">
-            <li>
-                (4) Giấy xác nhận dân sự có dấu đỏ,
-            </li>
-            <li>
-                (5) Căn cước công dân photo công chứng,
-            </li>
-            <li>
-                (6) Photo công chứng bằng cấp (nếu có)
-            </li>
-        </ul>
-    </div>
 
-    <p class="mt-1">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        Mọi thắc mắc xin liên hệ: P.HCNS Vinachi 0976.831.226 hcns@vinachi.vn. Trân trọng!
-    </p>
-    
+    <h3 class="section-heading">IV - THỦ TỤC NHẬN VIỆC</h3>
+    <p>Mang theo hồ sơ: sơ yếu lý lịch, khai sinh, hộ khẩu, CCCD, bằng cấp, giấy xác nhận dân sự.</p>
+
+    <p>Mọi thắc mắc liên hệ: P.HCNS Vinachi 0976.831.226 - hcns@vinachi.vn</p>
+
     <div class="flex justify-end mt-10 mr-8">
         <div class="text-center">
             <p class="font-bold">TM CÔNG TY TNHH VINACHI</p>
             <p class="font-bold mt-2">PHÒNG HCNS</p>
         </div>
     </div>
-
 </div>
 
 <script>
-    function printDocument() {
-        window.print();
-    }
-    
+    function printDocument() { window.print(); }
+
     function downloadExcel() {
-        // Lấy bảng HTML
         const table = document.getElementById('incomeTable');
         let csv = [];
-        
-        // Lấy tiêu đề từ thead
         const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText);
         csv.push(headers.join(','));
-
-        // Lấy dữ liệu từ tbody
-        const rows = table.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            const rowData = Array.from(row.querySelectorAll('td')).map(td => {
-                let text = td.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
-                // Xử lý các trường có dấu phẩy hoặc ký tự đặc biệt
-                if (text.includes(',') || text.includes('"') || text.includes('\n')) {
-                    text = '"' + text.replace(/"/g, '""') + '"';
-                }
-                return text;
-            });
+        table.querySelectorAll('tbody tr').forEach(row => {
+            const rowData = Array.from(row.querySelectorAll('td')).map(td => td.innerText.trim());
             csv.push(rowData.join(','));
         });
-
-        const csvContent = csv.join('\n');
-        
-        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob(["\uFEFF" + csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
-        if (link.download !== undefined) {
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'Thong_tin_thu_nhap.csv');
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Thu_nhap.csv';
+        link.click();
     }
 
     async function downloadPDF() {
         const element = document.getElementById('documentContainer');
-        const canvas = await html2canvas(element, { scale: 2 });
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
         const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
-        const A4_WIDTH = 210; // mm
-        const A4_HEIGHT = 297; // mm
-        const margin = 15; // 1.5cm
-        const doc = new jspdf.jsPDF('p', 'mm', 'a4');
-        const imgProps = doc.getImageProperties(imgData);
-        const finalImgWidth = A4_WIDTH - 2 * margin;
-        const finalImgHeight = (imgProps.height * finalImgWidth) / imgProps.width;
+        const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+        const pdfWidth = 210, pdfHeight = 297;
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-        doc.addImage(imgData, 'JPEG', margin, (A4_HEIGHT - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
-        doc.save('Thu_moi_nhan_viec.pdf');
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgHeight);
+        pdf.save('Thu_moi_nhan_viec.pdf');
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const params = new URLSearchParams(window.location.search);
-
-        // Utility function to safely update text content, handling multi-line text
-        function updateElementText(id, paramName, parser = (val) => decodeURIComponent(val)) {
-            const element = document.getElementById(id);
-            if (element && params.has(paramName)) {
-                const text = parser(params.get(paramName));
-                element.textContent = text;
-            } else if (element) {
-                // Keep the span empty if no parameter is provided, so the surrounding text remains
-                element.textContent = '';
-            }
-        }
-        
-        function updateMultiLineText(id, paramName) {
-            const element = document.getElementById(id);
-            if (element && params.has(paramName)) {
-                let text = decodeURIComponent(params.get(paramName));
-                text = text.replace(/(?:\r\n|\r|\n)/g, '<br>');
-                element.innerHTML = text;
-            }
-        }
-
-        // Parse and format dates (DD/MM/YYYY)
-        function parseAndFormatDate(paramName, dayId, monthId, yearId) {
-            if (params.has(paramName)) {
-                const dateStr = decodeURIComponent(params.get(paramName));
-                const parts = dateStr.split('/');
-                if (parts.length === 3) {
-                    const [day, month, year] = parts;
-                    document.getElementById(dayId).textContent = day;
-                    document.getElementById(monthId).textContent = month;
-                    document.getElementById(yearId).textContent = year;
-                }
-            }
-        }
-        
-        // Parse and format a full date/time string (HH:mm DD/MM/YYYY)
-        function parseAndFormatFullDateTime(paramName) {
-            if (params.has(paramName)) {
-                const fullDateTimeStr = decodeURIComponent(params.get(paramName));
-                const [timeStr, dateStr] = fullDateTimeStr.split(' ');
-                
-                // Parse time
-                if (timeStr) {
-                    const [hour, minute] = timeStr.split(':');
-                    document.getElementById('gio_data').textContent = hour;
-                    document.getElementById('phut_data').textContent = minute;
-                }
-
-                // Parse date
-                if (dateStr) {
-                    const [day, month, year] = dateStr.split('/');
-                    document.getElementById('ngay_nhan_viec_data').textContent = day;
-                    document.getElementById('thang_nhan_viec_data').textContent = month;
-                    document.getElementById('nam_nhan_viec_data').textContent = year;
-                }
-            }
-        }
-        
-        // --- Data Population from URL Parameters ---
-        // General text fields
-        updateElementText('ten_ung_vien_data', 'ten', (val) => decodeURIComponent(val).toUpperCase());
-        updateElementText('dia_diem_data', 'noiNV');
-        updateElementText('vi_tri_ung_tuyen_data', 'viTri');
-        updateElementText('phong_ban_data', 'phong');
-        updateElementText('thoi_gian_lam_viec_data', 'tgLV');
-        updateMultiLineText('ghi_chu_data', 'ghichu'); // Sử dụng hàm mới cho trường ghi chú
-        
-        // Conditional handling for "thoi gian thu viec"
-        // This is updated to always display the line
-        updateElementText('thoi_gian_thu_viec_data', 'tgTV', (val) => {
-             return decodeURIComponent(val);
-        });
-
-        // Special fields with custom logic
-        parseAndFormatDate('ngayPH', 'ngay_data', 'thang_data', 'nam_data');
-        parseAndFormatFullDateTime('tgNV');
-
-        // Salary and allowance fields
-        function updateCurrencyField(id, paramName) {
-            updateElementText(id, paramName, (val) => {
-                const num = parseFloat(val);
-                return isNaN(num) ? '0' : num.toLocaleString('vi-VN');
-            });
-        }
-        
-        updateCurrencyField('luong_cb_data', 'luongCB');
-        updateCurrencyField('luong_kpi_data', 'luongKPI');
-        updateCurrencyField('dam_phan_data', 'luongDP');
-        updateCurrencyField('pc_chuc_vu_data', 'pcCV');
-        updateCurrencyField('phu_cap_vung_mien_data', 'pcVM');
-        updateCurrencyField('phu_cap_khac_data', 'pcKhac');
-        
-        // Total Income and Bonus fields
-        const tongThuNhapTu = parseFloat(params.get('thuNhapTu')) || 0;
-        const tongThuNhapDen = parseFloat(params.get('thuNhapDen')) || 0;
-        const tongThuNhapData = document.getElementById('tong_thu_nhap_data');
-        if (tongThuNhapTu > 0 && tongThuNhapDen > 0) {
-            tongThuNhapData.innerHTML = `Từ ${tongThuNhapTu.toLocaleString('vi-VN')}<br>Đến ${tongThuNhapDen.toLocaleString('vi-VN')}`;
-        } else if (tongThuNhapTu > 0) {
-            tongThuNhapData.textContent = `Từ ${tongThuNhapTu.toLocaleString('vi-VN')}`;
-        } else if (tongThuNhapDen > 0) {
-            tongThuNhapData.textContent = `Đến ${tongThuNhapDen.toLocaleString('vi-VN')}`;
-        } else {
-            // Fallback: calculate total from other salary components
-            const total = (parseFloat(params.get('luongCB')) || 0) + 
-                          (parseFloat(params.get('luongKPI')) || 0) + 
-                          (parseFloat(params.get('luongDP')) || 0) + 
-                          (parseFloat(params.get('pcCV')) || 0) +
-                          (parseFloat(params.get('pcVM')) || 0) +
-                          (parseFloat(params.get('pcKhac')) || 0);
-            tongThuNhapData.textContent = total.toLocaleString('vi-VN');
-        }
-
-        const thuongTu = parseFloat(params.get('thuongTu')) || 0;
-        const thuongDen = parseFloat(params.get('thuongDen')) || 0;
-        const thuongData = document.getElementById('thuong_data');
-        if (thuongTu > 0 && thuongDen > 0) {
-            thuongData.innerHTML = `Từ ${thuongTu.toLocaleString('vi-VN')}<br>Đến ${thuongDen.toLocaleString('vi-VN')}`;
-        } else if (thuongTu > 0) {
-            thuongData.textContent = `Từ ${thuongTu.toLocaleString('vi-VN')}`;
-        } else if (thuongDen > 0) {
-            thuongData.textContent = `Đến ${thuongDen.toLocaleString('vi-VN')}`;
-        } else {
-            thuongData.textContent = '0';
-        }
-        
-        // Calculate and display total salary from salary components
-        const tongLuongTuLuongData = document.getElementById('tong_thu_nhap_tu_luong_data');
-        if (tongLuongTuLuongData) {
-            const tongLuong = (parseFloat(params.get('luongCB')) || 0) + 
-                              (parseFloat(params.get('luongKPI')) || 0) + 
-                              (parseFloat(params.get('luongDP')) || 0) + 
-                              (parseFloat(params.get('pcCV')) || 0) +
-                              (parseFloat(params.get('pcVM')) || 0) +
-                              (parseFloat(params.get('pcKhac')) || 0);
-            tongLuongTuLuongData.textContent = tongLuong.toLocaleString('vi-VN');
-        }
-    });
 </script>
 
 </body>
