@@ -116,21 +116,6 @@
             padding-left: 20px;
         }
 
-        .signature-table {
-            width: 100%;
-            margin-top: 50px;
-        }
-
-        .signature-table td {
-            width: 50%;
-            text-align: center;
-            vertical-align: top;
-        }
-        
-        .signature-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
     </style>
 </head>
 <body>
@@ -177,7 +162,7 @@
             - Vị trí công việc: <span id="vi_tri_ung_tuyen_data"></span> thuộc phòng <span id="phong_ban_data"></span>
         </li>
         <li class="mb-2">
-            - Thời gian làm việc: 8h/ 1 ngày. Từ thứ 2 đến thứ 7 (nghỉ <span id="nghi_thu_7_data"></span> chiều thứ 7 có lương)
+            - Thời gian làm việc: <span id="thoi_gian_lam_viec_data"></span>.
         </li>
         <li class="mb-2">
             - Thời gian thử việc: tối đa <span id="thoi_gian_thu_viec_data"></span> với khối gián tiếp, 4 tháng với khối kinh doanh. Nhận 100% lương vị trí trong quá trình thử việc.
@@ -185,14 +170,33 @@
     </ul>
 
     <h3 class="section-heading">II - THU NHẬP</h3>
-    <ul class="list-style-none">
-        <li class="mb-2">
-            <strong>TỔNG THU NHẬP</strong> = Lương CB + Lương KPI + Đàm phán + Phụ cấp + Thưởng
-        </li>
-        <li class="mb-2">
-            <span id="tong_thu_nhap_data"></span> = <span id="luong_cb_data"></span> + <span id="luong_kpi_data"></span> + <span id="dam_phan_data"></span> + <span id="phu_cap_data"></span> + Từ <span id="thuong_tu_data"></span> đến <span id="thuong_den_data"></span>
-        </li>
-    </ul>
+    <!-- Bảng thu nhập đã được cập nhật theo yêu cầu -->
+    <table class="w-full border-collapse border border-gray-400 mb-4 text-sm">
+        <thead>
+            <tr class="bg-gray-100 text-center font-bold">
+                <th class="border border-gray-400 p-2 font-bold">Tổng thu nhập</th>
+                <th class="border border-gray-400 p-2">Lương CB</th>
+                <th class="border border-gray-400 p-2">Lương KPI</th>
+                <th class="border border-gray-400 p-2">Đàm phán</th>
+                <th class="border border-gray-400 p-2">PC chức vụ</th>
+                <th class="border border-gray-400 p-2">Phụ cấp vùng miền</th>
+                <th class="border border-gray-400 p-2">Phụ cấp khác</th>
+                <th class="border border-gray-400 p-2">Thưởng</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="text-center">
+                <td id="tong_thu_nhap_data" class="border border-gray-400 p-2 font-bold"></td>
+                <td id="luong_cb_data" class="border border-gray-400 p-2"></td>
+                <td id="luong_kpi_data" class="border border-gray-400 p-2"></td>
+                <td id="dam_phan_data" class="border border-gray-400 p-2"></td>
+                <td id="pc_chuc_vu_data" class="border border-gray-400 p-2"></td>
+                <td id="phu_cap_vung_mien_data" class="border border-gray-400 p-2"></td>
+                <td id="phu_cap_khac_data" class="border border-gray-400 p-2"></td>
+                <td id="thuong_data" class="border border-gray-400 p-2"></td>
+            </tr>
+        </tbody>
+    </table>
     
     <p class="mb-2">Trong đó:</p>
     <ul class="list-style-none indent-1">
@@ -200,14 +204,25 @@
             - Lương cơ bản, Lương đàm phán và phụ cấp tính theo số ngày đi làm thực tế
         </li>
         <li class="mb-2">
-            - Lương KPI tính theo kết quả công việc (Điểm OLE) (Khối gián tiếp: Các công việc được giao, Khối kinh doanh: Hoàn thành doanh thu)
+            - Lương KPI tính theo tỷ lệ hoàn thành doanh số mức áp
         </li>
         <li class="mb-2">
-            - Các khoản thưởng:
-            <ul class="list-style-none indent-1">
-                <li>+) Khối gián tiếp: được nhận khi doanh thu toàn công ty đạt từ 85% trở lên và điểm OLE cá nhân đạt 85 trở lên.</li>
-                <li>+) Khối trực tiếp: được nhận khi doanh thu cá nhân đạt từ 85% trở lên. Tỷ lệ trích thưởng đạt càng lớn khi đăng ký bậc càng cao. Các khoản thưởng kinh doanh khác: Chiết khấu, Bán cao hơn giá niêm yết, Bán hàng tồn kho, . . . (Từ 3% đến 8% theo giá trị đơn hàng).</li>
-            </ul>
+            - Lương đàm phán (nếu có): Khoản đàm phán riêng với ứng viên, tính theo ngày đi làm
+        </li>
+        <li class="mb-2">
+            - Phụ cấp chức vụ (nếu có): Tùy theo vị trí công việc, tính theo ngày đi làm
+        </li>
+        <li class="mb-2">
+            - Phụ cấp vùng miền (nếu có): Công ty hỗ trợ thêm cho nhân sự làm việc tại các khu vực đặc thù, tính theo ngày đi làm
+        </li>
+        <li class="mb-2">
+            - Phụ cấp khác (nếu có): Tùy theo vị trí công việc, tính theo ngày đi làm
+        </li>
+        <li class="mb-2">
+            - Thưởng doanh số: Được nhận khi hoàn thành doanh số mức áp từ 85% trở lên. Tỷ lệ trích thưởng đạt càng lớn khi đăng ký bậc càng cao
+        </li>
+        <li class="mb-2">
+            - Các khoản thưởng kinh doanh khác: Chiết khấu, Bán cao hơn giá niêm yết, Bán hàng tồn kho, . . . (Từ 3% đến 8% theo giá trị đơn hàng). Việc này giúp tổng thu nhập hàng tháng có thể cao hơn dự kiến như ở trên
         </li>
     </ul>
 
@@ -267,16 +282,12 @@
         Trân trọng!
     </p>
     
-    <table class="signature-table">
-        <tr>
-            <td>
-                <p class="signature-title">TM GIÁM ĐỐC</p>
-            </td>
-            <td>
-                <p class="signature-title">PHÒNG HCNS</p>
-            </td>
-        </tr>
-    </table>
+    <div class="flex justify-end mt-12 mr-8">
+        <div class="text-center">
+            <p class="font-bold">TM CÔNG TY TNHH VINACHI</p>
+            <p class="font-bold mt-2">PHÒNG HCNS</p>
+        </div>
+    </div>
 
 </div>
 
@@ -284,63 +295,116 @@
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
 
-        function updateElementText(id, paramName) {
+        // Utility function to safely update text content
+        function updateElementText(id, paramName, parser = (val) => decodeURIComponent(val)) {
             const element = document.getElementById(id);
             if (element && params.has(paramName)) {
-                element.textContent = decodeURIComponent(params.get(paramName));
+                element.textContent = parser(params.get(paramName));
+            }
+        }
+
+        // Parse and format dates (DD/MM/YYYY)
+        function parseAndFormatDate(paramName) {
+            if (params.has(paramName)) {
+                const dateStr = decodeURIComponent(params.get(paramName));
+                const parts = dateStr.split('/');
+                if (parts.length === 3) {
+                    const [day, month, year] = parts;
+                    document.getElementById('ngay_data').textContent = day;
+                    document.getElementById('thang_data').textContent = month;
+                    document.getElementById('nam_data').textContent = year;
+                }
+            } else {
+                // Default to current date if no URL param is provided
+                const today = new Date();
+                document.getElementById('ngay_data').textContent = today.getDate().toString();
+                document.getElementById('thang_data').textContent = (today.getMonth() + 1).toString();
+                document.getElementById('nam_data').textContent = today.getFullYear().toString();
             }
         }
         
-        // Lấy ngày hiện tại
-        const today = new Date();
-        document.getElementById('ngay_data').textContent = today.getDate().toString();
-        document.getElementById('thang_data').textContent = (today.getMonth() + 1).toString();
-        document.getElementById('nam_data').textContent = today.getFullYear().toString();
+        // Parse and format a full date/time string (HH:mm DD/MM/YYYY)
+        function parseAndFormatFullDateTime(paramName) {
+            if (params.has(paramName)) {
+                const fullDateTimeStr = decodeURIComponent(params.get(paramName));
+                const [timeStr, dateStr] = fullDateTimeStr.split(' ');
+                
+                // Parse time
+                if (timeStr) {
+                    const [hour, minute] = timeStr.split(':');
+                    document.getElementById('gio_data').textContent = hour;
+                    document.getElementById('phut_data').textContent = minute;
+                }
 
-        // Cập nhật các trường thông tin dựa trên tham số URL
-        // Tên tham số được lấy từ file Word và quy ước của AppSheet
-        const tgNhanViec = params.get('Tg in moi nhan viec');
-        if (tgNhanViec) {
-            const date = new Date(tgNhanViec);
-            document.getElementById('ngay_nhan_viec_data').textContent = date.getDate().toString();
-            document.getElementById('thang_nhan_viec_data').textContent = (date.getMonth() + 1).toString();
-            document.getElementById('nam_nhan_viec_data').textContent = date.getFullYear().toString();
-            document.getElementById('gio_data').textContent = date.getHours().toString();
-            document.getElementById('phut_data').textContent = date.getMinutes().toString();
+                // Parse date
+                if (dateStr) {
+                    const [day, month, year] = dateStr.split('/');
+                    document.getElementById('ngay_nhan_viec_data').textContent = day;
+                    document.getElementById('thang_nhan_viec_data').textContent = month;
+                    document.getElementById('nam_nhan_viec_data').textContent = year;
+                }
+            } else {
+                 // Fallback to existing logic
+                 updateElementText('gio_data', 'Tg in moi nhan viec', (val) => new Date(val).getHours().toString());
+                 updateElementText('phut_data', 'Tg in moi nhan viec', (val) => new Date(val).getMinutes().toString());
+                 updateElementText('ngay_nhan_viec_data', 'Tg in moi nhan viec', (val) => new Date(val).getDate().toString());
+                 updateElementText('thang_nhan_viec_data', 'Tg in moi nhan viec', (val) => (new Date(val).getMonth() + 1).toString());
+                 updateElementText('nam_nhan_viec_data', 'Tg in moi nhan viec', (val) => new Date(val).getFullYear().toString());
+            }
+        }
+        
+        // --- Data Population from URL Parameters ---
+        // General text fields
+        updateElementText('ten_ung_vien_data', 'ten', (val) => decodeURIComponent(val).toUpperCase());
+        updateElementText('dia_diem_data', 'noiNV');
+        updateElementText('vi_tri_ung_tuyen_data', 'viTri');
+        updateElementText('phong_ban_data', 'phong');
+        updateElementText('thoi_gian_lam_viec_data', 'tgLV');
+        updateElementText('thoi_gian_thu_viec_data', 'tgTV');
+        updateElementText('ghi_chu_data', 'ghichu');
+
+        // Special fields with custom logic
+        parseAndFormatDate('ngayPH');
+        parseAndFormatFullDateTime('tgNV');
+
+        // Salary and allowance fields
+        function updateCurrencyField(id, paramName) {
+            updateElementText(id, paramName, (val) => {
+                const num = parseFloat(val);
+                return isNaN(num) ? '0' : num.toLocaleString('vi-VN');
+            });
+        }
+        
+        updateCurrencyField('luong_cb_data', 'luongCB');
+        updateCurrencyField('luong_kpi_data', 'luongKPI');
+        updateCurrencyField('dam_phan_data', 'luongDP');
+        updateCurrencyField('pc_chuc_vu_data', 'pcCV');
+        updateCurrencyField('phu_cap_vung_mien_data', 'pcVM');
+        updateCurrencyField('phu_cap_khac_data', 'pcKhac');
+        
+        // Total Income and Bonus fields
+        const tongThuNhapTu = parseFloat(params.get('thuNhapTu')) || 0;
+        const tongThuNhapDen = parseFloat(params.get('thuNhapDen')) || 0;
+        if (tongThuNhapTu > 0 || tongThuNhapDen > 0) {
+            document.getElementById('tong_thu_nhap_data').textContent = `Từ ${tongThuNhapTu.toLocaleString('vi-VN')} đến ${tongThuNhapDen.toLocaleString('vi-VN')}`;
+        } else {
+            // Fallback: calculate total from other salary components
+            const total = (parseFloat(params.get('luongCB')) || 0) + 
+                          (parseFloat(params.get('luongKPI')) || 0) + 
+                          (parseFloat(params.get('luongDP')) || 0) + 
+                          (parseFloat(params.get('pcCV')) || 0) +
+                          (parseFloat(params.get('pcVM')) || 0) +
+                          (parseFloat(params.get('pcKhac')) || 0);
+            document.getElementById('tong_thu_nhap_data').textContent = total.toLocaleString('vi-VN');
         }
 
-        const upperCaseParams = ['Tên ứng viên'];
-        upperCaseParams.forEach(param => {
-            const element = document.getElementById(param.toLowerCase().replace(/ /g, '_') + '_data');
-            if (element && params.has(param)) {
-                element.textContent = decodeURIComponent(params.get(param)).toUpperCase();
-            }
-        });
-        
-        updateElementText('dia_diem_data', 'Địa điểm nhận việc');
-        updateElementText('vi_tri_ung_tuyen_data', 'Vị trí ứng tuyển');
-        updateElementText('phong_ban_data', 'Phòng');
-        updateElementText('nghi_thu_7_data', 'Nghỉ thứ 7');
-        updateElementText('thoi_gian_thu_viec_data', 'Thời gian thử việc');
-        updateElementText('luong_cb_data', 'Lương cơ bản');
-        updateElementText('luong_kpi_data', 'Lương KPI');
-        updateElementText('dam_phan_data', 'Đàm phán thêm');
-        updateElementText('phu_cap_data', 'Phụ cấp thêm');
-        updateElementText('thuong_tu_data', 'Thưởng đạt từ');
-        updateElementText('thuong_den_data', 'Thưởng đạt đến');
-        updateElementText('ghi_chu_data', 'Ghi chú mời nhận việc');
-
-        // Tính tổng thu nhập
-        const luong_cb = parseFloat(params.get('Lương cơ bản')) || 0;
-        const luong_kpi = parseFloat(params.get('Lương KPI')) || 0;
-        const dam_phan = parseFloat(params.get('Đàm phán thêm')) || 0;
-        const phu_cap = parseFloat(params.get('Phụ cấp thêm')) || 0;
-        const tong_thu_nhap = luong_cb + luong_kpi + dam_phan + phu_cap;
-        document.getElementById('tong_thu_nhap_data').textContent = tong_thu_nhap.toLocaleString('vi-VN');
-        document.getElementById('luong_cb_data').textContent = luong_cb.toLocaleString('vi-VN');
-        document.getElementById('luong_kpi_data').textContent = luong_kpi.toLocaleString('vi-VN');
-        document.getElementById('dam_phan_data').textContent = dam_phan.toLocaleString('vi-VN');
-        document.getElementById('phu_cap_data').textContent = phu_cap.toLocaleString('vi-VN');
+        const thuongTu = parseFloat(params.get('thuongTu')) || 0;
+        const thuongDen = parseFloat(params.get('thuongDen')) || 0;
+        if (thuongTu > 0 || thuongDen > 0) {
+            document.getElementById('thuong_data').textContent = `Từ ${thuongTu.toLocaleString('vi-VN')} đến ${thuongDen.toLocaleString('vi-VN')}`;
+        } else {
+            document.getElementById('thuong_data').textContent = '0';
+        }
     });
 
     async function downloadPDF() {
