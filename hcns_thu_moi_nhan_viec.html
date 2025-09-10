@@ -13,7 +13,7 @@
     <style>
         body {
             font-family: 'Times New Roman', Times, serif;
-            line-height: 1.4;
+            line-height: 1.2;
             margin: 0;
             padding: 0;
             color: #333;
@@ -165,10 +165,10 @@
             - Thời gian làm việc: <span id="thoi_gian_lam_viec_data"></span>.
         </li>
         <li class="mb-2">
-            - Thời gian thử việc: <span id="thoi_gian_thu_viec_info"></span>
+            - Thời gian thử việc
         </li>
         <li class="mb-2" id="tg_tv_li">
-            - Thời gian thử việc: tối đa <span id="thoi_gian_thu_viec_data"></span> với khối gián tiếp, 4 tháng với khối kinh doanh. Nhận 100% lương vị trí trong quá trình thử việc.
+            - Thời gian thử việc: tối đa <span id="thoi_gian_thu_viec_data"></span> với khối gián tiếp, 4 tháng với khối kinh doanh.
         </li>
     </ul>
 
@@ -222,13 +222,13 @@
             - <span class="font-bold">Phụ cấp khác</span> (nếu có): Tùy theo vị trí công việc, tính theo ngày đi làm
         </li>
         <li class="mb-2">
-            - Nhận 100% lương trong quá trình thử việc (không có thưởng)
-        </li>
-        <li class="mb-2">
             - <span class="font-bold">Thưởng doanh số</span>: Được nhận khi hoàn thành doanh số mức áp từ 85% trở lên. Tỷ lệ trích thưởng đạt càng lớn khi đăng ký bậc càng cao
         </li>
         <li class="mb-2">
             - Các khoản thưởng kinh doanh khác: Chiết khấu, Bán cao hơn giá niêm yết, Bán hàng tồn kho, . . . (Từ 3% đến 8% theo giá trị đơn hàng). Việc này giúp tổng thu nhập hàng tháng có thể cao hơn dự kiến như ở trên
+        </li>
+        <li class="mb-2">
+            - Nhận 100% lương trong quá trình thử việc (không có thưởng)
         </li>
     </ul>
 
@@ -249,9 +249,7 @@
         <li class="mb-2">
             - Du lịch hàng năm. Liên hoan 3 tháng/1 lần đối với cấp Trưởng nhóm trở lên.
         </li>
-        <li class="mb-2">
-            - <span id="ghi_chu_data"></span>
-        </li>
+        <li class="mb-2" id="ghi_chu_data"></li>
     </ul>
     
     <h3 class="section-heading">IV - THỦ TỤC NHẬN VIỆC</h3>
@@ -301,11 +299,21 @@
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
 
-        // Utility function to safely update text content
+        // Utility function to safely update text content, handling multi-line text
         function updateElementText(id, paramName, parser = (val) => decodeURIComponent(val)) {
             const element = document.getElementById(id);
             if (element && params.has(paramName)) {
-                element.textContent = parser(params.get(paramName));
+                const text = parser(params.get(paramName));
+                element.textContent = text;
+            }
+        }
+        
+        function updateMultiLineText(id, paramName) {
+            const element = document.getElementById(id);
+            if (element && params.has(paramName)) {
+                let text = decodeURIComponent(params.get(paramName));
+                text = text.replace(/(?:\r\n|\r|\n)/g, '<br>');
+                element.innerHTML = text;
             }
         }
 
@@ -353,7 +361,7 @@
         updateElementText('vi_tri_ung_tuyen_data', 'viTri');
         updateElementText('phong_ban_data', 'phong');
         updateElementText('thoi_gian_lam_viec_data', 'tgLV');
-        updateElementText('ghi_chu_data', 'ghichu');
+        updateMultiLineText('ghi_chu_data', 'ghichu'); // Sử dụng hàm mới cho trường ghi chú
         
         // Conditional handling for "thoi gian thu viec"
         const tgTvLi = document.getElementById('tg_tv_li');
@@ -386,7 +394,7 @@
         const tongThuNhapTu = parseFloat(params.get('thuNhapTu')) || 0;
         const tongThuNhapDen = parseFloat(params.get('thuNhapDen')) || 0;
         if (tongThuNhapTu > 0 || tongThuNhapDen > 0) {
-            document.getElementById('tong_thu_nhap_data').textContent = `Từ ${tongThuNhapTu.toLocaleString('vi-VN')} đến ${tongThuNhapDen.toLocaleString('vi-VN')}`;
+            document.getElementById('tong_thu_nhap_data').innerHTML = `Từ ${tongThuNhapTu.toLocaleString('vi-VN')}<br>Đến ${tongThuNhapDen.toLocaleString('vi-VN')}`;
         } else {
             // Fallback: calculate total from other salary components
             const total = (parseFloat(params.get('luongCB')) || 0) + 
@@ -401,7 +409,7 @@
         const thuongTu = parseFloat(params.get('thuongTu')) || 0;
         const thuongDen = parseFloat(params.get('thuongDen')) || 0;
         if (thuongTu > 0 || thuongDen > 0) {
-            document.getElementById('thuong_data').textContent = `Từ ${thuongTu.toLocaleString('vi-VN')} đến ${thuongDen.toLocaleString('vi-VN')}`;
+            document.getElementById('thuong_data').innerHTML = `Từ ${thuongTu.toLocaleString('vi-VN')}<br>Đến ${thuongDen.toLocaleString('vi-VN')}`;
         } else {
             document.getElementById('thuong_data').textContent = '0';
         }
