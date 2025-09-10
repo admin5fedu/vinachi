@@ -13,7 +13,7 @@
     <style>
         body {
             font-family: 'Times New Roman', Times, serif;
-            line-height: 1.2;
+            line-height: 1.1; /* Giảm khoảng cách dòng */
             margin: 0;
             padding: 0;
             color: #333;
@@ -23,7 +23,7 @@
 
         .document-container {
             width: 21cm;
-            padding: 1.5cm; /* Lề đồng bộ 1.5cm */
+            padding: 1.5cm;
             margin: 30px auto;
             background-color: #fff;
             box-sizing: border-box;
@@ -63,7 +63,7 @@
 
         @page {
             size: A4;
-            margin: 1.5cm; /* Lề đồng bộ 1.5cm khi in */
+            margin: 1.5cm;
         }
 
         @media print {
@@ -97,14 +97,14 @@
             font-weight: bold;
             font-size: 20px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px; /* Giảm margin bottom */
         }
 
         .section-heading {
             font-weight: bold;
             text-transform: uppercase;
-            margin-top: 15px;
-            margin-bottom: 5px;
+            margin-top: 10px; /* Giảm margin top */
+            margin-bottom: 3px; /* Giảm margin bottom */
         }
         
         .list-style-none {
@@ -116,13 +116,28 @@
             padding-left: 20px;
         }
         .list-item-spacing {
-            margin-bottom: 1px;
+            margin-bottom: 0; /* Giảm khoảng cách giữa các mục */
         }
+
+        .mb-2 {
+            margin-bottom: 5px; /* Giảm khoảng cách cho các đoạn văn */
+        }
+        
     </style>
 </head>
 <body>
 
-<div class="flex justify-end p-4 no-print">
+<div class="flex justify-end gap-2 p-4 no-print">
+    <button id="printButton"
+            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            data-html2canvas-ignore="true" onclick="printDocument()">
+        In
+    </button>
+    <button id="downloadExcelButton"
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            data-html2canvas-ignore="true" onclick="downloadExcel()">
+        Xuất Excel
+    </button>
     <button id="downloadPdfButton"
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             data-html2canvas-ignore="true" onclick="downloadPDF()">
@@ -158,25 +173,25 @@
     <h3 class="section-heading">I - THỜI GIAN VÀ ĐỊA ĐIỂM</h3>
     <ul class="list-style-none indent-1">
         <li class="list-item-spacing">
-            - Lúc: <span id="gio_data"></span>h<span id="phut_data"></span> ngày <span id="ngay_nhan_viec_data"></span> tháng <span id="thang_nhan_viec_data"></span> năm <span id="nam_nhan_viec_data"></span>
+            - <strong>Lúc:</strong> <span id="gio_data"></span>h<span id="phut_data"></span> ngày <span id="ngay_nhan_viec_data"></span> tháng <span id="thang_nhan_viec_data"></span> năm <span id="nam_nhan_viec_data"></span>
         </li>
         <li class="list-item-spacing">
-            - Tại: <span id="dia_diem_data"></span>
+            - <strong>Tại:</strong> <span id="dia_diem_data"></span>
         </li>
         <li class="list-item-spacing">
-            - Vị trí công việc: <span id="vi_tri_ung_tuyen_data"></span> thuộc phòng <span id="phong_ban_data"></span>
+            - <strong>Vị trí công việc:</strong> <span id="vi_tri_ung_tuyen_data"></span> thuộc phòng <span id="phong_ban_data"></span>
         </li>
         <li class="list-item-spacing">
-            - Thời gian làm việc: <span id="thoi_gian_lam_viec_data"></span>.
+            - <strong>Thời gian làm việc:</strong> <span id="thoi_gian_lam_viec_data"></span>.
         </li>
         <li class="list-item-spacing">
-            - Thời gian thử việc: <span id="thoi_gian_thu_viec_data"></span>.
+            - <strong>Thời gian thử việc:</strong> <span id="thoi_gian_thu_viec_data"></span>.
         </li>
     </ul>
 
     <h3 class="section-heading">II - THU NHẬP</h3>
     <!-- Bảng thu nhập đã được cập nhật theo yêu cầu -->
-    <table class="w-full border-collapse border border-gray-400 mb-2 text-sm">
+    <table class="w-full border-collapse border border-gray-400 mb-2 text-sm" id="incomeTable">
         <thead>
             <tr class="bg-gray-100 text-center font-bold">
                 <th class="border border-gray-400 p-2 font-bold">Tổng thu nhập</th>
@@ -288,6 +303,65 @@
 </div>
 
 <script>
+    function printDocument() {
+        window.print();
+    }
+    
+    function downloadExcel() {
+        // Lấy bảng HTML
+        const table = document.getElementById('incomeTable');
+        let csv = [];
+        
+        // Lấy tiêu đề từ thead
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText);
+        csv.push(headers.join(','));
+
+        // Lấy dữ liệu từ tbody
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const rowData = Array.from(row.querySelectorAll('td')).map(td => {
+                let text = td.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
+                // Xử lý các trường có dấu phẩy hoặc ký tự đặc biệt
+                if (text.includes(',') || text.includes('"') || text.includes('\n')) {
+                    text = '"' + text.replace(/"/g, '""') + '"';
+                }
+                return text;
+            });
+            csv.push(rowData.join(','));
+        });
+
+        const csvContent = csv.join('\n');
+        
+        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'Thong_tin_thu_nhap.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    async function downloadPDF() {
+        const element = document.getElementById('documentContainer');
+        const canvas = await html2canvas(element, { scale: 2 });
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+        const A4_WIDTH = 210; // mm
+        const A4_HEIGHT = 297; // mm
+        const margin = 15; // 1.5cm
+        const doc = new jspdf.jsPDF('p', 'mm', 'a4');
+        const imgProps = doc.getImageProperties(imgData);
+        const finalImgWidth = A4_WIDTH - 2 * margin;
+        const finalImgHeight = (imgProps.height * finalImgWidth) / imgProps.width;
+
+        doc.addImage(imgData, 'JPEG', margin, (A4_HEIGHT - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
+        doc.save('Thu_moi_nhan_viec.pdf');
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
 
@@ -429,23 +503,6 @@
             tongLuongTuLuongData.textContent = tongLuong.toLocaleString('vi-VN');
         }
     });
-
-    async function downloadPDF() {
-        const element = document.getElementById('documentContainer');
-        const canvas = await html2canvas(element, { scale: 2 });
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
-
-        const A4_WIDTH = 210; // mm
-        const A4_HEIGHT = 297; // mm
-        const margin = 15; // 1.5cm
-        const doc = new jspdf.jsPDF('p', 'mm', 'a4');
-        const imgProps = doc.getImageProperties(imgData);
-        const finalImgWidth = A4_WIDTH - 2 * margin;
-        const finalImgHeight = (imgProps.height * finalImgWidth) / imgProps.width;
-
-        doc.addImage(imgData, 'JPEG', margin, (A4_HEIGHT - finalImgHeight) / 2, finalImgWidth, finalImgHeight);
-        doc.save('Thu_moi_nhan_viec.pdf');
-    }
 </script>
 
 </body>
