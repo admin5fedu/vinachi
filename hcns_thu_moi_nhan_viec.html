@@ -17,7 +17,7 @@
          */
         body {
             font-family: 'Times New Roman', Times, serif;
-            line-height: 1.2; /* Đã điều chỉnh giãn dòng để dễ đọc hơn */
+            line-height: 1.2; /* Đã điều chỉnh giãn dòng */
             margin: 0;
             padding: 0;
             color: #333;
@@ -95,7 +95,7 @@
                 color: #000 !important;
                 font-family: 'Times New Roman', Times, serif !important;
                 background: white !important;
-                line-height: 1.5 !important; /* Đã điều chỉnh để khớp với màn hình */
+                line-height: 1.2 !important; /* Đã điều chỉnh để khớp với màn hình */
             }
         }
 
@@ -179,19 +179,14 @@
     <h3 class="section-heading">I - THỜI GIAN VÀ ĐỊA ĐIỂM</h3>
     <ul class="list-style-none indent-1">
         <li class="list-item-spacing">
-            - <strong>Lúc:</strong> <span id="gio_data"></span>h<span id="phut_data"></span> ngày <span id="ngay_nhan_viec_data"></span> tháng <span id="thang_nhan_viec_data"></span> năm <span id="nam_nhan_viec_data"></span>
-        </li>
-        <li class="list-item-spacing">
-            - <strong>Tại:</strong> <span id="dia_diem_data"></span>
+            - <strong>Lúc:</strong> <span id="gio_data"></span>h<span id="phut_data"></span> ngày <span id="ngay_nhan_viec_formatted_data"></span>
+             - <strong>Tại:</strong> <span id="dia_diem_data"></span>
         </li>
         <li class="list-item-spacing">
             - <strong>Vị trí công việc:</strong> <span id="vi_tri_ung_tuyen_data"></span> thuộc phòng <span id="phong_ban_data"></span>
         </li>
         <li class="list-item-spacing">
-            - <strong>Thời gian làm việc:</strong> <span id="thoi_gian_lam_viec_data"></span>.
-        </li>
-        <li class="list-item-spacing">
-            - <strong>Thời gian thử việc:</strong> <span id="thoi_gian_thu_viec_data"></span>.
+            - <strong>Thời gian làm việc:</strong> <span id="thoi_gian_lam_viec_data"></span>. - <strong>Thời gian thử việc:</strong> <span id="thoi_gian_thu_viec_data"></span>.
         </li>
     </ul>
 
@@ -415,10 +410,7 @@
                 }
 
                 if (dateStr) {
-                    const [day, month, year] = dateStr.split('/');
-                    document.getElementById('ngay_nhan_viec_data').textContent = day;
-                    document.getElementById('thang_nhan_viec_data').textContent = month;
-                    document.getElementById('nam_nhan_viec_data').textContent = year;
+                    document.getElementById('ngay_nhan_viec_formatted_data').textContent = dateStr;
                 }
             }
         }
