@@ -11,9 +11,13 @@
     <!-- Thư viện để tạo file PDF từ Canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
+        /*
+         * Cập nhật CSS để loại bỏ lề mặc định của trình duyệt khi in.
+         * Đặt lề trang `@page` về 0 và sử dụng padding của .document-container để tạo lề nội dung.
+         */
         body {
             font-family: 'Times New Roman', Times, serif;
-            line-height: 1.1; /* Giảm khoảng cách dòng */
+            line-height: 1.1;
             margin: 0;
             padding: 0;
             color: #333;
@@ -30,7 +34,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Các lớp CSS cho header */
         .header-table {
             width: 100%;
             border-collapse: collapse;
@@ -61,9 +64,10 @@
             line-height: 1.2;
         }
 
+        /* Quan trọng: đặt lề trang vật lý về 0 */
         @page {
             size: A4;
-            margin: 1.5cm;
+            margin: 0;
         }
 
         @media print {
@@ -74,7 +78,6 @@
                 padding: 1.5cm !important;
                 box-shadow: none !important;
                 border: none !important;
-                height: 29.7cm !important; /* Đảm bảo kích thước A4 */
             }
             body {
                 margin: 0 !important;
@@ -100,14 +103,14 @@
             font-weight: bold;
             font-size: 20px;
             text-align: center;
-            margin-bottom: 10px; /* Giảm margin bottom */
+            margin-bottom: 10px;
         }
 
         .section-heading {
             font-weight: bold;
             text-transform: uppercase;
-            margin-top: 10px; /* Giảm margin top */
-            margin-bottom: 3px; /* Giảm margin bottom */
+            margin-top: 10px;
+            margin-bottom: 3px;
         }
         
         .list-style-none {
@@ -119,11 +122,11 @@
             padding-left: 20px;
         }
         .list-item-spacing {
-            margin-bottom: 0; /* Giảm khoảng cách giữa các mục */
+            margin-bottom: 0;
         }
 
         .mb-2 {
-            margin-bottom: 5px; /* Giảm khoảng cách cho các đoạn văn */
+            margin-bottom: 5px;
         }
         
     </style>
@@ -353,9 +356,9 @@
         const canvas = await html2canvas(element, { scale: 2 });
         const imgData = canvas.toDataURL('image/jpeg', 1.0);
 
-        const A4_WIDTH = 210; // mm
-        const A4_HEIGHT = 297; // mm
-        const margin = 15; // 1.5cm
+        const A4_WIDTH = 210;
+        const A4_HEIGHT = 297;
+        const margin = 15;
         const doc = new jspdf.jsPDF('p', 'mm', 'a4');
         const imgProps = doc.getImageProperties(imgData);
         const finalImgWidth = A4_WIDTH - 2 * margin;
@@ -368,14 +371,12 @@
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
 
-        // Utility function to safely update text content, handling multi-line text
         function updateElementText(id, paramName, parser = (val) => decodeURIComponent(val)) {
             const element = document.getElementById(id);
             if (element && params.has(paramName)) {
                 const text = parser(params.get(paramName));
                 element.textContent = text;
             } else if (element) {
-                // Keep the span empty if no parameter is provided, so the surrounding text remains
                 element.textContent = '';
             }
         }
@@ -389,7 +390,6 @@
             }
         }
 
-        // Parse and format dates (DD/MM/YYYY)
         function parseAndFormatDate(paramName, dayId, monthId, yearId) {
             if (params.has(paramName)) {
                 const dateStr = decodeURIComponent(params.get(paramName));
@@ -403,20 +403,17 @@
             }
         }
         
-        // Parse and format a full date/time string (HH:mm DD/MM/YYYY)
         function parseAndFormatFullDateTime(paramName) {
             if (params.has(paramName)) {
                 const fullDateTimeStr = decodeURIComponent(params.get(paramName));
                 const [timeStr, dateStr] = fullDateTimeStr.split(' ');
                 
-                // Parse time
                 if (timeStr) {
                     const [hour, minute] = timeStr.split(':');
                     document.getElementById('gio_data').textContent = hour;
                     document.getElementById('phut_data').textContent = minute;
                 }
 
-                // Parse date
                 if (dateStr) {
                     const [day, month, year] = dateStr.split('/');
                     document.getElementById('ngay_nhan_viec_data').textContent = day;
@@ -426,26 +423,20 @@
             }
         }
         
-        // --- Data Population from URL Parameters ---
-        // General text fields
         updateElementText('ten_ung_vien_data', 'ten', (val) => decodeURIComponent(val).toUpperCase());
         updateElementText('dia_diem_data', 'noiNV');
         updateElementText('vi_tri_ung_tuyen_data', 'viTri');
         updateElementText('phong_ban_data', 'phong');
         updateElementText('thoi_gian_lam_viec_data', 'tgLV');
-        updateMultiLineText('ghi_chu_data', 'ghichu'); // Sử dụng hàm mới cho trường ghi chú
+        updateMultiLineText('ghi_chu_data', 'ghichu');
         
-        // Conditional handling for "thoi gian thu viec"
-        // This is updated to always display the line
         updateElementText('thoi_gian_thu_viec_data', 'tgTV', (val) => {
              return decodeURIComponent(val);
         });
 
-        // Special fields with custom logic
         parseAndFormatDate('ngayPH', 'ngay_data', 'thang_data', 'nam_data');
         parseAndFormatFullDateTime('tgNV');
 
-        // Salary and allowance fields
         function updateCurrencyField(id, paramName) {
             updateElementText(id, paramName, (val) => {
                 const num = parseFloat(val);
@@ -460,7 +451,6 @@
         updateCurrencyField('phu_cap_vung_mien_data', 'pcVM');
         updateCurrencyField('phu_cap_khac_data', 'pcKhac');
         
-        // Total Income and Bonus fields
         const tongThuNhapTu = parseFloat(params.get('thuNhapTu')) || 0;
         const tongThuNhapDen = parseFloat(params.get('thuNhapDen')) || 0;
         const tongThuNhapData = document.getElementById('tong_thu_nhap_data');
@@ -471,7 +461,6 @@
         } else if (tongThuNhapDen > 0) {
             tongThuNhapData.textContent = `Đến ${tongThuNhapDen.toLocaleString('vi-VN')}`;
         } else {
-            // Fallback: calculate total from other salary components
             const total = (parseFloat(params.get('luongCB')) || 0) + 
                           (parseFloat(params.get('luongKPI')) || 0) + 
                           (parseFloat(params.get('luongDP')) || 0) + 
@@ -494,7 +483,6 @@
             thuongData.textContent = '0';
         }
         
-        // Calculate and display total salary from salary components
         const tongLuongTuLuongData = document.getElementById('tong_thu_nhap_tu_luong_data');
         if (tongLuongTuLuongData) {
             const tongLuong = (parseFloat(params.get('luongCB')) || 0) + 
