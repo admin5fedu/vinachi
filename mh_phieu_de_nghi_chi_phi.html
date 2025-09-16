@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            line-height: 1.2;
+            line-height: 1.5;
             margin: 0;
             padding: 0;
             color: #333;
@@ -148,7 +148,7 @@
             </div>
             <!-- Vị trí ngày tháng -->
             <div class="text-xs italic ml-auto text-right">
-                Bắc Ninh, ngày <?!= ngay_tao_phieu_full ?>
+                Bắc Ninh, <?!= ngay_tao_phieu_full ?>
             </div>
         </div>
 
@@ -286,8 +286,8 @@
 
     // Lấy tất cả các tham số từ URL
     const params = new URLSearchParams(window.location.search);
-
     const data = {};
+
     const soTien = params.get('so_tien') || '';
     const ngayTaoPhieu = params.get('ngay_tao_phieu') || '';
     const loaiPhieu = params.get('loai_phieu') || 'CHI TẠM ỨNG';
@@ -313,18 +313,10 @@
         data[key] = decodedValue;
     }
 
-    // Tìm và thay thế các placeholder trong nội dung HTML
-    const placeholders = document.body.innerHTML.match(/\<\?\!=\s*(\w+)\s*\?\>/g) || [];
-    let replacedHTML = document.body.innerHTML;
-
-    placeholders.forEach((placeholder) => {
-        const key = placeholder.replace(/<\?!=\s*(\w+)\s*?>/, '$1');
-        const value = data[key] || '';
-        const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-        replacedHTML = replacedHTML.replace(regex, value);
+    // 🔹 Thay thế placeholder trong toàn bộ document
+    document.body.innerHTML = document.body.innerHTML.replace(/<\?!=\s*(\w+)\s*\?>/g, (match, key) => {
+        return data[key] || "";
     });
-
-    document.body.innerHTML = replacedHTML;
 
     // Tự động in khi có tham số 'print' trong URL
     if (params.has('print')) {
