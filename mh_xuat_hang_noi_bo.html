@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phiếu Đề Nghị Mua hàng</title>
+    <title>Phiếu Đề Nghị Chi phí</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -208,8 +208,8 @@
                     <tr>
                         <td colspan="3" class="text-right font-bold">Tổng cộng:</td>
                         <td class="font-bold text-center" id="total_quantity"></td>
-                        <td></td>
-                        <td class="font-bold text-right" id="total_amount"></td>
+                        <td class="font-bold text-center"></td>
+                        <td class="font-bold text-center" id="total_amount"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -403,9 +403,9 @@
                         <td class="text-center">${index + 1}</td>
                         <td>${tenHangHoa}</td>
                         <td class="text-center">${dvt}</td>
-                        <td class="text-right">${soLuong.toLocaleString('vi-VN')}</td>
-                        <td class="text-right">${donGia.toLocaleString('vi-VN')}</td>
-                        <td class="text-right">${thanhTien.toLocaleString('vi-VN')}</td>
+                        <td class="text-center">${soLuong.toLocaleString('vi-VN')}</td>
+                        <td class="text-center">${donGia.toLocaleString('vi-VN')}</td>
+                        <td class="text-center">${thanhTien.toLocaleString('vi-VN')}</td>
                     `;
                     productsTableBody.appendChild(row);
                 }
