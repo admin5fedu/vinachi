@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            line-height: 1.5;
+            line-height: 1.8; /* Tăng giãn dòng */
             margin: 0;
             padding: 0;
             color: #333;
@@ -99,6 +99,7 @@
                 padding: 0 !important;
                 background: white !important;
                 font-size: 10pt !important;
+                line-height: 1.5 !important;
             }
             .no-print {
                 display: none !important;
@@ -110,7 +111,6 @@
                 color: #000 !important;
                 font-family: 'Times New Roman', Times, serif !important;
                 background: white !important;
-                line-height: 1.2 !important;
             }
         }
     </style>
@@ -152,7 +152,7 @@
             </div>
         </div>
 
-        <div class="section-title">PHIẾU ĐỀ NGHỊ <span id="loai_phieu"></span></div>
+        <div class="section-title">PHIẾU ĐỀ NGHỊ <span id="loai_phieu" class="font-bold uppercase"></span></div>
         <p class="text-center text-sm italic">(Mã phiếu: <span id="id_phieu"></span>)</p>
         <p class="text-center text-sm font-semibold">Kính gửi: Phòng Tài chính Kế toán</p>
 
@@ -285,7 +285,9 @@
             tempNum = Math.floor(tempNum / 1000);
             i++;
         }
-        return (result.trim() + ' đồng chẵn').replace(/\s+/g, ' ');
+        // Viết hoa chữ cái đầu tiên
+        let finalResult = result.trim() + ' đồng chẵn';
+        return finalResult.charAt(0).toUpperCase() + finalResult.slice(1).replace(/\s+/g, ' ');
     }
     
     // Hàm xử lý chính để điền dữ liệu
@@ -327,7 +329,7 @@
             const soTienClean = soTien.replace(/\./g, '');
             const soTienElement = document.getElementById('so_tien_hien_thi');
             const bangChuElement = document.getElementById('bang_chu');
-            if (soTienElement) soTienElement.textContent = soTienClean;
+            if (soTienElement) soTienElement.textContent = soTienClean.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Định dạng số tiền
             if (bangChuElement) bangChuElement.textContent = convertNumberToVietnamese(soTienClean);
         }
 
