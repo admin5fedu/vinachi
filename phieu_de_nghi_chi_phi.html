@@ -148,11 +148,11 @@
             </div>
             <!-- Vị trí ngày tháng -->
             <div class="text-xs italic ml-auto text-right">
-                Bắc Ninh, ngày <?!= ngay_ngay ?> tháng <?!= ngay_thang ?> năm <?!= ngay_nam ?>
+                Bắc Ninh, ngày <?!= ngay_tao_phieu_full ?>
             </div>
         </div>
 
-        <div class="section-title">PHIẾU ĐỀ NGHỊ CHI TẠM ỨNG</div>
+        <div class="section-title">PHIẾU ĐỀ NGHỊ <?!= loai_phieu ?></div>
         <p class="text-center text-sm italic">(Mã phiếu: <?!= id ?>)</p>
         <p class="text-center text-sm font-semibold">Kính gửi: Phòng Tài chính Kế toán</p>
 
@@ -219,23 +219,108 @@
     function downloadExcel() {
         alert("Chức năng xuất Excel chưa được hỗ trợ cho loại tài liệu này.");
     }
-    
+
+    // Chuyển đổi số thành chữ tiếng Việt
+    function convertNumberToVietnamese(num) {
+        if (!num) return "";
+        num = parseInt(num.toString().replace(/[^0-9]/g, ''));
+        if (isNaN(num)) return "Số tiền không hợp lệ";
+
+        const units = ['', 'nghìn', 'triệu', 'tỷ', 'nghìn tỷ'];
+        const digits = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+
+        function readThreeDigits(n) {
+            let result = '';
+            let trăm = Math.floor(n / 100);
+            let chuc = Math.floor((n % 100) / 10);
+            let donvi = n % 10;
+            if (trăm > 0) {
+                result += digits[trăm] + ' trăm';
+            }
+            if (chuc === 0 && donvi === 0) {
+                if (trăm > 0) return result;
+                else return 'không';
+            }
+            if (trăm > 0) result += ' ';
+            if (chuc === 1) {
+                result += 'mười';
+            } else if (chuc > 1) {
+                result += digits[chuc] + ' mươi';
+            }
+            if (chuc > 0 && donvi > 0) result += ' ';
+            if (donvi === 1) {
+                if (chuc === 0) {
+                    result += 'một';
+                } else {
+                    result += 'mốt';
+                }
+            } else if (donvi === 5) {
+                if (chuc > 0) {
+                    result += 'lăm';
+                } else {
+                    result += 'năm';
+                }
+            } else if (donvi > 0) {
+                result += digits[donvi];
+            }
+            if (chuc === 0 && donvi > 0 && trăm > 0) {
+                result = result.replace('mươi', 'linh');
+            }
+            return result;
+        }
+
+        let result = '';
+        let i = 0;
+        let tempNum = num;
+        while (tempNum > 0) {
+            let threeDigits = tempNum % 1000;
+            if (threeDigits > 0) {
+                let text = readThreeDigits(threeDigits);
+                result = text + ' ' + units[i] + ' ' + result;
+            }
+            tempNum = Math.floor(tempNum / 1000);
+            i++;
+        }
+        return (result.trim() + ' đồng chẵn').replace(/\s+/g, ' ');
+    }
+
     // Lấy tất cả các tham số từ URL
     const params = new URLSearchParams(window.location.search);
-    // Tìm tất cả các placeholder trong nội dung HTML, ví dụ: <?!= ho_va_ten ?>
+
+    const data = {};
+    const soTien = params.get('so_tien') || '';
+    const ngayTaoPhieu = params.get('ngay_tao_phieu') || '';
+    const loaiPhieu = params.get('loai_phieu') || 'CHI TẠM ỨNG';
+
+    // Xử lý ngày tháng
+    if (ngayTaoPhieu) {
+        const parts = ngayTaoPhieu.split('/');
+        if (parts.length === 3) {
+            data.ngay_tao_phieu_full = `ngày ${parts[0]} tháng ${parts[1]} năm ${parts[2]}`;
+        }
+    }
+
+    // Xử lý số tiền thành chữ
+    const soTienClean = soTien.replace(/\./g, '');
+    data.bang_chu = convertNumberToVietnamese(soTienClean);
+
+    // Xử lý tên phiếu
+    data.loai_phieu = loaiPhieu.toUpperCase();
+
+    // Lấy tất cả các tham số còn lại
+    for (const [key, value] of params.entries()) {
+        const decodedValue = decodeURIComponent(value).replace(/\n/g, "<br/>");
+        data[key] = decodedValue;
+    }
+
+    // Tìm và thay thế các placeholder trong nội dung HTML
     const placeholders = document.body.innerHTML.match(/\<\?\!=\s*(\w+)\s*\?\>/g) || [];
     let replacedHTML = document.body.innerHTML;
 
     placeholders.forEach((placeholder) => {
-        const keyMatch = placeholder.match(/\<\?\!=\s*(\w+)\s*\?\>/);
-        if (!keyMatch) return;
-        const key = keyMatch[1];
-        // Lấy giá trị từ URL với key tương ứng
-        const rawValue = params.get(key) || '';
-        // Giải mã và thay thế các ký tự xuống dòng
-        const value = decodeURIComponent(rawValue).replace(/\n/g, "<br/>");
-        const regex = new RegExp(`<\\?!=\\s*${key}\\s*\\?>`, 'g');
-        // Thay thế placeholder bằng giá trị tương ứng
+        const key = placeholder.replace(/<\?!=\s*(\w+)\s*?>/, '$1');
+        const value = data[key] || '';
+        const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
         replacedHTML = replacedHTML.replace(regex, value);
     });
 
