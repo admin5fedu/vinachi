@@ -1,9 +1,293 @@
-<script>
-    // Lấy tất cả tham số từ URL
-    const params = new URLSearchParams(window.location.search);
-    const data = {};
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phiếu Đề Nghị Chi phí</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện để chuyển HTML sang Canvas/Hình ảnh -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Thư viện để tạo file PDF từ Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f0f0f0;
+            font-size: 13px;
+        }
 
-    // Lấy số tiền và ngày tạo phiếu
+        .document-container {
+            /* Kích thước A5 ngang: 21cm x 14.8cm */
+            width: 21cm;
+            height: 14.8cm;
+            padding: 1.5cm;
+            margin: 30px auto;
+            background-color: #fff;
+            box-sizing: border-box;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo img {
+            width: 50px;
+            border-radius: 8px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .info-value {
+            color: #1f2937;
+            white-space: pre-line;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .footer {
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            margin-top: 10px; /* Thêm khoảng cách nhẹ cho phần chữ ký */
+        }
+
+        /* Tăng cỡ chữ cho các lớp Tailwind cụ thể */
+        .text-xs { font-size: 14px; }
+        .text-sm { font-size: 16px; }
+
+        /* Định nghĩa trang in A5 ngang */
+        @page {
+            size: A5 landscape;
+            margin: 0;
+        }
+
+        @media print {
+            .document-container {
+                width: 100% !important;
+                height: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 1.5cm !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                font-size: 10pt !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color: #000 !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                background: white !important;
+                line-height: 1.2 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="flex justify-end gap-2 p-4 no-print">
+    <button id="printButton"
+            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            data-html2canvas-ignore="true" onclick="printDocument()">
+        In
+    </button>
+    <button id="downloadExcelButton"
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            data-html2canvas-ignore="true" onclick="downloadExcel()">
+        Xuất Excel
+    </button>
+    <button id="downloadPdfButton"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            data-html2canvas-ignore="true" onclick="downloadPDF()">
+        Xuất PDF
+    </button>
+</div>
+
+<div id="document-content" class="document-container">
+    <!-- Phần Header -->
+    <div>
+        <div class="header">
+            <div class="header-logo">
+                <img src="https://drive.google.com/thumbnail?id=12VL0Dxkj5d8xwLFVRslpHdtlWd4MHF5a" alt="Logo Công ty" />
+            </div>
+            <div>
+                <p class="text-sm uppercase font-bold">CÔNG TY TNHH VINACHI VIỆT NAM</p>
+                <p class="text-xs italic">Hương Mạc - Phù Khê - Từ Sơn - Bắc Ninh</p>
+            </div>
+            <!-- Vị trí ngày tháng -->
+            <div class="text-xs italic ml-auto text-right">
+                Bắc Ninh, ngày <?!= ngay_tao_phieu_full ?>
+            </div>
+        </div>
+
+        <div class="section-title">PHIẾU ĐỀ NGHỊ <?!= loai_phieu ?></div>
+        <p class="text-center text-sm italic">(Mã phiếu: <?!= id ?>)</p>
+        <p class="text-center text-sm font-semibold">Kính gửi: Phòng Tài chính Kế toán</p>
+
+        <!-- Thông tin chi tiết -->
+        <div class="two-col mt-2">
+            <div>
+                <p><span class="info-label">Họ tên:</span> <span class="info-value"><?!= ho_va_ten ?></span></p>
+                <p><span class="info-label">Thời gian đề nghị:</span> <span class="info-value"><?!= tg_de_nghi ?></span></p>
+                <p><span class="info-label">Nội dung đề nghị:</span> <span class="info-value"><?!= nd_de_nghi ?></span></p>
+            </div>
+            <div>
+                <p><span class="info-label">Mã Nhân Viên:</span> <span class="info-value"><?!= mnv ?></span></p>
+                <p><span class="info-label">Phòng:</span> <span class="info-value"><?!= phong ?></span></p>
+            </div>
+        </div>
+        <div class="mt-2">
+            <p><span class="info-label">Khoản mục:</span> <span class="info-value"><?!= khoan_muc ?></span></p>
+            <p><span class="info-label">Số tiền:</span> <span class="text-red-600 font-bold"><?!= so_tien ?></span> VND</p>
+            <p>
+                <span class="info-label">Bằng chữ:</span>
+                <span class="italic"><?!= bang_chu ?></span>
+            </p>
+            <p><span class="info-label">Ghi chú:</span><br><span class="info-value"><?!= ghi_chu ?></span></p>
+        </div>
+    </div>
+
+    <!-- Chữ ký ở cuối phiếu -->
+    <div class="footer">
+        <div>Người đề nghị</div>
+        <div>Quản lý</div>
+        <div>Kế toán</div>
+        <div>Phê duyệt</div>
+    </div>
+</div>
+
+<!-- Script xử lý biến từ URL và các hàm chức năng -->
+<script>
+    // Hàm xử lý việc in tài liệu
+    function printDocument() {
+        window.print();
+    }
+
+    // Hàm xuất tài liệu ra file PDF
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf;
+        const input = document.getElementById('document-content');
+        
+        html2canvas(input, { scale: 2 }).then(canvas => {
+            const imgData = canvas.toDataURL('image/jpeg');
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a5'
+            });
+            const imgWidth = 210;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            
+            pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+            pdf.save('phieu_de_nghi_chi_phi.pdf');
+        });
+    }
+
+    // Hàm xuất ra file Excel
+    function downloadExcel() {
+        alert("Chức năng xuất Excel chưa được hỗ trợ cho loại tài liệu này.");
+    }
+
+    // Chuyển đổi số thành chữ tiếng Việt
+    function convertNumberToVietnamese(num) {
+        if (!num) return "";
+        num = parseInt(num.toString().replace(/[^0-9]/g, ''));
+        if (isNaN(num)) return "Số tiền không hợp lệ";
+
+        const units = ['', 'nghìn', 'triệu', 'tỷ', 'nghìn tỷ'];
+        const digits = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+
+        function readThreeDigits(n) {
+            let result = '';
+            let trăm = Math.floor(n / 100);
+            let chuc = Math.floor((n % 100) / 10);
+            let donvi = n % 10;
+            if (trăm > 0) {
+                result += digits[trăm] + ' trăm';
+            }
+            if (chuc === 0 && donvi === 0) {
+                if (trăm > 0) return result;
+                else return 'không';
+            }
+            if (trăm > 0) result += ' ';
+            if (chuc === 1) {
+                result += 'mười';
+            } else if (chuc > 1) {
+                result += digits[chuc] + ' mươi';
+            }
+            if (chuc > 0 && donvi > 0) result += ' ';
+            if (donvi === 1) {
+                if (chuc === 0) {
+                    result += 'một';
+                } else {
+                    result += 'mốt';
+                }
+            } else if (donvi === 5) {
+                if (chuc > 0) {
+                    result += 'lăm';
+                } else {
+                    result += 'năm';
+                }
+            } else if (donvi > 0) {
+                result += digits[donvi];
+            }
+            if (chuc === 0 && donvi > 0 && trăm > 0) {
+                result = result.replace('mươi', 'linh');
+            }
+            return result;
+        }
+
+        let result = '';
+        let i = 0;
+        let tempNum = num;
+        while (tempNum > 0) {
+            let threeDigits = tempNum % 1000;
+            if (threeDigits > 0) {
+                let text = readThreeDigits(threeDigits);
+                result = text + ' ' + units[i] + ' ' + result;
+            }
+            tempNum = Math.floor(tempNum / 1000);
+            i++;
+        }
+        return (result.trim() + ' đồng chẵn').replace(/\s+/g, ' ');
+    }
+
+    // Lấy tất cả các tham số từ URL
+    const params = new URLSearchParams(window.location.search);
+
+    const data = {};
     const soTien = params.get('so_tien') || '';
     const ngayTaoPhieu = params.get('ngay_tao_phieu') || '';
     const loaiPhieu = params.get('loai_phieu') || 'CHI TẠM ỨNG';
@@ -17,30 +301,37 @@
     }
 
     // Xử lý số tiền thành chữ
-    if (soTien) {
-        const soTienClean = soTien.replace(/\./g, '');
-        data.bang_chu = convertNumberToVietnamese(soTienClean);
-    }
+    const soTienClean = soTien.replace(/\./g, '');
+    data.bang_chu = convertNumberToVietnamese(soTienClean);
 
-    // Xử lý loại phiếu
+    // Xử lý tên phiếu
     data.loai_phieu = loaiPhieu.toUpperCase();
 
-    // Lấy tất cả tham số còn lại
+    // Lấy tất cả các tham số còn lại
     for (const [key, value] of params.entries()) {
         const decodedValue = decodeURIComponent(value).replace(/\n/g, "<br/>");
         data[key] = decodedValue;
     }
 
-    // 🔹 Chỉ thay thế trong phần nội dung tài liệu (không replace toàn body)
-    const container = document.getElementById("document-content");
-    container.innerHTML = container.innerHTML.replace(/<\?!=\s*(\w+)\s*\?>/g, (match, key) => {
-        return data[key] || "";
+    // Tìm và thay thế các placeholder trong nội dung HTML
+    const placeholders = document.body.innerHTML.match(/\<\?\!=\s*(\w+)\s*\?\>/g) || [];
+    let replacedHTML = document.body.innerHTML;
+
+    placeholders.forEach((placeholder) => {
+        const key = placeholder.replace(/<\?!=\s*(\w+)\s*?>/, '$1');
+        const value = data[key] || '';
+        const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+        replacedHTML = replacedHTML.replace(regex, value);
     });
 
-    // Tự động in khi có tham số 'print'
+    document.body.innerHTML = replacedHTML;
+
+    // Tự động in khi có tham số 'print' trong URL
     if (params.has('print')) {
         window.addEventListener('load', () => {
             window.print();
         });
     }
 </script>
+</body>
+</html>
