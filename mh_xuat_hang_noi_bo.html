@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phiếu Đề Nghị Chi phí</title>
+    <title>Phiếu Đề Nghị Mua hàng</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Thư viện để chuyển HTML sang Canvas/Hình ảnh -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Thư viện để tạo file PDF từ Canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            line-height: 1.8; /* Tăng giãn dòng */
+            line-height: 1.8;
             margin: 0;
             padding: 0;
             color: #333;
@@ -21,10 +19,10 @@
         }
 
         .document-container {
-            /* Kích thước A5 ngang: 21cm x 14.8cm */
+            /* Kích thước A4 dọc: 21cm x 29.7cm */
             width: 21cm;
-            height: 14.8cm;
-            padding: 1.5cm;
+            height: 29.7cm;
+            padding: 2cm;
             margin: 30px auto;
             background-color: #fff;
             box-sizing: border-box;
@@ -71,16 +69,34 @@
             font-size: 13px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            margin-top: 10px; /* Thêm khoảng cách nhẹ cho phần chữ ký */
+            margin-top: 10px;
         }
 
-        /* Tăng cỡ chữ cho các lớp Tailwind cụ thể */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        
+        table th, table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #e2e8f0;
+            font-weight: 600;
+            text-align: center;
+        }
+
         .text-xs { font-size: 14px; }
         .text-sm { font-size: 16px; }
 
-        /* Định nghĩa trang in A5 ngang */
+        /* Định nghĩa trang in A4 dọc */
         @page {
-            size: A5 landscape;
+            size: A4 portrait;
             margin: 0;
         }
 
@@ -90,7 +106,7 @@
                 height: 100% !important;
                 max-width: none !important;
                 margin: 0 !important;
-                padding: 1.5cm !important;
+                padding: 2cm !important;
                 box-shadow: none !important;
                 border: none !important;
             }
@@ -146,7 +162,6 @@
                 <p class="text-sm uppercase font-bold">CÔNG TY TNHH VINACHI VIỆT NAM</p>
                 <p class="text-xs italic">Hương Mạc - Phù Khê - Từ Sơn - Bắc Ninh</p>
             </div>
-            <!-- Vị trí ngày tháng -->
             <div class="text-xs italic ml-auto text-right">
                 Bắc Ninh, ngày <span id="ngay_tao_phieu_full"></span>
             </div>
@@ -170,12 +185,44 @@
         </div>
         <div class="mt-2">
             <p><span class="info-label">Khoản mục:</span> <span class="info-value" id="khoan_muc"></span></p>
+        </div>
+        
+        <!-- Bảng danh sách hàng hóa -->
+        <div class="mt-4">
+            <p class="font-bold mb-2">Chi tiết:</p>
+            <table id="products-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">TT</th>
+                        <th>Tên hàng hóa</th>
+                        <th style="width: 10%;">ĐVT</th>
+                        <th style="width: 15%;">Số lượng</th>
+                        <th style="width: 15%;">Đơn giá</th>
+                        <th style="width: 15%;">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dữ liệu hàng hóa sẽ được thêm vào đây bằng JavaScript -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-right font-bold">Tổng cộng:</td>
+                        <td class="font-bold text-center" id="total_quantity"></td>
+                        <td></td>
+                        <td class="font-bold text-right" id="total_amount"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        <!-- Thông tin tiền và ghi chú -->
+        <div class="mt-4">
             <p>
-                <span class="info-label">Số tiền:</span> 
+                <span class="info-label">Số tiền (bằng số):</span> 
                 <span class="text-red-600 font-bold" id="so_tien_hien_thi"></span> VND
             </p>
             <p>
-                <span class="info-label">Bằng chữ:</span>
+                <span class="info-label">Số tiền (bằng chữ):</span>
                 <span class="italic" id="bang_chu"></span>
             </p>
             <p><span class="info-label">Ghi chú:</span><br><span class="info-value" id="ghi_chu"></span></p>
@@ -206,9 +253,9 @@
         html2canvas(input, { scale: 2 }).then(canvas => {
             const imgData = canvas.toDataURL('image/jpeg');
             const pdf = new jsPDF({
-                orientation: 'landscape',
+                orientation: 'portrait',
                 unit: 'mm',
-                format: 'a5'
+                format: 'a4'
             });
             const imgWidth = 210;
             const imgHeight = canvas.height * imgWidth / canvas.width;
@@ -220,7 +267,6 @@
 
     // Hàm xuất ra file Excel
     function downloadExcel() {
-        // Thay thế alert() bằng console.log()
         console.log("Chức năng xuất Excel chưa được hỗ trợ cho loại tài liệu này.");
     }
 
@@ -285,7 +331,6 @@
             tempNum = Math.floor(tempNum / 1000);
             i++;
         }
-        // Viết hoa chữ cái đầu tiên
         let finalResult = result.trim() + ' đồng chẵn';
         return finalResult.charAt(0).toUpperCase() + finalResult.slice(1).replace(/\s+/g, ' ');
     }
@@ -293,15 +338,12 @@
     // Hàm xử lý chính để điền dữ liệu
     function populateDocument() {
         const params = new URLSearchParams(window.location.search);
-        const data = {};
+        const dataFromUrl = {};
 
-        // Lấy tất cả các tham số từ URL
         for (const [key, value] of params.entries()) {
-            // Giải mã URL và thay thế xuống dòng
-            data[key] = decodeURIComponent(value).replace(/\n/g, "<br/>");
+            dataFromUrl[key] = decodeURIComponent(value).replace(/\n/g, "<br/>");
         }
 
-        // Lấy các phần tử cần điền dữ liệu
         const elements = {
             'ho_va_ten': 'ho_va_ten',
             'mnv': 'mnv',
@@ -314,27 +356,15 @@
             'loai_phieu': 'loai_phieu',
         };
 
-        // Điền dữ liệu vào các phần tử
         for (const [key, elementId] of Object.entries(elements)) {
             const element = document.getElementById(elementId);
             if (element) {
-                element.innerHTML = data[key] || '';
+                element.innerHTML = dataFromUrl[key] || '';
             }
         }
 
-        // Xử lý các trường hợp đặc biệt
-        // Xử lý số tiền và chuyển đổi sang chữ
-        const soTien = data['so_tien'];
-        if (soTien) {
-            const soTienClean = soTien.replace(/\./g, '');
-            const soTienElement = document.getElementById('so_tien_hien_thi');
-            const bangChuElement = document.getElementById('bang_chu');
-            if (soTienElement) soTienElement.textContent = soTienClean.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Định dạng số tiền
-            if (bangChuElement) bangChuElement.textContent = convertNumberToVietnamese(soTienClean);
-        }
-
         // Xử lý ngày tháng
-        const ngayTaoPhieu = data['ngay_tao_phieu'];
+        const ngayTaoPhieu = dataFromUrl['ngay_tao_phieu'];
         if (ngayTaoPhieu) {
             const parts = ngayTaoPhieu.split('/');
             const ngayTaoPhieuFullElement = document.getElementById('ngay_tao_phieu_full');
@@ -342,6 +372,55 @@
                 ngayTaoPhieuFullElement.textContent = `ngày ${parts[0]} tháng ${parts[1]} năm ${parts[2]}`;
             }
         }
+        
+        // Dữ liệu mẫu cho bảng, bạn có thể thay đổi chuỗi này để nhập dữ liệu mới
+        const data = "Giấy A4_a_Ram_a_10_a_50000_b_Bút bi Thiên Long_a_Cây_a_50_a_4500_b_Kẹp ghim_a_Hộp_a_5_a_12000";
+
+        // Xử lý danh sách hàng hóa từ biến data
+        const productsTableBody = document.querySelector('#products-table tbody');
+        const productsTableTotalQuantity = document.getElementById('total_quantity');
+        const productsTableTotalAmount = document.getElementById('total_amount');
+        
+        let totalQuantity = 0;
+        let totalAmount = 0;
+
+        if (data) {
+            const rows = data.split('_b_');
+            rows.forEach((rowString, index) => {
+                const columns = rowString.split('_a_');
+                if (columns.length === 4) {
+                    const tenHangHoa = columns[0];
+                    const dvt = columns[1];
+                    const soLuong = parseFloat(columns[2].replace(',', '.'));
+                    const donGia = parseFloat(columns[3].replace(',', '.'));
+                    const thanhTien = soLuong * donGia;
+
+                    totalQuantity += soLuong;
+                    totalAmount += thanhTien;
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="text-center">${index + 1}</td>
+                        <td>${tenHangHoa}</td>
+                        <td class="text-center">${dvt}</td>
+                        <td class="text-right">${soLuong.toLocaleString('vi-VN')}</td>
+                        <td class="text-right">${donGia.toLocaleString('vi-VN')}</td>
+                        <td class="text-right">${thanhTien.toLocaleString('vi-VN')}</td>
+                    `;
+                    productsTableBody.appendChild(row);
+                }
+            });
+        }
+
+        // Cập nhật tổng số lượng và tổng thành tiền
+        productsTableTotalQuantity.textContent = totalQuantity.toLocaleString('vi-VN');
+        productsTableTotalAmount.textContent = totalAmount.toLocaleString('vi-VN') + ' VND';
+        
+        // Xử lý số tiền và chuyển đổi sang chữ
+        const soTienElement = document.getElementById('so_tien_hien_thi');
+        const bangChuElement = document.getElementById('bang_chu');
+        if (soTienElement) soTienElement.textContent = totalAmount.toLocaleString('vi-VN');
+        if (bangChuElement) bangChuElement.textContent = convertNumberToVietnamese(totalAmount);
 
         // Tự động in nếu có tham số 'print'
         if (params.has('print')) {
@@ -349,7 +428,6 @@
         }
     }
 
-    // Chạy hàm chính khi trang đã tải xong
     window.onload = populateDocument;
 </script>
 </body>
