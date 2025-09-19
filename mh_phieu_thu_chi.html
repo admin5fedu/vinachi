@@ -162,26 +162,26 @@
                 <p><span class="info-label" id="nguoi_giao_dich_label">Người nộp/nhận:</span> <span class="info-value" id="nguoi_giao_dich"></span></p>
             </div>
             <div>
-                <p><span class="info-label">Lý do thu/chi:</span> <span class="info-value" id="ly_do"></span></p>
+                <p><span class="info-label">Phòng ban bộ phận:</span> <span class="info-value" id="phong_ban_bo_phan"></span></p>
             </div>
         </div>
         
         <div class="mt-2">
-            <div class="two-col">
-                <div>
-                    <p><span class="info-label">Số tiền:</span> 
-                        <span class="text-red-600 font-bold" id="so_tien_hien_thi"></span> VND
-                    </p>
-                </div>
-                <div>
-                    <p>
-                        <span class="info-label">Bằng chữ:</span>
-                        <span class="italic" id="bang_chu"></span>
-                    </p>
-                </div>
-            </div>
+            <p><span class="info-label">Số tiền:</span> 
+                <span class="text-red-600 font-bold" id="so_tien_hien_thi"></span> VND
+            </p>
+            <p>
+                <span class="info-label">Bằng chữ:</span>
+                <span class="italic" id="bang_chu"></span>
+            </p>
+            <p><span class="info-label">Nội dung / Lý do:</span> <span class="info-value" id="ly_do"></span></p>
+            <p><span class="info-label">Hình thức chi:</span> <span class="info-value" id="hinh_thuc_chi"></span></p>
         </div>
         
+        <div class="mt-2">
+            <p><span class="info-label">Kèm theo:</span> <span class="info-value" id="kem_theo"></span></p>
+        </div>
+
         <div class="mt-2">
             <p><span class="info-label">Ghi chú:</span><br><span class="info-value" id="ghi_chu"></span></p>
         </div>
@@ -189,10 +189,10 @@
 
     <!-- Chữ ký ở cuối phiếu -->
     <div class="footer">
-        <div>Người lập phiếu</div>
-        <div>Người nộp/nhận</div>
-        <div>Thủ quỹ</div>
+        <div>Người nhận</div>
+        <div>Người chi</div>
         <div>Kế toán trưởng</div>
+        <div>Giám đốc</div>
     </div>
 </div>
 
@@ -312,6 +312,9 @@
             'id': 'id_phieu',
             'nguoi_giao_dich': 'nguoi_giao_dich',
             'ly_do': 'ly_do',
+            'phong_ban_bo_phan': 'phong_ban_bo_phan',
+            'hinh_thuc_chi': 'hinh_thuc_chi',
+            'kem_theo': 'kem_theo',
             'ghi_chu': 'ghi_chu'
         };
 
