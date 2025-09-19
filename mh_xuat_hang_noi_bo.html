@@ -373,10 +373,9 @@
             }
         }
         
-        // Dữ liệu mẫu cho bảng, bạn có thể thay đổi chuỗi này để nhập dữ liệu mới
-        const data = "Giấy A4_a_Ram_a_10_a_50000_b_Bút bi Thiên Long_a_Cây_a_50_a_4500_b_Kẹp ghim_a_Hộp_a_5_a_12000";
-
-        // Xử lý danh sách hàng hóa từ biến data
+        // Lấy dữ liệu sản phẩm từ URL
+        const productsDataString = dataFromUrl['products_data'];
+        
         const productsTableBody = document.querySelector('#products-table tbody');
         const productsTableTotalQuantity = document.getElementById('total_quantity');
         const productsTableTotalAmount = document.getElementById('total_amount');
@@ -384,8 +383,9 @@
         let totalQuantity = 0;
         let totalAmount = 0;
 
-        if (data) {
-            const rows = data.split('_b_');
+        // Xử lý danh sách hàng hóa từ biến productsDataString
+        if (productsDataString) {
+            const rows = productsDataString.split('_b_');
             rows.forEach((rowString, index) => {
                 const columns = rowString.split('_a_');
                 if (columns.length === 4) {
