@@ -161,13 +161,17 @@
             <div>
                 <p><span class="info-label">Họ tên:</span> <span class="info-value" id="ho_va_ten"></span></p>
                 <p><span class="info-label">Thời gian đề nghị:</span> <span class="info-value" id="tg_de_nghi"></span></p>
-                <p><span class="info-label">Nội dung đề nghị:</span> <span class="info-value" id="nd_de_nghi"></span></p>
             </div>
             <div>
                 <p><span class="info-label">Mã Nhân Viên:</span> <span class="info-value" id="mnv"></span></p>
                 <p><span class="info-label">Phòng:</span> <span class="info-value" id="phong"></span></p>
             </div>
         </div>
+        
+        <div class="mt-2">
+            <p><span class="info-label">Nội dung đề nghị:</span> <span class="info-value" id="nd_de_nghi"></span></p>
+        </div>
+
         <div class="mt-2">
             <p><span class="info-label">Khoản mục:</span> <span class="info-value" id="khoan_muc"></span></p>
             <p>
@@ -178,7 +182,33 @@
                 <span class="info-label">Bằng chữ:</span>
                 <span class="italic" id="bang_chu"></span>
             </p>
+        </div>
+        
+        <div class="mt-2">
             <p><span class="info-label">Ghi chú:</span><br><span class="info-value" id="ghi_chu"></span></p>
+        </div>
+
+        <!-- Thông tin thanh toán đã được sắp xếp lại -->
+        <div class="mt-2">
+            <div class="two-col">
+                <div>
+                    <p><span class="info-label">Hình thức thanh toán:</span> <span class="info-value" id="hinh_thuc_thanh_toan"></span></p>
+                </div>
+                <div>
+                    <p><span class="info-label">Người nhận tiền:</span> <span class="info-value" id="nguoi_nhan_tien"></span></p>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-4 mt-2">
+                <div>
+                    <p><span class="info-label">Ngân hàng:</span> <span class="info-value" id="ngan_hang"></span></p>
+                </div>
+                <div>
+                    <p><span class="info-label">Số tài khoản:</span> <span class="info-value" id="so_tai_khoan"></span></p>
+                </div>
+                <div>
+                    <p><span class="info-label">Chủ tài khoản:</span> <span class="info-value" id="chu_tai_khoan"></span></p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -312,6 +342,11 @@
             'ghi_chu': 'ghi_chu',
             'id': 'id_phieu',
             'loai_phieu': 'loai_phieu',
+            'hinh_thuc_thanh_toan': 'hinh_thuc_thanh_toan',
+            'nguoi_nhan_tien': 'nguoi_nhan_tien',
+            'ngan_hang': 'ngan_hang',
+            'so_tai_khoan': 'so_tai_khoan',
+            'chu_tai_khoan': 'chu_tai_khoan'
         };
 
         // Điền dữ liệu vào các phần tử
