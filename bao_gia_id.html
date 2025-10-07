@@ -126,28 +126,28 @@
 
         <!-- THÔNG TIN BÁO GIÁ & KHÁCH HÀNG -->
         <div class="p-4 bg-blue-50 border-b-2 border-blue-400">
-            <!-- 1. Hiển thị ID Báo giá dưới tiêu đề (In nghiêng, trong ngoặc) -->
+            <!-- 1. Hiển thị ID Báo giá dưới tiêu đề (ĐÃ CHỈNH SỬA YÊU CẦU 1: (ID: )) -->
             <div class="text-xl font-bold text-center text-blue-800">BẢNG BÁO GIÁ</div>
             <div class="text-center text-sm italic text-gray-600 mb-3">
-                (ID Báo giá: <span id="quoteID" class="font-bold text-blue-800 not-italic">Đang tải...</span>)
+                (ID: <span id="quoteID" class="font-bold text-blue-800 not-italic">...</span>)
             </div>
             
             <!-- 2. Nội dung Kính gửi, SĐT, Địa chỉ (Lấy từ Khách hàng, SĐT, Địa chỉ trong Sheet Báo giá) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 
-                <!-- Kính gửi (Khách hàng) -->
+                <!-- Kính gửi (Khách hàng) - Yêu cầu 2 -->
                 <div class="flex items-center">
                     <span class="font-semibold text-gray-700 w-24 shrink-0">Kính gửi:</span>
                     <span id="customerName" class="font-medium text-gray-900">...</span>
                 </div>
                 
-                <!-- Số điện thoại -->
+                <!-- Số điện thoại - Yêu cầu 2 -->
                 <div class="flex items-center">
                     <span class="font-semibold text-gray-700 w-24 shrink-0">Số điện thoại:</span>
                     <span id="customerPhone" class="font-medium text-gray-900">...</span>
                 </div>
                 
-                <!-- Địa chỉ -->
+                <!-- Địa chỉ - Yêu cầu 2 -->
                 <div class="flex items-center">
                     <span class="font-semibold text-gray-700 w-24 shrink-0">Địa chỉ:</span>
                     <span id="customerAddress" class="font-medium text-gray-900">...</span>
@@ -266,7 +266,6 @@
         const GID_QUOTE_DETAIL = '1582939880'; 
 
         // Vị trí cột (column indexes) trong Google Sheet (A=0, B=1, C=2, ...)
-        // Đã cập nhật tên cột mô tả để khớp với yêu cầu
         const COL_INDEX = {
             // Sheet "Báo giá" (GID: 949969846)
             MAIN_ID: 0, // Cột A: ID
@@ -295,6 +294,8 @@
             DETAIL_PRICE_AFTER_DISCOUNT: 8, // Cột I: Giá sau CK
             DETAIL_TOTAL: 9, // Cột J: Thành tiền
         };
+
+        const DEFAULT_PLACEHOLDER = '...';
 
         // Hàm lấy tham số truy vấn từ URL
         function getQueryParams() {
@@ -395,14 +396,16 @@
         
         // Hàm định dạng ngày tháng
         function formatDate(dateValue) {
-            if (!dateValue) return '...';
+            if (!dateValue) return DEFAULT_PLACEHOLDER;
             
             let date;
             
             if (typeof dateValue === 'string' && dateValue.startsWith('Date')) {
                 try {
+                    // Xử lý định dạng Date(YYYY,M,D) của Gviz
                     const match = dateValue.match(/Date\((\d+),(\d+),(\d+)/);
                     if (match) {
+                        // Lưu ý: month trong JS là 0-based, Gviz trả về 0-based.
                         const [, year, month, day] = match;
                         date = new Date(year, month, day); 
                     }
@@ -419,7 +422,7 @@
                 const y = date.getFullYear();
                 return `Ngày ${d < 10 ? '0' + d : d} tháng ${m < 10 ? '0' + m : m} năm ${y}`;
             }
-            return dateValue;
+            return dateValue || DEFAULT_PLACEHOLDER;
         }
 
         // Hàm tải và cập nhật nội dung
@@ -428,21 +431,28 @@
             const idBaoGia = params.IDbaogia;
             const loadingOverlay = document.getElementById('loadingOverlay');
             
+            // Đặt tất cả các trường về giá trị mặc định trước
+            document.getElementById('quoteID').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('customerName').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('customerPhone').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('customerAddress').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('quoteDate').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('totalOrder').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('vatRate').innerText = 'VAT (0,0%)';
+            document.getElementById('vatAmount').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('otherCosts').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('otherDiscounts').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('finalTotal').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('amountInWords').innerText = 'Vui lòng cung cấp ID báo giá trên URL (ví dụ: ?IDbaogia=BG001) để xem dữ liệu.';
+            document.getElementById('salespersonName').innerText = 'Nguyễn Thị Hiền';
+            document.getElementById('salespersonNameSign').innerText = '(Nguyễn Thị Hiền)';
+            
+            const productTableBody = document.getElementById('productTableBody');
+            productTableBody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-gray-500">Vui lòng cung cấp ID báo giá trên URL.</td></tr>';
+            
             // LOGIC MỚI: Xử lý khi không có ID báo giá
             if (!idBaoGia) {
-                // Yêu cầu của người dùng: Nếu không có ID, không hiển thị overlay lỗi, chỉ để trống.
-                // Cập nhật trường ID báo giá và bảng chi tiết để thông báo nhẹ nhàng.
-                document.getElementById('quoteID').innerText = 'Chưa cung cấp';
-                document.getElementById('customerName').innerText = 'Khách hàng (Chưa có ID)';
-                document.getElementById('customerPhone').innerText = '...';
-                document.getElementById('customerAddress').innerText = '...';
-                document.getElementById('finalTotal').innerText = '...';
-                document.getElementById('amountInWords').innerText = 'Vui lòng cung cấp ID báo giá trên URL (ví dụ: ?IDbaogia=BG001) để xem dữ liệu.';
-
-                const productTableBody = document.getElementById('productTableBody');
-                productTableBody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-gray-500">Vui lòng cung cấp ID báo giá trên URL.</td></tr>';
-                
-                // Đảm bảo overlay bị ẩn
+                // Nếu không có ID, chỉ hiển thị giá trị mặc định đã set ở trên.
                 loadingOverlay.classList.add('hidden');
                 return; // Dừng lại, không cần fetch API
             }
@@ -470,20 +480,21 @@
                 // 2. Cập nhật thông tin khách hàng và tổng kết
                 const getValue = (colIndex) => {
                     const label = mainCols[colIndex];
-                    return mainQuote[label] !== null ? mainQuote[label] : '';
+                    // Nếu giá trị là null, trả về chuỗi rỗng để không bị ghi đè lên DEFAULT_PLACEHOLDER ở các bước tiếp theo
+                    return mainQuote[label] !== null ? mainQuote[label] : ''; 
                 };
                 
-                // Cập nhật thông tin theo yêu cầu
-                document.getElementById('customerName').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_NAME) || 'Khách hàng';
-                document.getElementById('customerPhone').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_PHONE) || 'Chưa cập nhật';
-                document.getElementById('customerAddress').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_ADDRESS) || 'Chưa cập nhật';
+                // Cập nhật thông tin khách hàng (Yêu cầu 2)
+                document.getElementById('customerName').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_NAME) || DEFAULT_PLACEHOLDER;
+                document.getElementById('customerPhone').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_PHONE) || DEFAULT_PLACEHOLDER;
+                document.getElementById('customerAddress').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_ADDRESS) || DEFAULT_PLACEHOLDER;
                 
                 // Định dạng ngày tháng
                 const dateValue = getValue(COL_INDEX.MAIN_DATE);
                 document.getElementById('quoteDate').innerText = formatDate(dateValue);
                 
                 // Cập nhật người lập phiếu
-                const salesperson = getValue(COL_INDEX.MAIN_SALESPERSON) || 'Người lập phiếu';
+                const salesperson = getValue(COL_INDEX.MAIN_SALESPERSON) || 'Nguyễn Thị Hiền';
                 document.getElementById('salespersonName').innerText = salesperson;
                 document.getElementById('salespersonNameSign').innerText = `(${salesperson})`;
 
