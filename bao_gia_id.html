@@ -268,8 +268,7 @@
         const URL_QUOTE_DETAIL = `https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${GID_QUOTE_DETAIL}&single=true&output=csv`;
 
 
-        // Tên Cột (Header Name) - KHÔNG PHỤ THUỘC VÀO VỊ TRÍ CỘT NỮA!
-        // Lưu ý: Tên cột phải khớp chính xác với tiêu đề (header) trong Sheet.
+        // Tên Cột (Header Name) - ĐÃ CẬP NHẬT THEO ĐÚNG TÊN BẠN CUNG CẤP TỪ SHEET
         const COL_NAMES = {
             // Sheet "Báo giá"
             MAIN_ID: 'ID',
@@ -285,17 +284,17 @@
             MAIN_FINAL_TOTAL: 'Tổng tiền cuối',
             MAIN_AMOUNT_IN_WORDS: 'Bằng chữ',
             MAIN_SALESPERSON: 'Người lập phiếu',
-            MAIN_LOGO: 'Logo', // Đã thêm cột Logo
+            MAIN_LOGO: 'Logo',
 
-            // Sheet "Báo giá CT"
+            // Sheet "Báo giá CT" (Đã cập nhật tên cột chi tiết theo yêu cầu mới)
             DETAIL_QUOTE_ID: 'Báo giá',
-            DETAIL_CODE: 'Mã',
+            DETAIL_CODE: 'Mã sản phẩm', 
             DETAIL_NAME: 'Tên sản phẩm',
-            DETAIL_IMAGE_URL: 'Hình ảnh URL',
+            DETAIL_IMAGE_URL: 'Hình ảnh', 
             DETAIL_UNIT: 'ĐVT',
-            DETAIL_QUANTITY: 'SL',
-            DETAIL_PRICE: 'Đơn giá (chưa CK)',
-            DETAIL_DISCOUNT_RATE: 'CK',
+            DETAIL_QUANTITY: 'Số lượng', 
+            DETAIL_PRICE: 'Đơn giá', 
+            DETAIL_DISCOUNT_RATE: 'Chiết khấu', 
             DETAIL_PRICE_AFTER_DISCOUNT: 'Giá sau CK',
             DETAIL_TOTAL: 'Thành tiền',
         };
@@ -336,6 +335,7 @@
             if (!url || !url.trim()) {
                 return `<div class="bg-gray-200 p-1 rounded text-center text-[10px] text-gray-500">Không có ảnh</div>`;
             }
+            // Sử dụng URL hình ảnh trực tiếp từ cột "Hình ảnh"
             return `<img src="${url}" alt="Hình ảnh sản phẩm" class="object-cover rounded-md mx-auto" onerror="this.src='https://placehold.co/60x60/E5E7EB/9CA3AF?text=Lỗi';">`;
         }
         
@@ -576,6 +576,7 @@
 
                 // Lọc dữ liệu chi tiết bằng IDbaogia
                 const filteredDetails = detailDataResponse.data.filter(
+                    // Sử dụng cột 'Báo giá' trong sheet chi tiết để so sánh với ID Báo giá chính
                     row => row[COL_NAMES.DETAIL_QUOTE_ID] === idBaoGia
                 );
 
@@ -588,10 +589,13 @@
                         const getDetailValue = (colName) => product[colName] || '';
                         
                         // Lấy các giá trị (chuyển sang số nếu cần)
+                        // Sử dụng tên cột mới: 'Số lượng'
                         const quantity = parseFloat(getDetailValue(COL_NAMES.DETAIL_QUANTITY)) || 0;
+                        // Sử dụng tên cột mới: 'Đơn giá'
                         const price = parseFloat(getDetailValue(COL_NAMES.DETAIL_PRICE)) || 0;
                         
                         // CK có thể là 0.1, 0.05, hoặc 5%, 10%
+                        // Sử dụng tên cột mới: 'Chiết khấu'
                         let discountRate = getDetailValue(COL_NAMES.DETAIL_DISCOUNT_RATE);
                         if (typeof discountRate === 'string' && discountRate.endsWith('%')) {
                             discountRate = parseFloat(discountRate.replace('%', '')) / 100;
