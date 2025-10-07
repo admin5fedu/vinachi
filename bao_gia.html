@@ -31,12 +31,14 @@
             /* Viền nổi và đổ bóng */
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); 
             border: 1px solid #ccc;
-            @apply bg-white mx-auto my-5 overflow-hidden;
+            /* mx-auto giúp căn giữa nếu không dùng flex */
+            @apply bg-white mx-auto my-5 overflow-hidden; 
         }
 
         /* Điều chỉnh cho mobile: cho phép cuộn ngang để xem hết nội dung A4 */
         @media (max-width: 768px) {
             #document-content-wrapper {
+                /* Dùng justify-start và overflow-x-auto để cuộn ngang nếu màn hình hẹp */
                 @apply flex justify-start overflow-x-auto;
             }
             #document-content {
@@ -47,7 +49,8 @@
         /* Đảm bảo khung A4 nằm giữa trên màn hình lớn */
         @media (min-width: 769px) {
             #document-content-wrapper {
-                @apply pb-10;
+                /* THÊM flex justify-center để căn giữa toàn bộ nội dung A4 trên màn hình rộng */
+                @apply flex justify-center pb-10;
             }
         }
 
@@ -59,8 +62,8 @@
         .products-table .image-cell img {
             width: 100%;
             height: auto;
-            max-width: 80px;
-            max-height: 80px;
+            max-width: 60px; /* Giảm kích thước ảnh để tiết kiệm không gian */
+            max-height: 60px;
             object-fit: contain;
         }
         
@@ -81,9 +84,7 @@
             .no-print {
                 display: none !important;
             }
-            .footer {
-                display: none;
-            }
+            /* Đã xóa .footer { display: none; } để đảm bảo footer được in */
             
             /* Áp dụng quy tắc in cho #document-content */
             #document-content {
@@ -127,6 +128,19 @@
             .summary-table .final-total {
                 background-color: white !important;
             }
+            
+            /* FIX 2: Đảm bảo bảng vừa khít khi in/xuất PDF */
+            #productsTable {
+                width: 100% !important;
+                min-width: unset !important; /* Xóa min-width để bảng co lại */
+                font-size: 8pt !important; /* Giảm kích thước font cho bảng */
+            }
+            #productsTable th, #productsTable td {
+                padding: 0.25rem !important; /* Giảm padding cho bảng */
+            }
+            #productsTable .text-left {
+                 max-width: none !important; /* Bỏ giới hạn độ rộng cho cột Tên sản phẩm */
+            }
         }
         /* --- KẾT THÚC CẤU HÌNH IN A4 PORTRAIT --- */
     </style>
@@ -152,7 +166,7 @@
         </button>
     </div>
 
-    <!-- Wrapper chứa nội dung (Bỏ padding-top vì nút không còn fixed) -->
+    <!-- Wrapper chứa nội dung. Với màn hình lớn, CSS sẽ làm cho nó căn giữa. -->
     <div id="document-content-wrapper" class="pt-0 md:pt-0">
         <div id="document-content" class="a4-container">
             <!-- HEADER INFO -->
@@ -185,21 +199,21 @@
                 </div>
             </div>
             
-            <!-- PRODUCT TABLE -->
-            <div class="px-6 py-4 overflow-x-auto">
-                <table id="productsTable" class="products-table w-full border-collapse min-w-[700px]"> <!-- Thêm min-w để giữ độ rộng khi xuất Excel/PDF -->
+            <!-- PRODUCT TABLE (ĐÃ BỎ overflow-x-auto VÀ min-w-[700px]) -->
+            <div class="px-6 py-4">
+                <table id="productsTable" class="products-table w-full border-collapse">
                     <thead>
                         <tr class="bg-gray-800 text-white text-sm font-semibold text-center">
                             <th class="p-3 w-[4%]">TT</th>
-                            <th class="p-3 w-[10%]">Mã</th>
+                            <th class="p-3 w-[8%]">Mã</th>
                             <th class="p-3 w-[25%]">Tên sản phẩm</th>
-                            <th class="p-3 w-[8%]">Hình ảnh</th>
-                            <th class="p-3 w-[6%]">ĐVT</th>
-                            <th class="p-3 w-[6%]">Số lượng</th>
-                            <th class="p-3 w-[10%]">Đơn giá</th>
-                            <th class="p-3 w-[6%]">CK</th>
-                            <th class="p-3 w-[10%]">Giá sau CK</th>
-                            <th class="p-3 w-[10%]">Thành tiền</th>
+                            <th class="p-3 w-[6%]">Hình ảnh</th>
+                            <th class="p-3 w-[5%]">ĐVT</th>
+                            <th class="p-3 w-[5%]">Số lượng</th>
+                            <th class="p-3 w-[9%]">Đơn giá</th>
+                            <th class="p-3 w-[5%]">CK</th>
+                            <th class="p-3 w-[9%]">Giá sau CK</th>
+                            <th class="p-3 w-[9%]">Thành tiền</th>
                         </tr>
                     </thead>
                     <tbody id="productTableBody" class="text-xs text-center">
@@ -288,9 +302,9 @@
                 Hai triệu hai trăm ngàn đồng
             </div>
 
-            <!-- FOOTER -->
+            <!-- FOOTER (ĐÃ CẬP NHẬT THÔNG TIN LIÊN HỆ) -->
             <div class="footer text-center text-sm italic text-gray-500 p-6 bg-gray-50 rounded-b-xl">
-                Mọi thông tin thắc mắc, quy khách vui lòng liên hệ theo thông tin <span id="salespersonName">Nguyễn Thị Hiền</span> để được giải đáp.<br>
+                Mọi thông tin thắc mắc, quy khách vui lòng liên hệ theo thông tin <span id="salespersonName">Nguyễn Thị Luyến, SĐT: 0978 147 788</span> để được giải đáp.<br>
                 Trân trọng cảm ơn!
             </div>
         </div>
@@ -375,15 +389,18 @@
             // Xóa cột Hình ảnh trong Excel
             const range = XLSX.utils.decode_range(ws['!ref']);
             if (range.e.c > 0) {
-                // Di chuyển cột
+                // Vị trí cột Hình ảnh là Cột thứ 4 (index 3)
+                const imageColumnIndex = 3; 
+
+                // Di chuyển dữ liệu của các cột sau sang trái 1 cột
                 for (let R = range.s.r; R <= range.e.r; ++R) {
-                    for (let C = 3; C < range.e.c; ++C) { // Cột thứ 4 (index 3) là Hình ảnh
+                    for (let C = imageColumnIndex; C < range.e.c; ++C) { 
                         const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
                         const nextCellAddress = XLSX.utils.encode_cell({ r: R, c: C + 1 });
                         ws[cellAddress] = ws[nextCellAddress];
                     }
                 }
-                // Điều chỉnh lại phạm vi
+                // Điều chỉnh lại phạm vi (giảm đi 1 cột)
                 range.e.c -= 1; 
                 ws['!ref'] = XLSX.utils.encode_range(range);
             }
@@ -447,7 +464,7 @@
                 }
             }
             
-            // Update salesperson name
+            // Update salesperson name (sẽ ghi đè thông tin mặc định nếu có)
             if (params.salespersonName) {
                 document.getElementById('salespersonName').innerText = params.salespersonName;
             }
@@ -571,7 +588,8 @@
                 // If no URL is provided, return a placeholder
                 return `<div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Không có ảnh</div>`;
             }
-            return `<img src="${url}" alt="Hình ảnh sản phẩm" class="object-cover rounded-md mx-auto" onerror="this.src='https://placehold.co/64x64/E5E7EB/9CA3AF?text=Ảnh+lỗi';">`;
+            // Giảm kích thước ảnh placeholder để phù hợp với việc điều chỉnh CSS
+            return `<img src="${url}" alt="Hình ảnh sản phẩm" class="object-cover rounded-md mx-auto" onerror="this.src='https://placehold.co/60x60/E5E7EB/9CA3AF?text=Ảnh+lỗi';">`;
         }
 
         // Helper function to format currency with dots
