@@ -126,28 +126,28 @@
 
         <!-- THÔNG TIN BÁO GIÁ & KHÁCH HÀNG -->
         <div class="p-4 bg-blue-50 border-b-2 border-blue-400">
-            <!-- 1. Hiển thị ID Báo giá dưới tiêu đề (ĐÃ CHỈNH SỬA YÊU CẦU 1: (ID: )) -->
+            <!-- 1. Hiển thị ID Báo giá dưới tiêu đề -->
             <div class="text-xl font-bold text-center text-blue-800">BẢNG BÁO GIÁ</div>
             <div class="text-center text-sm italic text-gray-600 mb-3">
                 (ID: <span id="quoteID" class="font-bold text-blue-800 not-italic">...</span>)
             </div>
             
-            <!-- 2. Nội dung Kính gửi, SĐT, Địa chỉ (Lấy từ Khách hàng, SĐT, Địa chỉ trong Sheet Báo giá) -->
+            <!-- 2. Nội dung Kính gửi, SĐT, Địa chỉ -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
                 
-                <!-- Kính gửi (Khách hàng) - Yêu cầu 2 -->
+                <!-- Kính gửi (Khách hàng) -->
                 <div class="flex items-center">
                     <span class="font-semibold text-gray-700 w-24 shrink-0">Kính gửi:</span>
                     <span id="customerName" class="font-medium text-gray-900">...</span>
                 </div>
                 
-                <!-- Số điện thoại - Yêu cầu 2 -->
+                <!-- Số điện thoại -->
                 <div class="flex items-center">
                     <span class="font-semibold text-gray-700 w-24 shrink-0">Số điện thoại:</span>
                     <span id="customerPhone" class="font-medium text-gray-900">...</span>
                 </div>
                 
-                <!-- Địa chỉ - Yêu cầu 2 -->
+                <!-- Địa chỉ -->
                 <div class="flex items-center">
                     <span class="font-semibold text-gray-700 w-24 shrink-0">Địa chỉ:</span>
                     <span id="customerAddress" class="font-medium text-gray-900">...</span>
@@ -260,45 +260,45 @@
     </div>
 
     <script>
-        // CÁC THAM SỐ ĐÃ ĐƯỢC CẬP NHẬT THEO YÊU CẦU CỦA BẠN
+        // CÁC THAM SỐ CẤU HÌNH API
         const SPREADSHEET_ID = '2PACX-1vRqDU43Zjz4NZXwIJWFllaMmxbFZEnTnMGaZa3YqMkkBw104E0E9ItxHOan42X2NrTWTjfF1_TGKzWL'; 
         const GID_MAIN_QUOTE = '949969846'; 
         const GID_QUOTE_DETAIL = '1582939880'; 
 
-        // Vị trí cột (column indexes) trong Google Sheet (A=0, B=1, C=2, ...)
-        // ĐÃ CẬP NHẬT: Khách hàng (I=8), Số điện thoại (J=9), Địa chỉ (K=10)
-        const COL_INDEX = {
-            // Sheet "Báo giá" (GID: 949969846)
-            MAIN_ID: 0, // Cột A: ID
-            MAIN_CUSTOMER_NAME: 8, // Cột I: Khách hàng (ĐÃ CẬP NHẬT)
-            MAIN_CUSTOMER_PHONE: 9, // Cột J: Số điện thoại (ĐÃ CẬP NHẬT)
-            MAIN_CUSTOMER_ADDRESS: 10, // Cột K: Địa chỉ (ĐÃ CẬP NHẬT)
-            
-            // Cập nhật lại các cột còn lại dựa trên vị trí mới (giả định bắt đầu từ L trở đi)
-            MAIN_DATE: 4, // Cột E: Ngày báo giá (Giữ nguyên)
-            MAIN_TOTAL_ORDER: 5, // Cột F: Tổng ĐH (Giữ nguyên)
-            MAIN_VAT_RATE: 6, // Cột G: Tỷ lệ VAT (Giữ nguyên)
-            MAIN_VAT_AMOUNT: 7, // Cột H: Tiền VAT (Giữ nguyên)
-
-            // Cần xác nhận lại vị trí các cột này nếu chúng nằm sau I, J, K
-            MAIN_OTHER_COSTS: 11, // Cột L: Chi phí khác (GIẢ ĐỊNH LÀ L)
-            MAIN_OTHER_DISCOUNTS: 12, // Cột M: Giảm giá khác (GIẢ ĐỊNH LÀ M)
-            MAIN_FINAL_TOTAL: 13, // Cột N: Tổng tiền cuối (GIẢ ĐỊNH LÀ N)
-            MAIN_AMOUNT_IN_WORDS: 14, // Cột O: Bằng chữ (GIẢ ĐỊNH LÀ O)
-            MAIN_SALESPERSON: 15, // Cột P: Người lập phiếu (GIẢ ĐỊNH LÀ P)
+        // URL Tải CSV
+        const URL_MAIN_QUOTE = `https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${GID_MAIN_QUOTE}&single=true&output=csv`;
+        const URL_QUOTE_DETAIL = `https://docs.google.com/spreadsheets/d/e/${SPREADSHEET_ID}/pub?gid=${GID_QUOTE_DETAIL}&single=true&output=csv`;
 
 
-            // Sheet "Báo giá CT" (GID: 1582939880) - Giữ nguyên
-            DETAIL_QUOTE_ID: 0, // Cột A: Báo giá (Liên kết với ID Báo giá)
-            DETAIL_CODE: 1, // Cột B: Mã
-            DETAIL_NAME: 2, // Cột C: Tên sản phẩm
-            DETAIL_IMAGE_URL: 3, // Cột D: Hình ảnh URL
-            DETAIL_UNIT: 4, // Cột E: ĐVT
-            DETAIL_QUANTITY: 5, // Cột F: SL
-            DETAIL_PRICE: 6, // Cột G: Đơn giá (chưa CK)
-            DETAIL_DISCOUNT_RATE: 7, // Cột H: CK (0-1)
-            DETAIL_PRICE_AFTER_DISCOUNT: 8, // Cột I: Giá sau CK
-            DETAIL_TOTAL: 9, // Cột J: Thành tiền
+        // Tên Cột (Header Name) - KHÔNG PHỤ THUỘC VÀO VỊ TRÍ CỘT NỮA!
+        // Lưu ý: Tên cột phải khớp chính xác với tiêu đề (header) trong Sheet.
+        const COL_NAMES = {
+            // Sheet "Báo giá"
+            MAIN_ID: 'ID',
+            MAIN_CUSTOMER_NAME: 'Khách hàng',
+            MAIN_CUSTOMER_PHONE: 'Số điện thoại',
+            MAIN_CUSTOMER_ADDRESS: 'Địa chỉ',
+            MAIN_DATE: 'Ngày báo giá',
+            MAIN_TOTAL_ORDER: 'Tổng ĐH',
+            MAIN_VAT_RATE: 'Tỷ lệ VAT',
+            MAIN_VAT_AMOUNT: 'Tiền VAT',
+            MAIN_OTHER_COSTS: 'Chi phí khác',
+            MAIN_OTHER_DISCOUNTS: 'Giảm giá khác',
+            MAIN_FINAL_TOTAL: 'Tổng tiền cuối',
+            MAIN_AMOUNT_IN_WORDS: 'Bằng chữ',
+            MAIN_SALESPERSON: 'Người lập phiếu',
+
+            // Sheet "Báo giá CT"
+            DETAIL_QUOTE_ID: 'Báo giá',
+            DETAIL_CODE: 'Mã',
+            DETAIL_NAME: 'Tên sản phẩm',
+            DETAIL_IMAGE_URL: 'Hình ảnh URL',
+            DETAIL_UNIT: 'ĐVT',
+            DETAIL_QUANTITY: 'SL',
+            DETAIL_PRICE: 'Đơn giá (chưa CK)',
+            DETAIL_DISCOUNT_RATE: 'CK',
+            DETAIL_PRICE_AFTER_DISCOUNT: 'Giá sau CK',
+            DETAIL_TOTAL: 'Thành tiền',
         };
 
         const DEFAULT_PLACEHOLDER = '...';
@@ -339,65 +339,97 @@
             }
             return `<img src="${url}" alt="Hình ảnh sản phẩm" class="object-cover rounded-md mx-auto" onerror="this.src='https://placehold.co/60x60/E5E7EB/9CA3AF?text=Lỗi';">`;
         }
-
-        // Hàm chuyển đổi phản hồi Gviz thành JSON đơn giản
-        function gvizToJSON(responseText) {
+        
+        // Hàm định dạng ngày tháng
+        function formatDate(dateValue) {
+            if (!dateValue) return DEFAULT_PLACEHOLDER;
+            
+            // Xử lý định dạng ngày tháng của Google Sheet trong CSV (thường là MM/DD/YYYY hoặc YYYY-MM-DD)
             try {
-                // Loại bỏ phần wrapper: google.visualization.Query.setResponse(...)
-                const jsonString = responseText.substring(responseText.indexOf('{'), responseText.lastIndexOf('}') + 1);
-                const data = JSON.parse(jsonString);
-                
-                if (data.status === 'ok' && data.table) {
-                    const rows = data.table.rows;
-                    // Lấy nhãn cột. Dùng id (chữ cái cột) nếu không có label
-                    const columns = data.table.cols.map(col => col.label || col.id);
-                    
-                    const result = rows.map(row => {
-                        const obj = {};
-                        row.c.forEach((cell, index) => {
-                            // Lấy giá trị thô 'v' (value) hoặc giá trị hiển thị 'f' (formatted value)
-                            obj[columns[index]] = cell ? (cell.v !== undefined ? cell.v : cell.f) : null;
-                        });
-                        return obj;
-                    });
-
-                    // *** LOG ĐỂ DEBUG ***
-                    console.log("[Gviz Success]: Cột (Column Headers):", columns);
-                    console.log("[Gviz Success]: Dữ liệu hàng đầu tiên (First Row Data):", result[0]);
-                    // *** END LOG ***
-                    
-                    return { columns, data: result };
+                let date;
+                // Nếu là chuỗi, thử parse
+                if (typeof dateValue === 'string') {
+                    // Cố gắng thay thế dấu / bằng - để tăng khả năng parse trên nhiều trình duyệt
+                    date = new Date(dateValue.replace(/\//g, '-')); 
+                } else if (dateValue instanceof Date) {
+                    date = dateValue;
+                } else {
+                    return dateValue || DEFAULT_PLACEHOLDER;
                 }
-                return { error: 'Invalid Gviz data structure', data: [] };
+
+                if (date && !isNaN(date)) {
+                    const d = date.getDate();
+                    const m = date.getMonth() + 1; 
+                    const y = date.getFullYear();
+                    return `Ngày ${d < 10 ? '0' + d : d} tháng ${m < 10 ? '0' + m : m} năm ${y}`;
+                }
             } catch (e) {
-                console.error("Lỗi phân tích cú pháp Gviz JSON:", e);
-                return { error: 'Failed to parse JSON', data: [] };
+                console.error("Lỗi định dạng ngày:", e);
             }
+            return dateValue || DEFAULT_PLACEHOLDER;
         }
 
-        // Hàm chung để lấy dữ liệu từ Google Sheet
-        async function fetchSheetData(gid, tqlQuery) {
-            const encodedQuery = encodeURIComponent(tqlQuery);
-            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}&tq=${encodedQuery}`;
+        /**
+         * Hàm Parse CSV thành Array of Objects.
+         * Giả định: Dòng đầu tiên là header, dấu phân cách là phẩy (,).
+         * KHÔNG HỖ TRỢ các trường có chứa dấu phẩy bên trong (ví dụ: "text, with comma").
+         */
+        function parseCSV(csvText) {
+            if (!csvText) return [];
+
+            // Tách các hàng (sử dụng regex để loại bỏ hàng trống)
+            const lines = csvText.split(/\r\n|\n/).filter(line => line.trim().length > 0);
+            if (lines.length < 1) return [];
+
+            // Dòng đầu tiên là header
+            const headers = lines[0].split(',').map(header => header.trim().replace(/"/g, ''));
+            const data = [];
+
+            // Duyệt qua các dòng dữ liệu (bắt đầu từ dòng thứ 2)
+            for (let i = 1; i < lines.length; i++) {
+                // Tách các giá trị (chúng ta sẽ dùng regex cơ bản để xử lý dấu ngoặc kép)
+                const values = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+                
+                const obj = {};
+                for (let j = 0; j < headers.length; j++) {
+                    // Loại bỏ dấu ngoặc kép và trim khoảng trắng
+                    const value = values[j] ? values[j].trim().replace(/^"|"$/g, '') : null;
+                    obj[headers[j]] = value;
+                }
+                data.push(obj);
+            }
             
-            console.log(`[QUERY GID ${gid}]: ${tqlQuery}`);
-            console.log("Fetching URL:", url);
+            console.log("[CSV Headers]:", headers);
+            console.log("[CSV Data (First Item)]:", data[0]);
+            
+            return data;
+        }
+
+
+        // Hàm chung để lấy dữ liệu từ Google Sheet (CSV)
+        async function fetchSheetData(csvUrl) {
+            console.log(`[Fetching CSV]: ${csvUrl}`);
 
             try {
                 // Sử dụng hàm fetch với chế độ không cache để đảm bảo dữ liệu mới nhất
-                const response = await fetch(url, { cache: 'no-cache' });
-                const text = await response.text();
-                return gvizToJSON(text);
+                const response = await fetch(csvUrl, { cache: 'no-cache' });
+                if (!response.ok) {
+                    throw new Error(`Lỗi HTTP: ${response.status}`);
+                }
+                const csvText = await response.text();
+                // Parse CSV thành mảng các đối tượng
+                const data = parseCSV(csvText);
+                return { data: data };
             } catch (error) {
-                console.error(`Lỗi khi tải dữ liệu từ GID ${gid}:`, error);
+                console.error(`Lỗi khi tải dữ liệu từ CSV URL:`, error);
                 return { error: 'Network or parsing error', data: [] };
             }
         }
         
-        // Hàm hiển thị thông báo lỗi (chỉ sử dụng khi ID CÓ nhưng không tìm thấy dữ liệu)
+        // Hàm hiển thị thông báo lỗi
         function displayError(message) {
             const overlay = document.getElementById('loadingOverlay');
-            overlay.classList.remove('hidden');
+            overlay.classList.remove('hidden', 'bg-blue-100');
             overlay.classList.add('bg-red-50');
             overlay.style.color = '#B91C1C';
             overlay.innerHTML = `LỖI: ${message}. Vui lòng kiểm tra lại ID báo giá và cấu hình sheet.`;
@@ -406,44 +438,13 @@
             document.getElementById('productTableBody').innerHTML = '<tr><td colspan="10" class="p-4 text-center text-red-500 font-bold">LỖI: Không tìm thấy dữ liệu chi tiết.</td></tr>';
         }
         
-        // Hàm định dạng ngày tháng
-        function formatDate(dateValue) {
-            if (!dateValue) return DEFAULT_PLACEHOLDER;
-            
-            let date;
-            
-            if (typeof dateValue === 'string' && dateValue.startsWith('Date')) {
-                try {
-                    // Xử lý định dạng Date(YYYY,M,D) của Gviz
-                    const match = dateValue.match(/Date\((\d+),(\d+),(\d+)/);
-                    if (match) {
-                        // Lưu ý: month trong JS là 0-based, Gviz trả về 0-based.
-                        const [, year, month, day] = match;
-                        date = new Date(year, month, day); 
-                    }
-                } catch (e) {
-                    console.error("Lỗi định dạng ngày Gviz:", e);
-                }
-            } else if (!isNaN(new Date(dateValue))) {
-                date = new Date(dateValue);
-            }
-
-            if (date && !isNaN(date)) {
-                const d = date.getDate();
-                const m = date.getMonth() + 1; // getMonth trả về 0-11
-                const y = date.getFullYear();
-                return `Ngày ${d < 10 ? '0' + d : d} tháng ${m < 10 ? '0' + m : m} năm ${y}`;
-            }
-            return dateValue || DEFAULT_PLACEHOLDER;
-        }
-
         // Hàm tải và cập nhật nội dung
         async function updateContent() {
             const params = getQueryParams();
             const idBaoGia = params.IDbaogia;
             const loadingOverlay = document.getElementById('loadingOverlay');
             
-            // Đặt tất cả các trường về giá trị mặc định trước
+            // Khởi tạo/Đặt lại giá trị mặc định
             document.getElementById('quoteID').innerText = DEFAULT_PLACEHOLDER;
             document.getElementById('customerName').innerText = DEFAULT_PLACEHOLDER;
             document.getElementById('customerPhone').innerText = DEFAULT_PLACEHOLDER;
@@ -462,66 +463,73 @@
             const productTableBody = document.getElementById('productTableBody');
             productTableBody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-gray-500">Vui lòng cung cấp ID báo giá trên URL.</td></tr>';
             
-            // LOGIC MỚI: Xử lý khi không có ID báo giá
             if (!idBaoGia) {
-                // Nếu không có ID, chỉ hiển thị giá trị mặc định đã set ở trên.
                 loadingOverlay.classList.add('hidden');
-                return; // Dừng lại, không cần fetch API
+                return;
             }
             
-            // Nếu có ID, hiển thị loading và tiếp tục fetch
             loadingOverlay.classList.remove('hidden');
-
-            // Cập nhật ID báo giá trên giao diện
             document.getElementById('quoteID').innerText = idBaoGia;
 
             try {
-                // 1. Lấy thông tin Báo giá chính (Sheet "Báo giá")
-                // Truy vấn: Chọn tất cả các cột mà cột ID (Col A, index 0, Col1) bằng IDbaogia
-                const queryMain = `SELECT * WHERE Col${COL_INDEX.MAIN_ID + 1} = '${idBaoGia}' LIMIT 1`;
-                const mainDataResponse = await fetchSheetData(GID_MAIN_QUOTE, queryMain);
+                // 1. Tải và lọc thông tin Báo giá chính (Sheet "Báo giá")
+                const mainDataResponse = await fetchSheetData(URL_MAIN_QUOTE);
                 
-                if (mainDataResponse.error || mainDataResponse.data.length === 0) {
-                    displayError(`Không tìm thấy Báo giá có ID: ${idBaoGia} trong sheet Báo giá. Vui lòng kiểm tra lại định dạng cột ID (Plain Text).`);
+                if (mainDataResponse.error) {
+                    displayError(`Lỗi mạng/tải dữ liệu sheet Báo giá: ${mainDataResponse.error}`);
                     return;
                 }
                 
-                const mainQuote = mainDataResponse.data[0];
-                const mainCols = mainDataResponse.columns;
+                // Lọc dữ liệu bằng IDbaogia
+                const filteredMainQuotes = mainDataResponse.data.filter(
+                    row => row[COL_NAMES.MAIN_ID] === idBaoGia
+                );
+
+                if (filteredMainQuotes.length === 0) {
+                    displayError(`Không tìm thấy Báo giá có ID: ${idBaoGia} trong sheet Báo giá.`);
+                    return;
+                }
+                
+                const mainQuote = filteredMainQuotes[0];
 
                 // 2. Cập nhật thông tin khách hàng và tổng kết
-                const getValue = (colIndex) => {
-                    // Lấy tên cột (label) từ chỉ mục, sau đó dùng tên cột để lấy giá trị từ dữ liệu
-                    const label = mainCols[colIndex];
-                    // Nếu giá trị là null, trả về chuỗi rỗng để không bị ghi đè lên DEFAULT_PLACEHOLDER ở các bước tiếp theo
-                    return mainQuote[label] !== null ? mainQuote[label] : ''; 
-                };
+                const getValue = (colName) => mainQuote[colName] || '';
                 
-                // Cập nhật thông tin khách hàng (SỬ DỤNG CÁC INDEX MỚI: 8, 9, 10)
-                document.getElementById('customerName').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_NAME) || DEFAULT_PLACEHOLDER;
-                document.getElementById('customerPhone').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_PHONE) || DEFAULT_PLACEHOLDER;
-                document.getElementById('customerAddress').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_ADDRESS) || DEFAULT_PLACEHOLDER;
+                // Cập nhật thông tin khách hàng (SỬ DỤNG TÊN CỘT)
+                document.getElementById('customerName').innerText = getValue(COL_NAMES.MAIN_CUSTOMER_NAME) || DEFAULT_PLACEHOLDER;
+                document.getElementById('customerPhone').innerText = getValue(COL_NAMES.MAIN_CUSTOMER_PHONE) || DEFAULT_PLACEHOLDER;
+                document.getElementById('customerAddress').innerText = getValue(COL_NAMES.MAIN_CUSTOMER_ADDRESS) || DEFAULT_PLACEHOLDER;
                 
                 // Định dạng ngày tháng
-                const dateValue = getValue(COL_INDEX.MAIN_DATE);
+                const dateValue = getValue(COL_NAMES.MAIN_DATE);
                 document.getElementById('quoteDate').innerText = formatDate(dateValue);
                 
                 // Cập nhật người lập phiếu
-                const salesperson = getValue(COL_INDEX.MAIN_SALESPERSON) || 'Nguyễn Thị Hiền';
+                const salesperson = getValue(COL_NAMES.MAIN_SALESPERSON) || 'Nguyễn Thị Hiền';
                 document.getElementById('salespersonName').innerText = salesperson;
                 document.getElementById('salespersonNameSign').innerText = `(${salesperson})`;
 
                 // Cập nhật tổng kết
-                const totalOrder = getValue(COL_INDEX.MAIN_TOTAL_ORDER);
-                const vatRate = getValue(COL_INDEX.MAIN_VAT_RATE);
-                const vatAmount = getValue(COL_INDEX.MAIN_VAT_AMOUNT);
-                const otherCosts = getValue(COL_INDEX.MAIN_OTHER_COSTS);
-                const otherDiscounts = getValue(COL_INDEX.MAIN_OTHER_DISCOUNTS);
-                const finalTotal = getValue(COL_INDEX.MAIN_FINAL_TOTAL);
-                const amountInWords = getValue(COL_INDEX.MAIN_AMOUNT_IN_WORDS);
-
-                const vatRateDisplay = vatRate ? (parseFloat(vatRate) * 100).toFixed(1).replace('.0', '') + '%' : '0.0%';
+                const totalOrder = getValue(COL_NAMES.MAIN_TOTAL_ORDER);
+                const vatRateText = getValue(COL_NAMES.MAIN_VAT_RATE);
+                const vatAmount = getValue(COL_NAMES.MAIN_VAT_AMOUNT);
+                const otherCosts = getValue(COL_NAMES.MAIN_OTHER_COSTS);
+                const otherDiscounts = getValue(COL_NAMES.MAIN_OTHER_DISCOUNTS);
+                const finalTotal = getValue(COL_NAMES.MAIN_FINAL_TOTAL);
+                const amountInWords = getValue(COL_NAMES.MAIN_AMOUNT_IN_WORDS);
                 
+                // Xử lý tỷ lệ VAT, có thể là số thập phân (0.1) hoặc % (10%)
+                let vatRateDisplay = '0.0%';
+                if (vatRateText) {
+                    let rate = parseFloat(vatRateText);
+                    if (rate > 1) { // Nếu nhập 10 thay vì 0.1
+                        rate = rate / 100;
+                    }
+                    if (!isNaN(rate)) {
+                        vatRateDisplay = (rate * 100).toFixed(1).replace('.0', '') + '%';
+                    }
+                }
+
                 document.getElementById('totalOrder').innerText = formatCurrency(totalOrder);
                 document.getElementById('vatRate').innerText = `VAT (${vatRateDisplay})`;
                 document.getElementById('vatAmount').innerText = formatCurrency(vatAmount);
@@ -530,40 +538,53 @@
                 document.getElementById('finalTotal').innerText = formatCurrency(finalTotal);
                 document.getElementById('amountInWords').innerText = amountInWords || 'Không có số tiền bằng chữ.';
 
-                // 3. Lấy thông tin chi tiết sản phẩm (Sheet "Báo giá CT")
-                const queryDetail = `SELECT * WHERE Col${COL_INDEX.DETAIL_QUOTE_ID + 1} = '${idBaoGia}'`;
-                const detailDataResponse = await fetchSheetData(GID_QUOTE_DETAIL, queryDetail);
+                // 3. Tải và lọc thông tin chi tiết sản phẩm (Sheet "Báo giá CT")
+                const detailDataResponse = await fetchSheetData(URL_QUOTE_DETAIL);
                 
-                const productTableBody = document.getElementById('productTableBody');
+                if (detailDataResponse.error) {
+                    // Vẫn hiển thị thông tin chính, chỉ báo lỗi phần chi tiết
+                    productTableBody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-red-500 font-bold">LỖI: Không tải được chi tiết sản phẩm.</td></tr>';
+                    loadingOverlay.classList.add('hidden');
+                    return;
+                }
+
+                // Lọc dữ liệu chi tiết bằng IDbaogia
+                const filteredDetails = detailDataResponse.data.filter(
+                    row => row[COL_NAMES.DETAIL_QUOTE_ID] === idBaoGia
+                );
+
                 productTableBody.innerHTML = ''; // Xóa dữ liệu mẫu
 
-                if (detailDataResponse.error || detailDataResponse.data.length === 0) {
+                if (filteredDetails.length === 0) {
                     productTableBody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-gray-500">Không tìm thấy chi tiết sản phẩm cho báo giá này.</td></tr>';
                 } else {
-                    const detailCols = detailDataResponse.columns;
-
-                    detailDataResponse.data.forEach((product, index) => {
-                        const getDetailValue = (colIndex) => {
-                             const label = detailCols[colIndex];
-                             return product[label] !== null ? product[label] : '';
-                        };
+                    filteredDetails.forEach((product, index) => {
+                        const getDetailValue = (colName) => product[colName] || '';
                         
-                        const quantity = parseFloat(getDetailValue(COL_INDEX.DETAIL_QUANTITY)) || 0;
-                        const price = parseFloat(getDetailValue(COL_INDEX.DETAIL_PRICE)) || 0;
-                        const discountRate = parseFloat(getDetailValue(COL_INDEX.DETAIL_DISCOUNT_RATE)) || 0;
-
-                        // Nếu các cột tính toán đã có sẵn trong Sheet (Giá sau CK, Thành tiền) thì ưu tiên dùng giá trị đó
-                        const priceAfterDiscount = parseFloat(getDetailValue(COL_INDEX.DETAIL_PRICE_AFTER_DISCOUNT)) || (price * (1 - discountRate));
-                        const total = parseFloat(getDetailValue(COL_INDEX.DETAIL_TOTAL)) || (quantity * priceAfterDiscount);
+                        // Lấy các giá trị (chuyển sang số nếu cần)
+                        const quantity = parseFloat(getDetailValue(COL_NAMES.DETAIL_QUANTITY)) || 0;
+                        const price = parseFloat(getDetailValue(COL_NAMES.DETAIL_PRICE)) || 0;
+                        
+                        // CK có thể là 0.1, 0.05, hoặc 5%, 10%
+                        let discountRate = getDetailValue(COL_NAMES.DETAIL_DISCOUNT_RATE);
+                        if (typeof discountRate === 'string' && discountRate.endsWith('%')) {
+                            discountRate = parseFloat(discountRate.replace('%', '')) / 100;
+                        } else {
+                            discountRate = parseFloat(discountRate) || 0;
+                        }
+                        
+                        // Ưu tiên dùng giá trị từ sheet nếu có, nếu không thì tự tính (tránh lỗi)
+                        const priceAfterDiscount = parseFloat(getDetailValue(COL_NAMES.DETAIL_PRICE_AFTER_DISCOUNT)) || (price * (1 - discountRate));
+                        const total = parseFloat(getDetailValue(COL_NAMES.DETAIL_TOTAL)) || (quantity * priceAfterDiscount);
 
                         const row = document.createElement('tr');
                         row.className = 'odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200';
                         row.innerHTML = `
                             <td class="p-2">${index + 1}</td>
-                            <td class="p-2">${getDetailValue(COL_INDEX.DETAIL_CODE) || ''}</td>
-                            <td class="p-2 text-left font-medium max-w-[200px]">${getDetailValue(COL_INDEX.DETAIL_NAME) || ''}</td>
-                            <td class="p-2 image-cell">${createImageTag(getDetailValue(COL_INDEX.DETAIL_IMAGE_URL))}</td>
-                            <td class="p-2">${getDetailValue(COL_INDEX.DETAIL_UNIT) || ''}</td>
+                            <td class="p-2">${getDetailValue(COL_NAMES.DETAIL_CODE) || ''}</td>
+                            <td class="p-2 text-left font-medium max-w-[200px]">${getDetailValue(COL_NAMES.DETAIL_NAME) || ''}</td>
+                            <td class="p-2 image-cell">${createImageTag(getDetailValue(COL_NAMES.DETAIL_IMAGE_URL))}</td>
+                            <td class="p-2">${getDetailValue(COL_NAMES.DETAIL_UNIT) || ''}</td>
                             <td class="p-2">${formatCurrency(quantity, true)}</td>
                             <td class="p-2 font-semibold text-green-600">${formatCurrency(price)}</td>
                             <td class="p-2">${(discountRate * 100).toFixed(0)}%</td>
