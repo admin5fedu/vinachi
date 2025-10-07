@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Báo Giá - Vinachi Việt Nam</title>
+    <!-- Thư viện Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            @apply bg-gray-100 text-gray-800;
+        }
+
+        /* Container that forces A4 size (210mm x 297mm) and allows scrolling on small screens */
+        .a4-container {
+            width: 21cm;
+            min-height: 29.7cm;
+            @apply bg-white shadow-2xl mx-auto my-5 overflow-hidden;
+        }
+
+        /* Mobile styling: allow horizontal scroll to view fixed A4 content */
+        @media (max-width: 768px) {
+            body {
+                /* Ensure content starts from the left and allows scrolling */
+                @apply flex justify-start overflow-x-auto;
+            }
+            .a4-container {
+                @apply mx-2 my-2 rounded-lg;
+            }
+        }
+
+        /* Table styling */
+        .products-table th, .products-table td {
+            border: 1px solid #e2e8f0; /* border-gray-200 */
+        }
+        
+        /* Đảm bảo hình ảnh co giãn bên trong ô */
+        .products-table .image-cell img {
+            width: 100%; 
+            height: auto; 
+            max-width: 60px; /* Giới hạn kích thước tối đa của ảnh cho vừa A4 */
+            max-height: 60px;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .footer {
+                display: none; /* Ẩn vùng footer khi in */
+            }
+            .a4-container {
+                box-shadow: none;
+                margin: 0;
+                border-radius: 0;
+            }
+            body {
+                padding: 0;
+                background: white;
+                color: black;
+            }
+            
+            /* Force black text and white background for printing clarity */
+            body * {
+                background: none !important;
+                color: black !important;
+            }
+
+            .products-table th, .products-table td, .summary-table td {
+                border-color: black !important;
+            }
+
+            .products-table th {
+                background-color: white !important;
+            }
+
+            .summary-table .final-total {
+                background-color: white !important;
+            }
+            
+            /* Force exact colors for printing, primarily for black text */
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* Set page size and margins for print */
+        @page {
+            size: A4 portrait; /* Đảm bảo định dạng A4 dạng dọc */
+            margin: 1cm;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1D4ED8;
+            border-radius: 0.5rem;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="a4-container relative">
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            Đang tải dữ liệu báo giá...
+        </div>
+
+        <!-- HEADER: Thông tin công ty -->
+        <div class="p-4 text-center bg-gray-50 border-b-2 border-gray-200">
+            <div class="text-lg font-bold mb-1 text-gray-900" id="companyName">CÔNG TY TNHH VINACHI VIỆT NAM</div>
+            <div class="text-xs leading-snug text-gray-600" id="companyBranches">
+                <div>CS1: Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</div>
+                <div>CS2: Km8+500 Đại lộ Thăng Long, Hoài Đức, Hà Nội</div>
+                <div>CS3: Thạch Thất - Hà Nội</div>
+            </div>
+        </div>
+
+        <!-- THÔNG TIN BÁO GIÁ & KHÁCH HÀNG -->
+        <div class="p-4 bg-blue-50 border-b-2 border-blue-400">
+            <div class="text-xl font-bold text-center text-blue-800 mb-3">BẢNG BÁO GIÁ</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                <div class="flex items-center">
+                    <span class="font-semibold text-gray-700 w-24 shrink-0">ID Báo giá:</span>
+                    <span id="quoteID" class="font-bold text-blue-800">Đang tải...</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="font-semibold text-gray-700 w-24 shrink-0">Kính gửi:</span>
+                    <span id="customerName" class="font-medium text-gray-900">...</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="font-semibold text-gray-700 w-24 shrink-0">Số điện thoại:</span>
+                    <span id="customerPhone" class="font-medium text-gray-900">...</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="font-semibold text-gray-700 w-24 shrink-0">Địa chỉ:</span>
+                    <span id="customerAddress" class="font-medium text-gray-900">...</span>
+                </div>
+                <div class="text-right font-medium text-gray-600 col-span-1 md:col-span-2 mt-2" id="quoteDate">...</div>
+            </div>
+        </div>
+        
+        <!-- BẢNG CHI TIẾT SẢN PHẨM -->
+        <div class="px-4 py-2"> <!-- Giảm padding để tối ưu không gian A4 -->
+            <table class="products-table w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-800 text-white text-xs font-semibold text-center uppercase"> <!-- Giảm cỡ chữ thành text-xs -->
+                        <th class="p-2 w-[4%]">TT</th>
+                        <th class="p-2 w-[10%]">Mã</th>
+                        <th class="p-2 w-[25%]">Tên sản phẩm</th>
+                        <th class="p-2 w-[8%]">Hình ảnh</th>
+                        <th class="p-2 w-[6%]">ĐVT</th>
+                        <th class="p-2 w-[6%]">SL</th>
+                        <th class="p-2 w-[10%]">Đơn giá</th>
+                        <th class="p-2 w-[6%]">CK</th>
+                        <th class="p-2 w-[10%]">Giá sau CK</th>
+                        <th class="p-2 w-[10%]">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody" class="text-[11px] text-center"> <!-- Cỡ chữ nhỏ hơn cho nội dung -->
+                    <!-- Dữ liệu sản phẩm sẽ được chèn vào đây từ Google Sheet -->
+                    <tr><td colspan="10" class="p-4 text-center text-gray-500">Không có dữ liệu chi tiết sản phẩm.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TỔNG KẾT & THÔNG TIN THANH TOÁN -->
+        <div class="p-4">
+            <div class="flex flex-col md:flex-row gap-4">
+                
+                <!-- Bảng tổng kết -->
+                <div class="md:w-1/2 w-full">
+                    <table class="summary-table w-full md:max-w-sm ml-auto text-sm">
+                        <tr class="border-b border-gray-300">
+                            <td class="p-2 font-semibold text-gray-700">TỔNG ĐH</td>
+                            <td class="p-2 text-right font-bold text-gray-900" id="totalOrder">...</td>
+                        </tr>
+                        <tr class="border-b border-gray-300">
+                            <td class="p-2 font-semibold text-gray-700" id="vatRate">VAT (0,0%)</td>
+                            <td class="p-2 text-right font-bold text-gray-900" id="vatAmount">...</td>
+                        </tr>
+                        <tr class="border-b border-gray-300">
+                            <td class="p-2 font-semibold text-gray-700">Chi phí khác</td>
+                            <td class="p-2 text-right font-bold text-gray-900" id="otherCosts">...</td>
+                        </tr>
+                        <tr class="border-b border-gray-300">
+                            <td class="p-2 font-semibold text-gray-700">Giảm giá khác</td>
+                            <td class="p-2 text-right font-bold text-gray-900" id="otherDiscounts">...</td>
+                        </tr>
+                        <tr class="final-total bg-gray-800 text-white text-lg font-bold">
+                            <td class="p-3">TỔNG TIỀN</td>
+                            <td class="p-3 text-right" id="finalTotal">...</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Thông tin chuyển khoản -->
+                <div class="md:w-1/2 w-full flex flex-col gap-4">
+                    <div class="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
+                        <div class="font-bold text-gray-800 mb-1">Tài khoản cá nhân</div>
+                        <div class="text-sm text-gray-600 leading-relaxed">
+                            STK: 09844434099<br>
+                            Ngân hàng: TP Bank<br>
+                            Chủ TK: VU THI HOA
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
+                        <div class="font-bold text-gray-800 mb-1">Tài khoản công ty</div>
+                        <div class="text-sm text-gray-600 leading-relaxed">
+                            STK: 119002673143<br>
+                            Ngân hàng: Vietinbank - KCN Tiên Sơn - Bắc Ninh<br>
+                            Chủ TK: CONG TY TNHH VINACHI VIET NAM
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tổng tiền bằng chữ -->
+        <div class="amount-words bg-blue-600 text-white font-bold p-3 text-center rounded-lg mx-4 mt-2 mb-4" id="amountInWords">
+            Đang tải số tiền bằng chữ...
+        </div>
+
+        <!-- FOOTER: Chữ ký và Ghi chú liên hệ -->
+        <div class="footer text-sm text-gray-800 p-4 bg-gray-100 border-t border-gray-200">
+            <!-- Chữ ký -->
+            <div class="flex justify-between text-center text-sm mb-4">
+                <div class="w-1/3">
+                    <div class="font-semibold text-gray-700">Khách hàng xác nhận</div>
+                    <div class="italic text-xs mt-1">(Ký, ghi rõ họ tên)</div>
+                </div>
+                <div class="w-1/3">
+                    <div class="font-semibold text-gray-700">Người lập phiếu</div>
+                    <div class="italic text-xs mt-1" id="salespersonNameSign">(Nguyễn Thị Hiền)</div>
+                </div>
+            </div>
+            <!-- Ghi chú liên hệ -->
+            <div class="text-center italic text-gray-500 mt-2">
+                Mọi thông tin thắc mắc, quý khách vui lòng liên hệ theo thông tin <span id="salespersonName">Nguyễn Thị Hiền</span> để được giải đáp.<br>
+                Trân trọng cảm ơn!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CÁC THAM SỐ ĐÃ ĐƯỢC CẬP NHẬT THEO YÊU CẦU CỦA BẠN
+        // Google Sheet ID: Lấy từ URL gốc của sheet (giữa /d/e/ và /pubhtml)
+        const SPREADSHEET_ID = '2PACX-1vRqDU43Zjz4NZXwIJWFllaMmxbFZEnTnMGaZa3YqMkkBw104E0E9ItxHOan42X2NrTWTjfF1_TGKzWL'; 
+        // GID của sheet "Báo giá" (Main Quote)
+        const GID_MAIN_QUOTE = '949969846'; 
+        // GID của sheet "Báo giá CT" (Quote Detail)
+        const GID_QUOTE_DETAIL = '1582939880'; 
+
+        // Vị trí cột (column indexes) trong Google Sheet (A=0, B=1, C=2, ...)
+        // Cần kiểm tra lại các chỉ mục này trong sheet của bạn!
+        const COL_INDEX = {
+            // Sheet "Báo giá" (GID: 949969846)
+            MAIN_ID: 0, // Cột A: ID
+            MAIN_CUSTOMER_NAME: 1, // Cột B: Kính gửi
+            MAIN_CUSTOMER_PHONE: 2, // Cột C: SĐT
+            MAIN_CUSTOMER_ADDRESS: 3, // Cột D: Địa chỉ
+            MAIN_DATE: 4, // Cột E: Ngày báo giá
+            MAIN_TOTAL_ORDER: 5, // Cột F: Tổng ĐH
+            MAIN_VAT_RATE: 6, // Cột G: Tỷ lệ VAT
+            MAIN_VAT_AMOUNT: 7, // Cột H: Tiền VAT
+            MAIN_OTHER_COSTS: 8, // Cột I: Chi phí khác
+            MAIN_OTHER_DISCOUNTS: 9, // Cột J: Giảm giá khác
+            MAIN_FINAL_TOTAL: 10, // Cột K: Tổng tiền cuối
+            MAIN_AMOUNT_IN_WORDS: 11, // Cột L: Bằng chữ
+            MAIN_SALESPERSON: 12, // Cột M: Người lập phiếu
+
+            // Sheet "Báo giá CT" (GID: 1582939880)
+            DETAIL_QUOTE_ID: 0, // Cột A: Báo giá (Liên kết với ID Báo giá)
+            DETAIL_CODE: 1, // Cột B: Mã
+            DETAIL_NAME: 2, // Cột C: Tên sản phẩm
+            DETAIL_IMAGE_URL: 3, // Cột D: Hình ảnh URL
+            DETAIL_UNIT: 4, // Cột E: ĐVT
+            DETAIL_QUANTITY: 5, // Cột F: SL
+            DETAIL_PRICE: 6, // Cột G: Đơn giá (chưa CK)
+            DETAIL_DISCOUNT_RATE: 7, // Cột H: CK (0-1)
+            DETAIL_PRICE_AFTER_DISCOUNT: 8, // Cột I: Giá sau CK
+            DETAIL_TOTAL: 9, // Cột J: Thành tiền
+        };
+
+        // Hàm lấy tham số truy vấn từ URL
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            const regex = /([^&=]+)=([^&]*)/g;
+            let m;
+            while (m = regex.exec(queryString)) {
+                params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+            }
+            return params;
+        }
+
+        // Hàm chuyển đổi định dạng tiền tệ (thêm dấu chấm)
+        function formatCurrency(amount, isQuantity = false) {
+            const num = parseFloat(amount);
+            if (isNaN(num)) return '0';
+            
+            if (isQuantity) {
+                // Định dạng số lượng (có thể có số thập phân)
+                return new Intl.NumberFormat('vi-VN', { 
+                    minimumFractionDigits: (num !== Math.floor(num) ? 2 : 0), 
+                    maximumFractionDigits: 2 
+                }).format(num);
+            }
+            
+            // Định dạng tiền tệ (làm tròn về số nguyên VND)
+            return new Intl.NumberFormat('vi-VN').format(Math.round(num));
+        }
+
+        // Hàm tạo thẻ hình ảnh có fallback
+        function createImageTag(url) {
+            if (!url || !url.trim()) {
+                return `<div class="bg-gray-200 p-1 rounded text-center text-[10px] text-gray-500">Không có ảnh</div>`;
+            }
+            // Sử dụng hình ảnh 60x60 làm placeholder lỗi
+            return `<img src="${url}" alt="Hình ảnh sản phẩm" class="object-cover rounded-md mx-auto" onerror="this.src='https://placehold.co/60x60/E5E7EB/9CA3AF?text=Lỗi';">`;
+        }
+
+        // Hàm chuyển đổi phản hồi Gviz thành JSON đơn giản
+        function gvizToJSON(responseText) {
+            try {
+                // Loại bỏ phần wrapper: google.visualization.Query.setResponse(...)
+                const jsonString = responseText.substring(responseText.indexOf('{'), responseText.lastIndexOf('}') + 1);
+                const data = JSON.parse(jsonString);
+                
+                if (data.status === 'ok' && data.table) {
+                    const rows = data.table.rows;
+                    // Sử dụng nhãn cột (label) nếu có, nếu không dùng id (chữ cái cột)
+                    const columns = data.table.cols.map(col => col.label || col.id);
+                    
+                    const result = rows.map(row => {
+                        const obj = {};
+                        row.c.forEach((cell, index) => {
+                            // Lấy giá trị thô 'v' (value) hoặc giá trị hiển thị 'f' (formatted value)
+                            obj[columns[index]] = cell ? (cell.v !== undefined ? cell.v : cell.f) : null;
+                        });
+                        return obj;
+                    });
+                    return { columns, data: result };
+                }
+                return { error: 'Invalid Gviz data structure', data: [] };
+            } catch (e) {
+                console.error("Lỗi phân tích cú pháp Gviz JSON:", e);
+                return { error: 'Failed to parse JSON', data: [] };
+            }
+        }
+
+        // Hàm chung để lấy dữ liệu từ Google Sheet
+        async function fetchSheetData(gid, tqlQuery) {
+            const encodedQuery = encodeURIComponent(tqlQuery);
+            // Sử dụng SPREADSHEET_ID đã được cung cấp
+            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${gid}&tq=${encodedQuery}`;
+            
+            console.log(`[QUERY GID ${gid}]: ${tqlQuery}`);
+            console.log("Fetching URL:", url);
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                return gvizToJSON(text);
+            } catch (error) {
+                console.error(`Lỗi khi tải dữ liệu từ GID ${gid}:`, error);
+                return { error: 'Network or parsing error', data: [] };
+            }
+        }
+        
+        // Hàm hiển thị thông báo lỗi
+        function displayError(message) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('bg-red-50');
+            overlay.style.color = '#B91C1C';
+            overlay.innerHTML = `LỖI: ${message}. Vui lòng kiểm tra lại ID báo giá và cấu hình sheet.`;
+        }
+        
+        // Hàm định dạng ngày tháng
+        function formatDate(dateValue) {
+            if (!dateValue) return '...';
+            
+            // Xử lý giá trị ngày tháng từ Google Sheet (có thể là chuỗi ISO hoặc định dạng khác)
+            let date;
+            
+            if (typeof dateValue === 'string' && dateValue.startsWith('Date')) {
+                // Xử lý định dạng Date(...) từ Gviz: Date(YYYY, M, D, H, M, S)
+                try {
+                    const match = dateValue.match(/Date\((\d+),(\d+),(\d+)/);
+                    if (match) {
+                        const [, year, month, day] = match;
+                        // Tháng trong JS là 0-indexed, Gviz là 0-indexed, nên không cần -1
+                        date = new Date(year, month, day); 
+                    }
+                } catch (e) {
+                    console.error("Lỗi định dạng ngày Gviz:", e);
+                }
+            } else if (!isNaN(new Date(dateValue))) {
+                date = new Date(dateValue);
+            }
+
+            if (date && !isNaN(date)) {
+                const d = date.getDate();
+                const m = date.getMonth() + 1; // getMonth trả về 0-11
+                const y = date.getFullYear();
+                return `Ngày ${d < 10 ? '0' + d : d} tháng ${m < 10 ? '0' + m : m} năm ${y}`;
+            }
+            return dateValue; // Trả về giá trị thô nếu không thể định dạng
+        }
+
+        // Hàm tải và cập nhật nội dung
+        async function updateContent() {
+            const params = getQueryParams();
+            const idBaoGia = params.IDbaogia;
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            loadingOverlay.classList.remove('hidden');
+
+            if (!idBaoGia) {
+                loadingOverlay.classList.remove('hidden');
+                loadingOverlay.classList.remove('bg-red-50');
+                loadingOverlay.innerHTML = 'Vui lòng cung cấp tham số "IDbaogia" trên URL. Ví dụ: ?IDbaogia=BG001';
+                return;
+            }
+            
+            document.getElementById('quoteID').innerText = idBaoGia;
+
+            try {
+                // 1. Lấy thông tin Báo giá chính (Sheet "Báo giá")
+                // Truy vấn: Chọn tất cả các cột mà cột ID (Col A, index 0, Col1) bằng IDbaogia
+                const queryMain = `SELECT * WHERE Col${COL_INDEX.MAIN_ID + 1} = '${idBaoGia}' LIMIT 1`;
+                const mainDataResponse = await fetchSheetData(GID_MAIN_QUOTE, queryMain);
+                
+                if (mainDataResponse.error || mainDataResponse.data.length === 0) {
+                    displayError(`Không tìm thấy Báo giá có ID: ${idBaoGia} trong sheet Báo giá.`);
+                    return;
+                }
+                
+                const mainQuote = mainDataResponse.data[0];
+                const mainCols = mainDataResponse.columns;
+
+                // 2. Cập nhật thông tin khách hàng và tổng kết
+                const getValue = (colIndex) => {
+                    const label = mainCols[colIndex];
+                    return mainQuote[label] !== null ? mainQuote[label] : '';
+                };
+                
+                document.getElementById('customerName').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_NAME);
+                document.getElementById('customerPhone').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_PHONE);
+                document.getElementById('customerAddress').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_ADDRESS);
+                
+                // Định dạng ngày tháng
+                const dateValue = getValue(COL_INDEX.MAIN_DATE);
+                document.getElementById('quoteDate').innerText = formatDate(dateValue);
+                
+                // Cập nhật người lập phiếu
+                const salesperson = getValue(COL_INDEX.MAIN_SALESPERSON) || 'Người lập phiếu';
+                document.getElementById('salespersonName').innerText = salesperson;
+                document.getElementById('salespersonNameSign').innerText = `(${salesperson})`;
+
+                // Cập nhật tổng kết
+                const totalOrder = getValue(COL_INDEX.MAIN_TOTAL_ORDER);
+                const vatRate = getValue(COL_INDEX.MAIN_VAT_RATE);
+                const vatAmount = getValue(COL_INDEX.MAIN_VAT_AMOUNT);
+                const otherCosts = getValue(COL_INDEX.MAIN_OTHER_COSTS);
+                const otherDiscounts = getValue(COL_INDEX.MAIN_OTHER_DISCOUNTS);
+                const finalTotal = getValue(COL_INDEX.MAIN_FINAL_TOTAL);
+                const amountInWords = getValue(COL_INDEX.MAIN_AMOUNT_IN_WORDS);
+
+                const vatRateDisplay = vatRate ? (parseFloat(vatRate) * 100).toFixed(1).replace('.0', '') + '%' : '0.0%';
+                
+                document.getElementById('totalOrder').innerText = formatCurrency(totalOrder);
+                document.getElementById('vatRate').innerText = `VAT (${vatRateDisplay})`;
+                document.getElementById('vatAmount').innerText = formatCurrency(vatAmount);
+                document.getElementById('otherCosts').innerText = formatCurrency(otherCosts);
+                document.getElementById('otherDiscounts').innerText = formatCurrency(otherDiscounts);
+                document.getElementById('finalTotal').innerText = formatCurrency(finalTotal);
+                document.getElementById('amountInWords').innerText = amountInWords || 'Không có số tiền bằng chữ.';
+
+                // 3. Lấy thông tin chi tiết sản phẩm (Sheet "Báo giá CT")
+                // Truy vấn: Chọn tất cả các cột mà cột "Báo giá" (Col A, index 0, Col1) bằng IDbaogia
+                const queryDetail = `SELECT * WHERE Col${COL_INDEX.DETAIL_QUOTE_ID + 1} = '${idBaoGia}'`;
+                const detailDataResponse = await fetchSheetData(GID_QUOTE_DETAIL, queryDetail);
+                
+                const productTableBody = document.getElementById('productTableBody');
+                productTableBody.innerHTML = ''; // Xóa dữ liệu mẫu
+
+                if (detailDataResponse.error || detailDataResponse.data.length === 0) {
+                    productTableBody.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-gray-500">Không tìm thấy chi tiết sản phẩm cho báo giá này.</td></tr>';
+                } else {
+                    const detailCols = detailDataResponse.columns;
+
+                    detailDataResponse.data.forEach((product, index) => {
+                        const getDetailValue = (colIndex) => {
+                             const label = detailCols[colIndex];
+                             return product[label] !== null ? product[label] : '';
+                        };
+                        
+                        const quantity = parseFloat(getDetailValue(COL_INDEX.DETAIL_QUANTITY)) || 0;
+                        const price = parseFloat(getDetailValue(COL_INDEX.DETAIL_PRICE)) || 0;
+                        const discountRate = parseFloat(getDetailValue(COL_INDEX.DETAIL_DISCOUNT_RATE)) || 0;
+
+                        // Nếu các cột tính toán đã có sẵn trong Sheet (Giá sau CK, Thành tiền) thì ưu tiên dùng giá trị đó
+                        const priceAfterDiscount = parseFloat(getDetailValue(COL_INDEX.DETAIL_PRICE_AFTER_DISCOUNT)) || (price * (1 - discountRate));
+                        const total = parseFloat(getDetailValue(COL_INDEX.DETAIL_TOTAL)) || (quantity * priceAfterDiscount);
+
+                        const row = document.createElement('tr');
+                        row.className = 'odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200';
+                        row.innerHTML = `
+                            <td class="p-2">${index + 1}</td>
+                            <td class="p-2">${getDetailValue(COL_INDEX.DETAIL_CODE) || ''}</td>
+                            <td class="p-2 text-left font-medium max-w-[200px]">${getDetailValue(COL_INDEX.DETAIL_NAME) || ''}</td>
+                            <td class="p-2 image-cell">${createImageTag(getDetailValue(COL_INDEX.DETAIL_IMAGE_URL))}</td>
+                            <td class="p-2">${getDetailValue(COL_INDEX.DETAIL_UNIT) || ''}</td>
+                            <td class="p-2">${formatCurrency(quantity, true)}</td>
+                            <td class="p-2 font-semibold text-green-600">${formatCurrency(price)}</td>
+                            <td class="p-2">${(discountRate * 100).toFixed(0)}%</td>
+                            <td class="p-2 font-semibold text-green-600">${formatCurrency(priceAfterDiscount)}</td>
+                            <td class="p-2 font-bold text-red-600">${formatCurrency(total)}</td>
+                        `;
+                        productTableBody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error("Lỗi tổng quát khi cập nhật nội dung:", error);
+                displayError("Lỗi không xác định khi tải dữ liệu.");
+            } finally {
+                loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        // Chạy hàm cập nhật khi trang tải xong
+        window.onload = updateContent;
+    </script>
+</body>
+</html>
