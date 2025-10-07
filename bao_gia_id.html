@@ -266,23 +266,29 @@
         const GID_QUOTE_DETAIL = '1582939880'; 
 
         // Vị trí cột (column indexes) trong Google Sheet (A=0, B=1, C=2, ...)
+        // ĐÃ CẬP NHẬT: Khách hàng (I=8), Số điện thoại (J=9), Địa chỉ (K=10)
         const COL_INDEX = {
             // Sheet "Báo giá" (GID: 949969846)
             MAIN_ID: 0, // Cột A: ID
-            MAIN_CUSTOMER_NAME: 1, // Cột B: Khách hàng (Sử dụng cho Kính gửi)
-            MAIN_CUSTOMER_PHONE: 2, // Cột C: Số điện thoại
-            MAIN_CUSTOMER_ADDRESS: 3, // Cột D: Địa chỉ
-            MAIN_DATE: 4, // Cột E: Ngày báo giá
-            MAIN_TOTAL_ORDER: 5, // Cột F: Tổng ĐH
-            MAIN_VAT_RATE: 6, // Cột G: Tỷ lệ VAT
-            MAIN_VAT_AMOUNT: 7, // Cột H: Tiền VAT
-            MAIN_OTHER_COSTS: 8, // Cột I: Chi phí khác
-            MAIN_OTHER_DISCOUNTS: 9, // Cột J: Giảm giá khác
-            MAIN_FINAL_TOTAL: 10, // Cột K: Tổng tiền cuối
-            MAIN_AMOUNT_IN_WORDS: 11, // Cột L: Bằng chữ
-            MAIN_SALESPERSON: 12, // Cột M: Người lập phiếu
+            MAIN_CUSTOMER_NAME: 8, // Cột I: Khách hàng (ĐÃ CẬP NHẬT)
+            MAIN_CUSTOMER_PHONE: 9, // Cột J: Số điện thoại (ĐÃ CẬP NHẬT)
+            MAIN_CUSTOMER_ADDRESS: 10, // Cột K: Địa chỉ (ĐÃ CẬP NHẬT)
+            
+            // Cập nhật lại các cột còn lại dựa trên vị trí mới (giả định bắt đầu từ L trở đi)
+            MAIN_DATE: 4, // Cột E: Ngày báo giá (Giữ nguyên)
+            MAIN_TOTAL_ORDER: 5, // Cột F: Tổng ĐH (Giữ nguyên)
+            MAIN_VAT_RATE: 6, // Cột G: Tỷ lệ VAT (Giữ nguyên)
+            MAIN_VAT_AMOUNT: 7, // Cột H: Tiền VAT (Giữ nguyên)
 
-            // Sheet "Báo giá CT" (GID: 1582939880)
+            // Cần xác nhận lại vị trí các cột này nếu chúng nằm sau I, J, K
+            MAIN_OTHER_COSTS: 11, // Cột L: Chi phí khác (GIẢ ĐỊNH LÀ L)
+            MAIN_OTHER_DISCOUNTS: 12, // Cột M: Giảm giá khác (GIẢ ĐỊNH LÀ M)
+            MAIN_FINAL_TOTAL: 13, // Cột N: Tổng tiền cuối (GIẢ ĐỊNH LÀ N)
+            MAIN_AMOUNT_IN_WORDS: 14, // Cột O: Bằng chữ (GIẢ ĐỊNH LÀ O)
+            MAIN_SALESPERSON: 15, // Cột P: Người lập phiếu (GIẢ ĐỊNH LÀ P)
+
+
+            // Sheet "Báo giá CT" (GID: 1582939880) - Giữ nguyên
             DETAIL_QUOTE_ID: 0, // Cột A: Báo giá (Liên kết với ID Báo giá)
             DETAIL_CODE: 1, // Cột B: Mã
             DETAIL_NAME: 2, // Cột C: Tên sản phẩm
@@ -343,7 +349,7 @@
                 
                 if (data.status === 'ok' && data.table) {
                     const rows = data.table.rows;
-                    // Sử dụng nhãn cột (label) nếu có, nếu không dùng id (chữ cái cột)
+                    // Lấy nhãn cột. Dùng id (chữ cái cột) nếu không có label
                     const columns = data.table.cols.map(col => col.label || col.id);
                     
                     const result = rows.map(row => {
@@ -354,6 +360,12 @@
                         });
                         return obj;
                     });
+
+                    // *** LOG ĐỂ DEBUG ***
+                    console.log("[Gviz Success]: Cột (Column Headers):", columns);
+                    console.log("[Gviz Success]: Dữ liệu hàng đầu tiên (First Row Data):", result[0]);
+                    // *** END LOG ***
+                    
                     return { columns, data: result };
                 }
                 return { error: 'Invalid Gviz data structure', data: [] };
@@ -470,7 +482,7 @@
                 const mainDataResponse = await fetchSheetData(GID_MAIN_QUOTE, queryMain);
                 
                 if (mainDataResponse.error || mainDataResponse.data.length === 0) {
-                    displayError(`Không tìm thấy Báo giá có ID: ${idBaoGia} trong sheet Báo giá.`);
+                    displayError(`Không tìm thấy Báo giá có ID: ${idBaoGia} trong sheet Báo giá. Vui lòng kiểm tra lại định dạng cột ID (Plain Text).`);
                     return;
                 }
                 
@@ -479,12 +491,13 @@
 
                 // 2. Cập nhật thông tin khách hàng và tổng kết
                 const getValue = (colIndex) => {
+                    // Lấy tên cột (label) từ chỉ mục, sau đó dùng tên cột để lấy giá trị từ dữ liệu
                     const label = mainCols[colIndex];
                     // Nếu giá trị là null, trả về chuỗi rỗng để không bị ghi đè lên DEFAULT_PLACEHOLDER ở các bước tiếp theo
                     return mainQuote[label] !== null ? mainQuote[label] : ''; 
                 };
                 
-                // Cập nhật thông tin khách hàng (Yêu cầu 2)
+                // Cập nhật thông tin khách hàng (SỬ DỤNG CÁC INDEX MỚI: 8, 9, 10)
                 document.getElementById('customerName').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_NAME) || DEFAULT_PLACEHOLDER;
                 document.getElementById('customerPhone').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_PHONE) || DEFAULT_PLACEHOLDER;
                 document.getElementById('customerAddress').innerText = getValue(COL_INDEX.MAIN_CUSTOMER_ADDRESS) || DEFAULT_PLACEHOLDER;
@@ -518,7 +531,6 @@
                 document.getElementById('amountInWords').innerText = amountInWords || 'Không có số tiền bằng chữ.';
 
                 // 3. Lấy thông tin chi tiết sản phẩm (Sheet "Báo giá CT")
-                // Truy vấn: Chọn tất cả các cột mà cột "Báo giá" (Col A, index 0, Col1) bằng IDbaogia
                 const queryDetail = `SELECT * WHERE Col${COL_INDEX.DETAIL_QUOTE_ID + 1} = '${idBaoGia}'`;
                 const detailDataResponse = await fetchSheetData(GID_QUOTE_DETAIL, queryDetail);
                 
