@@ -114,13 +114,11 @@
             Đang tải dữ liệu báo giá...
         </div>
 
-        <!-- HEADER: Thông tin công ty -->
+        <!-- HEADER: Thông tin công ty (Nội dung này sẽ được cập nhật bằng JS dựa trên cột Logo) -->
         <div class="p-4 text-center bg-gray-50 border-b-2 border-gray-200">
-            <div class="text-lg font-bold mb-1 text-gray-900" id="companyName">CÔNG TY TNHH VINACHI VIỆT NAM</div>
+            <div class="text-lg font-bold mb-1 text-gray-900" id="companyName">...</div>
             <div class="text-xs leading-snug text-gray-600" id="companyBranches">
-                <div>CS1: Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</div>
-                <div>CS2: Km8+500 Đại lộ Thăng Long, Hoài Đức, Hà Nội</div>
-                <div>CS3: Thạch Thất - Hà Nội</div>
+                <!-- Nội dung chi nhánh sẽ được chèn bằng JS -->
             </div>
         </div>
 
@@ -138,7 +136,7 @@
                 <!-- Kính gửi (Khách hàng) -->
                 <div class="flex items-center">
                     <span class="font-semibold text-gray-700 w-24 shrink-0">Kính gửi:</span>
-                    <span id="customerName" class="font-medium text-gray-900">...</span>
+                    <span id="customerName" class="font-medium text-gray-900 flex-1">...</span>
                 </div>
                 
                 <!-- Số điện thoại -->
@@ -150,7 +148,7 @@
                 <!-- Địa chỉ -->
                 <div class="flex items-center">
                     <span class="font-semibold text-gray-700 w-24 shrink-0">Địa chỉ:</span>
-                    <span id="customerAddress" class="font-medium text-gray-900">...</span>
+                    <span id="customerAddress" class="font-medium text-gray-900 flex-1">...</span>
                 </div>
                 
                 <div class="text-right font-medium text-gray-600 col-span-1 md:col-span-2 mt-2" id="quoteDate">...</div>
@@ -287,6 +285,7 @@
             MAIN_FINAL_TOTAL: 'Tổng tiền cuối',
             MAIN_AMOUNT_IN_WORDS: 'Bằng chữ',
             MAIN_SALESPERSON: 'Người lập phiếu',
+            MAIN_LOGO: 'Logo', // Đã thêm cột Logo
 
             // Sheet "Báo giá CT"
             DETAIL_QUOTE_ID: 'Báo giá',
@@ -444,7 +443,9 @@
             const idBaoGia = params.IDbaogia;
             const loadingOverlay = document.getElementById('loadingOverlay');
             
-            // Khởi tạo/Đặt lại giá trị mặc định
+            // Khởi tạo/Đặt lại giá trị mặc định cho các phần tử
+            document.getElementById('companyName').innerText = DEFAULT_PLACEHOLDER;
+            document.getElementById('companyBranches').innerHTML = DEFAULT_PLACEHOLDER;
             document.getElementById('quoteID').innerText = DEFAULT_PLACEHOLDER;
             document.getElementById('customerName').innerText = DEFAULT_PLACEHOLDER;
             document.getElementById('customerPhone').innerText = DEFAULT_PLACEHOLDER;
@@ -492,8 +493,30 @@
                 
                 const mainQuote = filteredMainQuotes[0];
 
-                // 2. Cập nhật thông tin khách hàng và tổng kết
+                // 2. Cập nhật Logo/Header công ty
                 const getValue = (colName) => mainQuote[colName] || '';
+                const logoType = getValue(COL_NAMES.MAIN_LOGO)?.toLowerCase().trim();
+
+                const companyNameEl = document.getElementById('companyName');
+                const companyBranchesEl = document.getElementById('companyBranches');
+                
+                // Nội dung chi nhánh chung
+                const commonBranches = `
+                    <div>CS1: Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</div>
+                    <div>CS2: Km8+500 Đại lộ Thăng Long, Hoài Đức, Hà Nội</div>
+                    <div>CS3: Thạch Thất - Hà Nội</div>
+                `;
+
+                if (logoType === 'duraval') {
+                    companyNameEl.innerText = 'CÔNG TY CỔ PHẦN DURAVAL VIỆT NAM';
+                    companyBranchesEl.innerHTML = commonBranches;
+                } else { // Mặc định là Vinachi hoặc bất kỳ giá trị nào khác
+                    companyNameEl.innerText = 'CÔNG TY TNHH VINACHI VIỆT NAM';
+                    companyBranchesEl.innerHTML = commonBranches;
+                }
+
+
+                // 3. Cập nhật thông tin khách hàng và tổng kết
                 
                 // Cập nhật thông tin khách hàng (SỬ DỤNG TÊN CỘT)
                 document.getElementById('customerName').innerText = getValue(COL_NAMES.MAIN_CUSTOMER_NAME) || DEFAULT_PLACEHOLDER;
@@ -518,6 +541,9 @@
                 const finalTotal = getValue(COL_NAMES.MAIN_FINAL_TOTAL);
                 const amountInWords = getValue(COL_NAMES.MAIN_AMOUNT_IN_WORDS);
                 
+                // Ghi log giá trị Tổng tiền cuối để debug
+                console.log(`[Báo giá chính] Giá trị cột '${COL_NAMES.MAIN_FINAL_TOTAL}':`, finalTotal);
+                
                 // Xử lý tỷ lệ VAT, có thể là số thập phân (0.1) hoặc % (10%)
                 let vatRateDisplay = '0.0%';
                 if (vatRateText) {
@@ -538,7 +564,7 @@
                 document.getElementById('finalTotal').innerText = formatCurrency(finalTotal);
                 document.getElementById('amountInWords').innerText = amountInWords || 'Không có số tiền bằng chữ.';
 
-                // 3. Tải và lọc thông tin chi tiết sản phẩm (Sheet "Báo giá CT")
+                // 4. Tải và lọc thông tin chi tiết sản phẩm (Sheet "Báo giá CT")
                 const detailDataResponse = await fetchSheetData(URL_QUOTE_DETAIL);
                 
                 if (detailDataResponse.error) {
