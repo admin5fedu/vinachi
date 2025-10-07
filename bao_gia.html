@@ -18,27 +18,24 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* Thay đổi nền body để làm nổi bật document-content */
-            @apply bg-gray-100 text-gray-800; 
+            /* Đã thêm min-h-screen để căn chỉnh tốt hơn */
+            @apply bg-gray-100 text-gray-800 min-h-screen; 
         }
 
         /* Vùng chứa A4 chính, đổi id là document-content để xuất PDF */
-        /* CẤU HÌNH HIỂN THỊ TRÊN MÀN HÌNH LÀ A4 DỌC */
         #document-content {
             width: 21cm; /* Chiều rộng A4 dọc */
             min-height: 29.7cm; /* Chiều cao A4 dọc */
             
-            /* Viền nổi và đổ bóng */
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); 
+            /* mx-auto giúp căn giữa Hàng ngang. Đã tăng margin my-8 để trông cân đối hơn (Fix căn giữa) */
+            @apply bg-white mx-auto my-8 overflow-hidden; 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); 
             border: 1px solid #ccc;
-            /* mx-auto giúp căn giữa nếu không dùng flex */
-            @apply bg-white mx-auto my-5 overflow-hidden; 
         }
 
-        /* Điều chỉnh cho mobile: cho phép cuộn ngang để xem hết nội dung A4 */
+        /* Điều chỉnh cho mobile */
         @media (max-width: 768px) {
             #document-content-wrapper {
-                /* Dùng justify-start và overflow-x-auto để cuộn ngang nếu màn hình hẹp */
                 @apply flex justify-start overflow-x-auto;
             }
             #document-content {
@@ -46,10 +43,9 @@
             }
         }
         
-        /* Đảm bảo khung A4 nằm giữa trên màn hình lớn */
+        /* Đảm bảo khung A4 nằm giữa trên màn hình lớn (Giữ nguyên) */
         @media (min-width: 769px) {
             #document-content-wrapper {
-                /* THÊM flex justify-center để căn giữa toàn bộ nội dung A4 trên màn hình rộng */
                 @apply flex justify-center pb-10;
             }
         }
@@ -58,25 +54,17 @@
             border: 1px solid #e2e8f0;
         }
         
-        /* Đảm bảo hình ảnh co giãn bên trong ô */
         .products-table .image-cell img {
             width: 100%;
             height: auto;
-            max-width: 60px; /* Giảm kích thước ảnh để tiết kiệm không gian */
+            max-width: 60px;
             max-height: 60px;
             object-fit: contain;
         }
         
-        /* Ẩn các nút điều khiển khi in */
-        .no-print {
-            /* Dùng utility classes thay vì CSS thuần: @apply hidden print:block */
-        }
-        
-        /* --- CẤU HÌNH IN A4 PORTRAIT (DỌC) THEO YÊU CẦU --- */
-        
-        /* Định nghĩa trang in A4 dọc */
+        /* --- CẤU HÌNH IN A4 PORTRAIT (DỌC) --- */
         @page {
-            size: A4 portrait; /* Đã chuyển sang A4 dọc */
+            size: A4 portrait;
             margin: 0;
         }
 
@@ -84,17 +72,17 @@
             .no-print {
                 display: none !important;
             }
-            /* Đã xóa .footer { display: none; } để đảm bảo footer được in */
             
-            /* Áp dụng quy tắc in cho #document-content */
             #document-content {
                 width: 100% !important;
                 height: 100% !important;
                 max-width: none !important;
                 margin: 0 !important;
-                padding: 1.5cm !important; /* Thêm padding cho nội dung in */
-                box-shadow: none !important; /* Loại bỏ box-shadow khi in */
-                border: none !important; /* Loại bỏ viền khi in */
+                /* Thêm padding cho nội dung in. Đã tăng padding-bottom để chứa footer (Fix footer missing) */
+                padding: 1.5cm !important; 
+                padding-bottom: 2.5cm !important; 
+                box-shadow: none !important;
+                border: none !important;
                 border-radius: 0 !important;
                 min-height: auto !important;
             }
@@ -103,22 +91,24 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 background: white !important;
-                /* Giữ font-size nhỏ để vừa A4 */
-                font-size: 10pt !important; 
+                font-size: 10pt !important; 
                 line-height: 1.5 !important;
                 color: black !important;
                 width: auto !important;
                 height: auto !important;
             }
             
-            /* Force exact colors for printing, primarily for black text */
+            /* Đảm bảo màu sắc in chính xác */
             * {
                 -webkit-print-color-adjust: exact !important;
                 color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                color: #000 !important;
-                font-family: 'Times New Roman', Times, serif !important;
+                /* Chỉ ép background trắng và text đen cho các phần chính */
                 background: white !important;
+            }
+            
+            body, #document-content, .products-table, .summary-table, .footer, div, span, p, h1, h2, h3, h4, th, td {
+                color: #000 !important; /* Force all text to black */
             }
 
             .products-table th, .products-table td, .summary-table td {
@@ -126,20 +116,28 @@
             }
 
             .summary-table .final-total {
+                /* Đảm bảo nền tổng tiền là trắng khi in để không bị đổ mực đen */
                 background-color: white !important;
             }
             
-            /* FIX 2: Đảm bảo bảng vừa khít khi in/xuất PDF */
+            /* FIX: Đảm bảo bảng vừa khít khi in/xuất PDF */
             #productsTable {
                 width: 100% !important;
-                min-width: unset !important; /* Xóa min-width để bảng co lại */
-                font-size: 8pt !important; /* Giảm kích thước font cho bảng */
+                min-width: unset !important;
+                font-size: 8pt !important;
             }
             #productsTable th, #productsTable td {
-                padding: 0.25rem !important; /* Giảm padding cho bảng */
+                padding: 0.25rem !important;
             }
             #productsTable .text-left {
-                 max-width: none !important; /* Bỏ giới hạn độ rộng cho cột Tên sản phẩm */
+                 max-width: none !important;
+            }
+
+            /* FIX: Đảm bảo footer luôn hiển thị */
+            .footer {
+                color: #000 !important; /* Đảm bảo text đen */
+                font-size: 9pt !important; /* Có thể giảm font size để chắc chắn nằm trong trang */
+                padding: 1rem 1.5cm !important;
             }
         }
         /* --- KẾT THÚC CẤU HÌNH IN A4 PORTRAIT --- */
@@ -147,7 +145,7 @@
 </head>
 <body>
 
-    <!-- Nút điều khiển (Định dạng chính xác theo code gốc của bạn) -->
+    <!-- Nút điều khiển -->
     <div class="flex justify-end gap-2 p-4 no-print">
         <button id="printButton"
                 class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
@@ -166,7 +164,7 @@
         </button>
     </div>
 
-    <!-- Wrapper chứa nội dung. Với màn hình lớn, CSS sẽ làm cho nó căn giữa. -->
+    <!-- Wrapper chứa nội dung. -->
     <div id="document-content-wrapper" class="pt-0 md:pt-0">
         <div id="document-content" class="a4-container">
             <!-- HEADER INFO -->
@@ -199,7 +197,7 @@
                 </div>
             </div>
             
-            <!-- PRODUCT TABLE (ĐÃ BỎ overflow-x-auto VÀ min-w-[700px]) -->
+            <!-- PRODUCT TABLE -->
             <div class="px-6 py-4">
                 <table id="productsTable" class="products-table w-full border-collapse">
                     <thead>
@@ -302,9 +300,9 @@
                 Hai triệu hai trăm ngàn đồng
             </div>
 
-            <!-- FOOTER (ĐÃ CẬP NHẬT THÔNG TIN LIÊN HỆ) -->
+            <!-- FOOTER (Kiểm tra lại CSS để đảm bảo in ra PDF - FIX) -->
             <div class="footer text-center text-sm italic text-gray-500 p-6 bg-gray-50 rounded-b-xl">
-                Mọi thông tin thắc mắc, quy khách vui lòng liên hệ theo thông tin <span id="salespersonName">Nguyễn Thị Luyến, SĐT: 0978 147 788</span> để được giải đáp.<br>
+                Mọi thông tin thắc mắc, quý khách vui lòng liên hệ theo thông tin <span id="salespersonName">Nguyễn Thị Luyến, SĐT: 0978 147 788</span> để được giải đáp.<br>
                 Trân trọng cảm ơn!
             </div>
         </div>
@@ -330,11 +328,11 @@
             loading.innerHTML = 'Đang tạo PDF, vui lòng chờ...';
             document.body.appendChild(loading);
 
-            html2canvas(input, { 
+            html2canvas(input, { 
                 scale: 2, // Tăng chất lượng hình ảnh
-                useCORS: true, 
+                useCORS: true, 
                 logging: false,
-                allowTaint: true 
+                allowTaint: true 
             }).then(canvas => {
                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
                 
@@ -358,6 +356,7 @@
                 heightLeft -= pdfHeight;
 
                 while (heightLeft >= 0) {
+                    // Cập nhật vị trí bắt đầu của ảnh trên trang mới
                     position = heightLeft - imgHeight;
                     pdf.addPage();
                     pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
@@ -390,22 +389,21 @@
             const range = XLSX.utils.decode_range(ws['!ref']);
             if (range.e.c > 0) {
                 // Vị trí cột Hình ảnh là Cột thứ 4 (index 3)
-                const imageColumnIndex = 3; 
+                const imageColumnIndex = 3; 
 
                 // Di chuyển dữ liệu của các cột sau sang trái 1 cột
                 for (let R = range.s.r; R <= range.e.r; ++R) {
-                    for (let C = imageColumnIndex; C < range.e.c; ++C) { 
+                    for (let C = imageColumnIndex; C < range.e.c; ++C) { 
                         const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
                         const nextCellAddress = XLSX.utils.encode_cell({ r: R, c: C + 1 });
                         ws[cellAddress] = ws[nextCellAddress];
                     }
                 }
                 // Điều chỉnh lại phạm vi (giảm đi 1 cột)
-                range.e.c -= 1; 
+                range.e.c -= 1; 
                 ws['!ref'] = XLSX.utils.encode_range(range);
             }
-            // Đặt lại tiêu đề cột (tùy chọn)
-
+            
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Chi Tiet San Pham");
             
