@@ -8,26 +8,46 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Thư viện để chuyển HTML sang Canvas/Hình ảnh (cho PDF) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Thư viện để tạo file PDF từ Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            @apply bg-gray-100 text-gray-800;
+            /* Thay đổi nền body để làm nổi bật document-content */
+            @apply bg-gray-100 text-gray-800; 
         }
 
-        /* Container that forces A4 size and allows scrolling on small screens */
-        .a4-container {
-            width: 21cm;
-            min-height: 29.7cm;
-            @apply bg-white shadow-xl rounded-xl mx-auto my-5 overflow-hidden;
+        /* Vùng chứa A4 chính, đổi id là document-content để xuất PDF */
+        /* CẤU HÌNH HIỂN THỊ TRÊN MÀN HÌNH LÀ A4 DỌC */
+        #document-content {
+            width: 21cm; /* Chiều rộng A4 dọc */
+            min-height: 29.7cm; /* Chiều cao A4 dọc */
+            
+            /* Viền nổi và đổ bóng */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); 
+            border: 1px solid #ccc;
+            @apply bg-white mx-auto my-5 overflow-hidden;
         }
 
-        /* Mobile styling: allow horizontal scroll to view fixed A4 content */
+        /* Điều chỉnh cho mobile: cho phép cuộn ngang để xem hết nội dung A4 */
         @media (max-width: 768px) {
-            body {
+            #document-content-wrapper {
                 @apply flex justify-start overflow-x-auto;
             }
-            .a4-container {
-                @apply mx-2 my-2 rounded-lg;
+            #document-content {
+                @apply mx-2 my-2;
+            }
+        }
+        
+        /* Đảm bảo khung A4 nằm giữa trên màn hình lớn */
+        @media (min-width: 769px) {
+            #document-content-wrapper {
+                @apply pb-10;
             }
         }
 
@@ -37,173 +57,347 @@
         
         /* Đảm bảo hình ảnh co giãn bên trong ô */
         .products-table .image-cell img {
-            width: 100%; /* Giữ chiều rộng tối đa của ô */
-            height: auto; /* Tự động điều chỉnh chiều cao để giữ tỷ lệ */
-            max-width: 80px; /* Giới hạn kích thước tối đa của ảnh */
+            width: 100%;
+            height: auto;
+            max-width: 80px;
             max-height: 80px;
+            object-fit: contain;
         }
         
+        /* Ẩn các nút điều khiển khi in */
+        .no-print {
+            /* Dùng utility classes thay vì CSS thuần: @apply hidden print:block */
+        }
+        
+        /* --- CẤU HÌNH IN A4 PORTRAIT (DỌC) THEO YÊU CẦU --- */
+        
+        /* Định nghĩa trang in A4 dọc */
+        @page {
+            size: A4 portrait; /* Đã chuyển sang A4 dọc */
+            margin: 0;
+        }
+
         @media print {
+            .no-print {
+                display: none !important;
+            }
             .footer {
                 display: none;
             }
-            .a4-container {
-                box-shadow: none;
-                margin: 0;
-                border-radius: 0;
-            }
-            body {
-                padding: 0;
-                background: white;
-                color: black;
+            
+            /* Áp dụng quy tắc in cho #document-content */
+            #document-content {
+                width: 100% !important;
+                height: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 1.5cm !important; /* Thêm padding cho nội dung in */
+                box-shadow: none !important; /* Loại bỏ box-shadow khi in */
+                border: none !important; /* Loại bỏ viền khi in */
+                border-radius: 0 !important;
+                min-height: auto !important;
             }
             
-            /* Cải thiện hiển thị khi in: Chuyển hết về nền trắng chữ đen */
-            body * {
-                background: none !important;
+            body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                /* Giữ font-size nhỏ để vừa A4 */
+                font-size: 10pt !important; 
+                line-height: 1.5 !important;
                 color: black !important;
+                width: auto !important;
+                height: auto !important;
+            }
+            
+            /* Force exact colors for printing, primarily for black text */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color: #000 !important;
+                font-family: 'Times New Roman', Times, serif !important;
+                background: white !important;
             }
 
             .products-table th, .products-table td, .summary-table td {
                 border-color: black !important;
             }
 
-            .products-table th {
-                background-color: white !important;
-            }
-
             .summary-table .final-total {
                 background-color: white !important;
             }
-            
-            /* Force exact colors for printing, primarily for black text */
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
         }
-
-        /* Set page size and margins for print */
-        @page {
-            size: A4 portrait;
-            margin: 1cm;
-        }
+        /* --- KẾT THÚC CẤU HÌNH IN A4 PORTRAIT --- */
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
-    <div class="a4-container">
-        <!-- Đã chỉnh p-8 thành p-4 và leading-relaxed thành leading-snug để giảm khoảng cách -->
-        <div class="p-4 text-center bg-gray-50 border-b-2 border-gray-200 rounded-t-xl">
-            <div class="text-lg font-bold mb-2 text-gray-900" id="companyName">CÔNG TY TNHH VINACHI VIỆT NAM</div>
-            <div class="text-xs leading-snug text-gray-600" id="companyBranches">
-                <div>CS1: Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</div>
-                <div>CS2: Km8+500 Đại lộ Thăng Long, Hoài Đức, Hà Nội</div>
-                <div>CS3: Thạch Thất - Hà Nội</div>
-            </div>
-        </div>
+<body>
 
-        <!-- Đã chỉnh p-6 thành p-4 và gap-y-3 thành gap-y-2 để giảm khoảng cách -->
-        <div class="p-4 bg-blue-50 border-b-2 border-blue-400">
-            <div class="text-xl font-bold text-center text-blue-800 mb-3">BẢNG BÁO GIÁ</div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
-                <div class="flex items-center">
-                    <span class="font-semibold text-gray-700 w-24 shrink-0">Kính gửi:</span>
-                    <span id="customerName" class="font-medium text-gray-900">Khách hàng Chị Vân Giang</span>
-                </div>
-                <div class="flex items-center">
-                    <span class="font-semibold text-gray-700 w-24 shrink-0">Số điện thoại:</span>
-                    <span id="customerPhone" class="font-medium text-gray-900">0915711288</span>
-                </div>
-                <div class="flex items-center">
-                    <span class="font-semibold text-gray-700 w-24 shrink-0">Địa chỉ:</span>
-                    <span id="customerAddress" class="font-medium text-gray-900">Toà TC2 Vinsmart</span>
-                </div>
-                <div class="text-right font-medium text-gray-600 col-span-1 md:col-span-2 mt-2" id="quoteDate">Ngày 25 tháng 08 năm 2025</div>
-            </div>
-        </div>
-        
-        <div class="px-6">
-            <table class="products-table w-full border-collapse">
-                <thead>
-                    <tr class="bg-gray-800 text-white text-sm font-semibold text-center">
-                        <th class="p-3 w-[4%]">TT</th>
-                        <th class="p-3 w-[10%]">Mã</th>
-                        <th class="p-3 w-[25%]">Tên sản phẩm</th>
-                        <th class="p-3 w-[8%]">Hình ảnh</th>
-                        <th class="p-3 w-[6%]">ĐVT</th>
-                        <th class="p-3 w-[6%]">Số lượng</th>
-                        <th class="p-3 w-[10%]">Đơn giá</th>
-                        <th class="p-3 w-[6%]">CK</th>
-                        <th class="p-3 w-[10%]">Giá sau CK</th>
-                        <th class="p-3 w-[10%]">Thành tiền</th>
-                    </tr>
-                </thead>
-                <tbody id="productTableBody" class="text-xs text-center">
-                    <!-- Product data will be inserted here by JavaScript -->
-        
-                </tbody>
-            </table>
-        </div>
+    <!-- Nút điều khiển (Định dạng chính xác theo code gốc của bạn) -->
+    <div class="flex justify-end gap-2 p-4 no-print">
+        <button id="printButton"
+                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                data-html2canvas-ignore="true" onclick="printDocument()">
+            In
+        </button>
+        <button id="downloadExcelButton"
+                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                data-html2canvas-ignore="true" onclick="downloadExcel()">
+            Xuất Excel
+        </button>
+        <button id="downloadPdfButton"
+                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                data-html2canvas-ignore="true" onclick="downloadPDF()">
+            Xuất PDF
+        </button>
+    </div>
 
-        <div class="p-6">
-            <!-- Đã thêm md:flex-row để đảm bảo layout theo hàng ngang trên các màn màn hình lớn, và flex-col trên mobile. -->
-            <div class="flex flex-col md:flex-row gap-6">
-                <div class="flex-1">
-                    <table class="summary-table w-full max-w-sm ml-auto">
-                        <tr class="border-b border-gray-300">
-                            <td class="p-2 font-semibold text-gray-700">TỔNG ĐH</td>
-                            <td class="p-2 text-right font-bold text-gray-900" id="totalOrder">16.941.000</td>
-                        </tr>
-                        <tr class="border-b border-gray-300">
-                            <td class="p-2 font-semibold text-gray-700" id="vatRate">VAT (0,0%)</td>
-                            <td class="p-2 text-right font-bold text-gray-900" id="vatAmount">0</td>
-                        </tr>
-                        <tr class="border-b border-gray-300">
-                            <td class="p-2 font-semibold text-gray-700">Chi phí khác</td>
-                            <td class="p-2 text-right font-bold text-gray-900" id="otherCosts">0</td>
-                        </tr>
-                        <tr class="border-b border-gray-300">
-                            <td class="p-2 font-semibold text-gray-700">Giảm giá khác</td>
-                            <td class="p-2 text-right font-bold text-gray-900" id="otherDiscounts">0</td>
-                        </tr>
-                        <tr class="final-total bg-gray-800 text-white text-lg font-bold">
-                            <td class="p-3">TỔNG TIỀN</td>
-                            <td class="p-3 text-right" id="finalTotal">16.941.000</td>
-                        </tr>
-                    </table>
+    <!-- Wrapper chứa nội dung (Bỏ padding-top vì nút không còn fixed) -->
+    <div id="document-content-wrapper" class="pt-0 md:pt-0">
+        <div id="document-content" class="a4-container">
+            <!-- HEADER INFO -->
+            <div class="p-4 text-center bg-gray-50 border-b-2 border-gray-200 rounded-t-xl">
+                <div class="text-lg font-bold mb-2 text-gray-900" id="companyName">CÔNG TY TNHH VINACHI VIỆT NAM</div>
+                <div class="text-xs leading-snug text-gray-600" id="companyBranches">
+                    <div>CS1: Kim Thiều - Hương Mạc - Từ Sơn - Bắc Ninh</div>
+                    <div>CS2: Km8+500 Đại lộ Thăng Long, Hoài Đức, Hà Nội</div>
+                    <div>CS3: Thạch Thất - Hà Nội</div>
                 </div>
-                
-                <!-- Thay đổi flex-col gap-4 thành flex-row flex-1 và thêm flex-wrap để tránh xuống dòng -->
-                <div class="flex flex-row flex-1 flex-wrap gap-4">
-                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                        <div class="font-bold text-gray-800 mb-1">Tài khoản cá nhân</div>
-                        <div class="text-sm text-gray-600 leading-relaxed">
-                            STK: 09844434099<br>
-                            Ngân hàng: TP Bank<br>
-                            Chủ TK: VU THI HOA
+            </div>
+
+            <!-- QUOTE DETAILS -->
+            <div class="p-4 bg-blue-50 border-b-2 border-blue-400">
+                <div class="text-xl font-bold text-center text-blue-800 mb-3">BẢNG BÁO GIÁ</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                    <div class="flex items-center">
+                        <span class="font-semibold text-gray-700 w-24 shrink-0">Kính gửi:</span>
+                        <span id="customerName" class="font-medium text-gray-900">Khách hàng Chị Vân Giang</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-semibold text-gray-700 w-24 shrink-0">Số điện thoại:</span>
+                        <span id="customerPhone" class="font-medium text-gray-900">0915711288</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-semibold text-gray-700 w-24 shrink-0">Địa chỉ:</span>
+                        <span id="customerAddress" class="font-medium text-gray-900">Toà TC2 Vinsmart</span>
+                    </div>
+                    <div class="text-right font-medium text-gray-600 col-span-1 md:col-span-2 mt-2" id="quoteDate">Ngày 25 tháng 08 năm 2025</div>
+                </div>
+            </div>
+            
+            <!-- PRODUCT TABLE -->
+            <div class="px-6 py-4 overflow-x-auto">
+                <table id="productsTable" class="products-table w-full border-collapse min-w-[700px]"> <!-- Thêm min-w để giữ độ rộng khi xuất Excel/PDF -->
+                    <thead>
+                        <tr class="bg-gray-800 text-white text-sm font-semibold text-center">
+                            <th class="p-3 w-[4%]">TT</th>
+                            <th class="p-3 w-[10%]">Mã</th>
+                            <th class="p-3 w-[25%]">Tên sản phẩm</th>
+                            <th class="p-3 w-[8%]">Hình ảnh</th>
+                            <th class="p-3 w-[6%]">ĐVT</th>
+                            <th class="p-3 w-[6%]">Số lượng</th>
+                            <th class="p-3 w-[10%]">Đơn giá</th>
+                            <th class="p-3 w-[6%]">CK</th>
+                            <th class="p-3 w-[10%]">Giá sau CK</th>
+                            <th class="p-3 w-[10%]">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody" class="text-xs text-center">
+                        <!-- Dữ liệu mẫu ban đầu để đảm bảo bảng không trống -->
+                        <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                            <td class="p-3">1</td>
+                            <td class="p-3">VNC-001</td>
+                            <td class="p-3 text-left font-medium max-w-[200px]">Thanh nẹp inox 304 chữ V, màu vàng gương</td>
+                            <td class="p-3 image-cell"><div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Không có ảnh</div></td>
+                            <td class="p-3">mét</td>
+                            <td class="p-3">10</td>
+                            <td class="p-3 font-semibold text-green-600">85.000</td>
+                            <td class="p-3">0%</td>
+                            <td class="p-3 font-semibold text-green-600">85.000</td>
+                            <td class="p-3 font-bold text-red-600">850.000</td>
+                        </tr>
+                        <tr class="odd:bg-gray-50 even:bg-white hover:bg-blue-50 transition-colors duration-200">
+                            <td class="p-3">2</td>
+                            <td class="p-3">VNC-002</td>
+                            <td class="p-3 text-left font-medium max-w-[200px]">Ke góc 90 độ mạ Chrome, kích thước 40mm</td>
+                            <td class="p-3 image-cell"><img src="https://placehold.co/64x64/E5E7EB/9CA3AF?text=Móc+treo" alt="Hình ảnh sản phẩm" class="object-cover rounded-md mx-auto" onerror="this.src='https://placehold.co/64x64/E5E7EB/9CA3AF?text=Ảnh+lỗi';"></td>
+                            <td class="p-3">cái</td>
+                            <td class="p-3">50</td>
+                            <td class="p-3 font-semibold text-green-600">30.000</td>
+                            <td class="p-3">10%</td>
+                            <td class="p-3 font-semibold text-green-600">27.000</td>
+                            <td class="p-3 font-bold text-red-600">1.350.000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SUMMARY AND BANK INFO -->
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Summary Table -->
+                    <div class="flex-1">
+                        <table class="summary-table w-full max-w-sm ml-auto">
+                            <tr class="border-b border-gray-300">
+                                <td class="p-2 font-semibold text-gray-700">TỔNG ĐH</td>
+                                <td class="p-2 text-right font-bold text-gray-900" id="totalOrder">2.200.000</td>
+                            </tr>
+                            <tr class="border-b border-gray-300">
+                                <td class="p-2 font-semibold text-gray-700" id="vatRate">VAT (0,0%)</td>
+                                <td class="p-2 text-right font-bold text-gray-900" id="vatAmount">0</td>
+                            </tr>
+                            <tr class="border-b border-gray-300">
+                                <td class="p-2 font-semibold text-gray-700">Chi phí khác</td>
+                                <td class="p-2 text-right font-bold text-gray-900" id="otherCosts">0</td>
+                            </tr>
+                            <tr class="border-b border-gray-300">
+                                <td class="p-2 font-semibold text-gray-700">Giảm giá khác</td>
+                                <td class="p-2 text-right font-bold text-gray-900" id="otherDiscounts">0</td>
+                            </tr>
+                            <tr class="final-total bg-gray-800 text-white text-lg font-bold">
+                                <td class="p-3">TỔNG TIỀN</td>
+                                <td class="p-3 text-right" id="finalTotal">2.200.000</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Bank Info -->
+                    <div class="flex flex-row flex-1 flex-wrap gap-4">
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                            <div class="font-bold text-gray-800 mb-1">Tài khoản cá nhân</div>
+                            <div class="text-sm text-gray-600 leading-relaxed">
+                                STK: 09844434099<br>
+                                Ngân hàng: TP Bank<br>
+                                Chủ TK: VU THI HOA
+                            </div>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                            <div class="font-bold text-gray-800 mb-1">Tài khoản công ty</div>
+                            <div class="text-sm text-gray-600 leading-relaxed">
+                                STK: 119002673143<br>
+                                Ngân hàng: Vietinbank - KCN Tiên Sơn - Bắc Ninh<br>
+                                Chủ TK: CONG TY TNHH VINACHI VIET NAM
+                            </div>
                         </div>
                     </div>
-                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                        <div class="font-bold text-gray-800 mb-1">Tài khoản công ty</div>
-                        <div class="text-sm text-gray-600 leading-relaxed">
-                            STK: 119002673143<br>
-                            Ngân hàng: Vietinbank - KCN Tiên Sơn - Bắc Ninh<br>
-                            Chủ TK: CONG TY TNHH VINACHI VIET NAM
-                        </div>
-                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="amount-words bg-blue-600 text-white font-bold p-4 text-center rounded-lg mx-6 my-4" id="amountInWords">
-            Mười sáu triệu chín trăm bốn mươi mốt ngàn đồng
-        </div>
+            <!-- AMOUNT IN WORDS -->
+            <div class="amount-words bg-blue-600 text-white font-bold p-4 text-center rounded-lg mx-6 my-4" id="amountInWords">
+                Hai triệu hai trăm ngàn đồng
+            </div>
 
-        <div class="footer text-center text-sm italic text-gray-500 p-6 bg-gray-50 rounded-b-xl">
-            Mọi thông tin thắc mắc, quy khách vui lòng liên hệ theo thông tin <span id="salespersonName">Nguyễn Thị Hiền</span> để được giải đáp.<br>
-            Trân trọng cảm ơn!
+            <!-- FOOTER -->
+            <div class="footer text-center text-sm italic text-gray-500 p-6 bg-gray-50 rounded-b-xl">
+                Mọi thông tin thắc mắc, quy khách vui lòng liên hệ theo thông tin <span id="salespersonName">Nguyễn Thị Hiền</span> để được giải đáp.<br>
+                Trân trọng cảm ơn!
+            </div>
         </div>
     </div>
 
     <script>
+        // --- CHỨC NĂNG XUẤT FILE ---
+
+        // Hàm in tài liệu
+        function printDocument() {
+            window.print();
+        }
+
+        // Hàm xuất tài liệu ra file PDF (ĐÃ CHUYỂN SANG A4 DỌC)
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const input = document.getElementById('document-content');
+
+            // Hiển thị thông báo đang tải (Tạo một div overlay)
+            const loading = document.createElement('div');
+            loading.id = 'loading-overlay';
+            loading.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-xl z-[9999]';
+            loading.innerHTML = 'Đang tạo PDF, vui lòng chờ...';
+            document.body.appendChild(loading);
+
+            html2canvas(input, { 
+                scale: 2, // Tăng chất lượng hình ảnh
+                useCORS: true, 
+                logging: false,
+                allowTaint: true 
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                
+                // Định dạng A4 Portrait (DỌC)
+                const pdf = new jsPDF({
+                    orientation: 'portrait', // Đặt chế độ dọc
+                    unit: 'mm',
+                    format: 'a4' // Đặt khổ A4
+                });
+                
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                // Tính toán chiều cao hình ảnh để giữ tỷ lệ
+                const imgHeight = canvas.height * pdfWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                // Thêm trang mới nếu nội dung dài hơn 1 trang A4
+                pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
+                    heightLeft -= pdfHeight;
+                }
+                
+                pdf.save('bang_bao_gia_vinachi_A4.pdf');
+                
+                // Xóa thông báo tải
+                document.body.removeChild(loading);
+            }).catch(error => {
+                console.error("Lỗi khi tạo PDF:", error);
+                // Xóa thông báo tải nếu có lỗi
+                const loadingElement = document.getElementById('loading-overlay');
+                if(loadingElement) document.body.removeChild(loadingElement);
+            });
+        }
+
+        // Hàm xuất ra file Excel (Chỉ xuất bảng sản phẩm chi tiết)
+        function downloadExcel() {
+            const table = document.getElementById('productsTable');
+            if (!table) {
+                console.error("Không tìm thấy bảng sản phẩm.");
+                return;
+            }
+
+            const ws = XLSX.utils.table_to_sheet(table, { raw: true });
+            
+            // Xóa cột Hình ảnh trong Excel
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            if (range.e.c > 0) {
+                // Di chuyển cột
+                for (let R = range.s.r; R <= range.e.r; ++R) {
+                    for (let C = 3; C < range.e.c; ++C) { // Cột thứ 4 (index 3) là Hình ảnh
+                        const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+                        const nextCellAddress = XLSX.utils.encode_cell({ r: R, c: C + 1 });
+                        ws[cellAddress] = ws[nextCellAddress];
+                    }
+                }
+                // Điều chỉnh lại phạm vi
+                range.e.c -= 1; 
+                ws['!ref'] = XLSX.utils.encode_range(range);
+            }
+            // Đặt lại tiêu đề cột (tùy chọn)
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Chi Tiet San Pham");
+            
+            const filename = 'bang_bao_gia_' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '.xlsx';
+            XLSX.writeFile(wb, filename);
+        }
+        
+        // --- CÁC HÀM XỬ LÝ DỮ LIỆU CŨ (GIỮ NGUYÊN) ---
+
         // Function to get query parameters from the URL
         function getQueryParams() {
             const params = {};
@@ -373,7 +567,7 @@
 
         // Helper function to create an image tag with a fallback
         function createImageTag(url) {
-            if (!url || !url.trim()) {
+            if (!url || !url.trim() || url.toLowerCase().includes('no-image')) {
                 // If no URL is provided, return a placeholder
                 return `<div class="bg-gray-200 p-2 rounded text-center text-[11px] text-gray-500">Không có ảnh</div>`;
             }
@@ -382,7 +576,9 @@
 
         // Helper function to format currency with dots
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('vi-VN').format(Math.round(amount));
+            const numericAmount = parseFloat(String(amount).replace(/[^0-9.]/g, ''));
+            if (isNaN(numericAmount)) return '0';
+            return new Intl.NumberFormat('vi-VN').format(Math.round(numericAmount));
         }
 
         // Run the update function when the page loads
