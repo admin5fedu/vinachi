@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quyết định Thay đổi vị trí chức vụ làm việc</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện html2pdf.js cho chức năng Xuất PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        /* Định dạng chung cho tài liệu và khung A4 */
+        .document-container {
+            /* Kích thước khổ A4 (210mm x 297mm) */
+            width: 210mm;
+            /* Chiều cao được đặt là min-height để nội dung dài hơn 1 trang vẫn cuộn được */
+            min-height: 297mm; 
+            max-width: 210mm; 
+            margin: 2rem auto; /* Căn giữa màn hình */
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Bóng nhẹ */
+            font-family: 'Inter', sans-serif;
+            font-size: 13px; 
+            /* ĐÃ GIẢM DÃN DÒNG (LINE HEIGHT) TỔNG THỂ */
+            line-height: 1.4; 
+            
+            /* LỀ: TRÊN/PHẢI/DƯỚI 1CM (10MM), TRÁI 1.5CM (15MM) */
+            padding: 10mm 10mm 10mm 15mm; 
+            box-sizing: border-box; 
+        }
+
+        /* Định dạng cho các trường dữ liệu động */
+        .placeholder-field {
+            color: #ef4444; /* Màu đỏ */
+            font-weight: 600;
+            border-bottom: 1px dashed #fca5a5;
+            padding: 0 4px;
+            white-space: nowrap; /* Ngăn ngừa ngắt dòng trong thẻ span */
+        }
+        
+        /* Điều chỉnh lại cỡ chữ cho các tiêu đề chính */
+        .header-text-large {
+            font-size: 15px; 
+        }
+        
+        .header-title-main {
+            font-size: 22px; 
+        }
+
+        .header-title-sub {
+            font-size: 17px; 
+        }
+
+        /* Định dạng in ấn */
+        @media print {
+            body {
+                background-color: white !important;
+                margin: 0 !important;
+            }
+            .document-container {
+                width: 210mm !important;
+                min-height: 297mm !important; 
+                margin: 0 !important;
+                box-shadow: none !important;
+                padding: 10mm 10mm 10mm 15mm !important; 
+                font-size: 12pt; 
+            }
+            /* Ẩn thanh nút chức năng khi in */
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+
+        /**
+         * Hàm lấy giá trị từ URL Query Parameters
+         * @returns {Object} Một đối tượng chứa các key-value của query params.
+         */
+        const getUrlParams = () => {
+            const params = {};
+            const searchParams = new URLSearchParams(window.location.search);
+            for (const [key, value] of searchParams) {
+                params[key] = decodeURIComponent(value);
+            }
+            return params;
+        };
+
+        /**
+         * Hàm thiết lập thương hiệu công ty dựa trên tham số 'tenCongTy' từ URL.
+         * Nếu 'tenCongTy' là 'Duraval', đổi tên công ty. Mặc định là Vinachi.
+         */
+        const setCompanyBranding = () => {
+            const urlParams = getUrlParams();
+            // Lấy tham số tenCongTy, mặc định là 'Vinachi'
+            const companyKey = (urlParams['tenCongTy'] || 'Vinachi').toLowerCase(); 
+
+            let fullCompanyName;
+            let directorTitle;
+            let signerTitle;
+
+            if (companyKey === 'duraval') {
+                fullCompanyName = "CÔNG TY CỔ PHẦN DURAVAL VIỆT NAM";
+                directorTitle = "GIÁM ĐỐC CÔNG TY CỔ PHẦN DURAVAL VIỆT NAM";
+                signerTitle = "TM CÔNG TY CỔ PHẦN DURAVAL VIỆT NAM";
+            } else { // Default: Vinachi
+                fullCompanyName = "CÔNG TY TNHH VINACHI VIỆT NAM";
+                directorTitle = "GIÁM ĐỐC CÔNG TY TNHH VINACHI VIỆT NAM";
+                signerTitle = "TM CÔNG TY TNHH VINACHI VIỆT NAM";
+            }
+
+            // Cập nhật các vị trí trong tài liệu
+            const headerEl = document.getElementById('company-header');
+            if (headerEl) headerEl.textContent = fullCompanyName;
+
+            const directorEl = document.getElementById('director-title');
+            if (directorEl) directorEl.textContent = directorTitle;
+
+            const signerEl = document.getElementById('signer-title');
+            if (signerEl) signerEl.textContent = signerTitle;
+        };
+        
+        /**
+         * Hàm thay thế các placeholder bằng giá trị từ URL.
+         */
+        const fillDocument = () => {
+            const urlParams = getUrlParams();
+            const placeholders = document.querySelectorAll('.placeholder-field');
+
+            placeholders.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (key && urlParams[key]) {
+                    element.textContent = urlParams[key];
+                    element.classList.remove('text-red-500', 'border-b', 'border-red-300');
+                    element.classList.add('text-gray-900', 'font-normal');
+                    element.style.borderBottom = 'none'; 
+                }
+            });
+        };
+
+        /**
+         * Hàm In tài liệu
+         */
+        const printDocument = () => {
+            window.print();
+        };
+
+        /**
+         * Hàm Xuất PDF sử dụng html2pdf.js
+         */
+        const downloadPDF = () => {
+            const element = document.getElementById('document-content');
+            // Cấu hình để xuất ra khổ A4
+            html2pdf(element, {
+                margin: 10, 
+                filename: 'Quyet_dinh_thay_doi_chuc_vu.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, logging: false, dpi: 192, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            });
+        };
+
+        /**
+         * Hàm Xuất Excel (dữ liệu động)
+         */
+        const downloadExcel = () => {
+            const placeholders = document.querySelectorAll('.placeholder-field');
+            let csvContent = "Ten_Bien,Gia_Tri\n";
+
+            placeholders.forEach(element => {
+                const key = element.getAttribute('data-key');
+                const value = element.textContent.trim();
+                if (key && value) {
+                    csvContent += `"${key}","${value.replace(/"/g, '""')}"\n`;
+                }
+            });
+
+            // Tạo Blob và link tải về
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) { 
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "Du_lieu_QD_thay_doi_chuc_vu.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        };
+
+
+        // Chạy hàm điền dữ liệu và kiểm tra tự động in khi tài liệu được tải xong
+        window.onload = () => {
+            setCompanyBranding(); // CHẠY ĐẦU TIÊN: Thiết lập tên công ty
+            fillDocument();
+
+            // Kiểm tra tham số 'print' để tự động in
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('print')) {
+                // Sử dụng setTimeout để đảm bảo render xong trước khi in
+                setTimeout(printDocument, 500); 
+            }
+        };
+
+    </script>
+</head>
+<body class="bg-gray-100 p-4">
+
+    <!-- THANH NÚT CHỨC NĂNG (Góc trên bên phải, định dạng theo yêu cầu) -->
+    <div class="flex justify-end gap-3 p-4 no-print sticky top-0 right-0 z-50">
+        <!-- Nút In (Màu xám) -->
+        <button id="printButton"
+                class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-150"
+                data-html2canvas-ignore="true" onclick="printDocument()">
+            In
+        </button>
+        <!-- Nút Xuất Excel (Màu xanh lá) -->
+        <button id="downloadExcelButton"
+                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-150"
+                data-html2canvas-ignore="true" onclick="downloadExcel()">
+            Xuất Excel
+        </button>
+        <!-- Nút Xuất PDF (Màu xanh dương) -->
+        <button id="downloadPdfButton"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-150"
+                data-html2canvas-ignore="true" onclick="downloadPDF()">
+            Xuất PDF
+        </button>
+    </div>
+
+    <!-- KHUNG TÀI LIỆU A4 CHÍNH -->
+    <div id="document-content" class="document-container text-gray-800">
+
+        <!-- HEADER - CỘNG HÒA XÃ HỘI & CÔNG TY -->
+        <div class="grid grid-cols-2 gap-4 text-center pb-6 border-b border-gray-300">
+            <div>
+                <!-- Tên Công ty -->
+                <p id="company-header" class="font-bold uppercase header-text-large">CÔNG TY TNHH VINACHI VIỆT NAM</p>
+            </div>
+            <!-- CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM (Dãn dòng đã được co lại qua leading-tight) -->
+            <div class="text-center flex flex-col items-center leading-tight">
+                <p class="font-bold uppercase header-text-large m-0 p-0">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+                <p class="font-bold border-b border-gray-800 inline-block m-0 p-0">Độc lập – Tự do – Hạnh phúc</p>
+            </div>
+        </div>
+
+        <!-- SỐ & ĐỊA ĐIỂM NGÀY THÁNG -->
+        <div class="flex justify-between pt-4 italic">
+             <p class="text-left">Số: <span class="placeholder-field ml-2" data-key="maPhieu">[Mã phiếu]</span></p>
+            <p class="text-right">Bắc Ninh, ngày <span class="placeholder-field" data-key="ngayTao">[TG tạo: Ngày]</span> tháng <span class="placeholder-field" data-key="thangTao">[TG tạo: Tháng]</span> Năm <span class="placeholder-field" data-key="namTao">[TG tạo: Năm]</span></p>
+        </div>
+        
+        <!-- TIÊU ĐỀ CHÍNH -->
+        <div class="text-center pt-6"> 
+            <h1 class="font-black uppercase header-title-main">QUYẾT ĐỊNH</h1>
+            <!-- CẬP NHẬT TIÊU ĐỀ CON -->
+            <p class="font-semibold pt-0 header-title-sub italic">(V/v: Thay đổi vị trí chức vụ làm việc)</p> 
+            <!-- Tên Giám đốc Công ty -->
+            <p id="director-title" class="font-bold uppercase pt-3">GIÁM ĐỐC CÔNG TY TNHH VINACHI VIỆT NAM</p> 
+        </div>
+
+        <!-- CĂN CỨ (Toàn bộ in nghiêng) - CẬP NHẬT NỘI DUNG CĂN CỨ -->
+        <div class="pt-6 italic"> 
+            <p class="mb-1">- Căn cứ vào quy định, quy chế, điều lệ hoạt động tổ chức công ty;</p> 
+            <p class="mb-1">- Căn cứ vào tình hình hoạt động, định hướng chiến lược phát triển;</p> 
+            <p class="mb-1">- Căn cứ vào chức năng, quyền hạn Ban giám đốc công ty;</p> 
+            <p>- Căn cứ vào năng lực và trình độ của nhân viên <span class="placeholder-field" data-key="hoTenDayDu">[Mã NV. Họ và tên]</span>.</p>
+        </div>
+
+        <!-- NỘI DUNG QUYẾT ĐỊNH -->
+        <div class="pt-6"> 
+            <h2 class="font-bold uppercase text-lg text-center mb-4">QUYẾT ĐỊNH</h2> 
+
+            <!-- ĐIỀU 1 - CẬP NHẬT NỘI DUNG THAY ĐỔI VỊ TRÍ -->
+            <p class="font-bold"><span class="mr-2">Điều 1:</span> <span class="placeholder-field" data-key="loai">[Loại: Ông/Bà]</span> Ông(Bà) <span class="placeholder-field" data-key="hoTenDayDu">[Mã NV. Họ và tên]</span> (Mã nhân viên: <span class="placeholder-field" data-key="maNhanVien">[Mã nhân viên]</span>)</p>
+            <div class="ml-6 mt-1 space-y-0.5"> 
+                <p>Sinh ngày: <span class="placeholder-field" data-key="ngaySinh">[Mã NV. Ngày sinh]</span></p>
+                <p>Hiện đang đảm nhận chức vụ: <span class="placeholder-field" data-key="chucVuTruocDoi">[Chức vụ trước thay đổi]</span> thuộc phòng: <span class="placeholder-field" data-key="phongBanTruocDoi">[Phòng ban trước thay đổi]</span>.</p>
+                <p>Nay đảm nhiệm vị trí: <span class="placeholder-field" data-key="chucVu">[Chức vụ sau thay đổi]</span> thuộc phòng ban: <span class="placeholder-field" data-key="phongBan">[Mã NV. Tên sơ đồ phòng ban]</span> của Công ty TNHH Vinachi kể từ ngày <span class="placeholder-field" data-key="ngayHieuLuc">[Ngày hiệu lực]</span>.</p>
+            </div>
+
+            <!-- ĐIỀU 2 - CẬP NHẬT QUYỀN LỢI -->
+            <p class="mt-3"><span class="font-bold mr-2">Điều 2:</span> Ông (bà) <span class="placeholder-field" data-key="hoTenDayDu">[Mã NV. Họ và tên]</span> được hưởng mọi quyền lợi, chính sách theo quy định của công ty, mức hưởng được áp dụng theo Cơ chế, chính sách ở vị trí mới kể từ ngày quyết định có hiệu lực.</p> 
+
+            <!-- ĐIỀU 3 - CẬP NHẬT TRÁCH NHIỆM -->
+            <p class="mt-3"><span class="font-bold mr-2">Điều 3:</span> Ông(Bà) <span class="placeholder-field" data-key="hoTenDayDu">[Mã NV. Họ và tên]</span> có trách nhiệm và nghĩa vụ thực hiện các công việc theo bản mô tả công việc liên quan tới chức năng – nhiệm vụ theo sự phân công của người quản lý trực tiếp và Ban lãnh đạo công ty.</p> 
+
+            <!-- ĐIỀU 4 - CẬP NHẬT TRÁCH NHIỆM THI HÀNH -->
+            <p class="mt-3"><span class="font-bold mr-2">Điều 4:</span> Phòng HCNS, các Phòng ban chức năng và Ông(Bà) <span class="placeholder-field" data-key="hoTenDayDu">[Mã NV. Họ và tên]</span> thuộc Công ty Vinachi chịu trách nhiệm thi hành quyết định này.</p> 
+
+            <!-- ĐIỀU 5 (MỚI) -->
+            <p class="font-bold mt-3"><span class="mr-2">Điều 5:</span> Quyết định có hiệu lực kể từ ngày ký./.</p> 
+
+            <p class="italic text-right mt-4 hidden">Quyết định này có hiệu lực từ ngày ký./.</p> <!-- Ẩn dòng cũ -->
+        </div>
+
+        <!-- NƠI NHẬN & CHỮ KÝ -->
+        <div class="mt-8 grid grid-cols-2"> 
+            <!-- NƠI NHẬN (Toàn bộ in nghiêng) -->
+            <div>
+                <p class="font-bold underline mb-1">Nơi nhận:</p> 
+                <!-- Cập nhật Nơi nhận theo file mới -->
+                <ul class="list-disc ml-4 space-y-0.5 italic"> 
+                    <li>Ban giám đốc (Để báo cáo);</li>
+                    <li>Các phòng ban (Để thực hiện);</li>
+                    <li><span class="placeholder-field" data-key="hoTenDayDu">[Mã NV. Họ và tên]</span> (Để thực hiện);</li>
+                    <li>Lưu văn thư (Để quản lý).</li>
+                </ul>
+            </div>
+
+            <!-- CHỮ KÝ - CẬP NHẬT CHỨC DANH KÝ -->
+            <div class="text-center">
+                <!-- Chữ ký Công ty -->
+                <p class="font-bold uppercase">TM GIÁM ĐỐC</p>
+                <p id="signer-title" class="font-bold uppercase">CÔNG TY TNHH VINACHI VIỆT NAM</p>
+                <p class="italic mt-14">(Ký, đóng dấu)</p> 
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
