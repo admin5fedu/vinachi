@@ -1,1 +1,294 @@
-z
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quyết định Chấm dứt Hợp đồng Lao động</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện html2pdf.js cho chức năng Xuất PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        /* Định dạng chung cho tài liệu và khung A4 */
+        .document-container {
+            /* Kích thước khổ A4 (210mm x 297mm) */
+            width: 210mm;
+            /* Chiều cao được đặt là min-height để nội dung dài hơn 1 trang vẫn cuộn được */
+            min-height: 297mm; 
+            max-width: 210mm; 
+            margin: 2rem auto; /* Căn giữa màn hình */
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Bóng nhẹ */
+            font-family: 'Inter', sans-serif;
+            font-size: 14px; 
+            line-height: 1.5;
+            
+            /* THIẾT LẬP LỀ 2CM (20mm) MỖI BÊN */
+            padding: 20mm; 
+            box-sizing: border-box; /* Quan trọng để padding không làm tăng kích thước A4 */
+            /* Loại bỏ overflow: hidden để nội dung có thể dài hơn 1 trang A4 */
+        }
+
+        /* Định dạng cho các trường dữ liệu động */
+        .placeholder-field {
+            color: #ef4444; /* Màu đỏ */
+            font-weight: 600;
+            border-bottom: 1px dashed #fca5a5;
+            padding: 0 4px;
+            white-space: nowrap; /* Ngăn ngừa ngắt dòng trong thẻ span */
+        }
+        
+        /* Điều chỉnh lại cỡ chữ cho các tiêu đề chính */
+        .header-text-large {
+            font-size: 16px; 
+        }
+        
+        .header-title-main {
+            font-size: 24px; 
+        }
+
+        .header-title-sub {
+            font-size: 18px; 
+        }
+
+        /* Định dạng in ấn */
+        @media print {
+            body {
+                background-color: white !important;
+                margin: 0 !important;
+            }
+            .document-container {
+                /* Thiết lập lại để đảm bảo in đúng lề, không bị margin của trình duyệt */
+                width: 210mm !important;
+                min-height: 297mm !important; /* Dùng min-height khi in */
+                margin: 0 !important;
+                box-shadow: none !important;
+                padding: 20mm !important; 
+                font-size: 13pt; 
+            }
+            /* Ẩn thanh nút chức năng khi in */
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+
+        /**
+         * Hàm lấy giá trị từ URL Query Parameters
+         * @returns {Object} Một đối tượng chứa các key-value của query params.
+         */
+        const getUrlParams = () => {
+            const params = {};
+            const searchParams = new URLSearchParams(window.location.search);
+            for (const [key, value] of searchParams) {
+                params[key] = decodeURIComponent(value);
+            }
+            return params;
+        };
+
+        /**
+         * Hàm thay thế các placeholder bằng giá trị từ URL.
+         */
+        const fillDocument = () => {
+            const urlParams = getUrlParams();
+            const placeholders = document.querySelectorAll('.placeholder-field');
+
+            placeholders.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (key && urlParams[key]) {
+                    element.textContent = urlParams[key];
+                    element.classList.remove('text-red-500', 'border-b', 'border-red-300');
+                    element.classList.add('text-gray-900', 'font-normal');
+                    element.style.borderBottom = 'none'; 
+                }
+            });
+        };
+
+        /**
+         * Hàm In tài liệu
+         */
+        const printDocument = () => {
+            window.print();
+        };
+
+        /**
+         * Hàm Xuất PDF sử dụng html2pdf.js
+         */
+        const downloadPDF = () => {
+            const element = document.getElementById('document-content');
+            // Cấu hình để xuất ra khổ A4
+            html2pdf(element, {
+                margin: 10, 
+                filename: 'Quyet_dinh_cham_dut_HDLD.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, logging: false, dpi: 192, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            });
+        };
+
+        /**
+         * Hàm Xuất Excel (dữ liệu động)
+         */
+        const downloadExcel = () => {
+            const placeholders = document.querySelectorAll('.placeholder-field');
+            let csvContent = "Ten_Bien,Gia_Tri\n";
+
+            placeholders.forEach(element => {
+                const key = element.getAttribute('data-key');
+                const value = element.textContent.trim();
+                if (key && value) {
+                    csvContent += `"${key}","${value.replace(/"/g, '""')}"\n`;
+                }
+            });
+
+            // Tạo Blob và link tải về
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) { 
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "Du_lieu_QD_cham_dut_HDLD.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        };
+
+
+        // Chạy hàm điền dữ liệu và kiểm tra tự động in khi tài liệu được tải xong
+        window.onload = () => {
+            fillDocument();
+
+            // Kiểm tra tham số 'print' để tự động in
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('print')) {
+                // Sử dụng setTimeout để đảm bảo render xong trước khi in
+                setTimeout(printDocument, 500); 
+            }
+        };
+
+    </script>
+</head>
+<body class="bg-gray-100 p-4">
+
+    <!-- THANH NÚT CHỨC NĂNG (Góc trên bên phải, định dạng theo yêu cầu) -->
+    <div class="flex justify-end gap-3 p-4 no-print sticky top-0 right-0 z-50">
+        <!-- Nút In (Màu xám) -->
+        <button id="printButton"
+                class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-150"
+                data-html2canvas-ignore="true" onclick="printDocument()">
+            In
+        </button>
+        <!-- Nút Xuất Excel (Màu xanh lá) -->
+        <button id="downloadExcelButton"
+                class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-150"
+                data-html2canvas-ignore="true" onclick="downloadExcel()">
+            Xuất Excel
+        </button>
+        <!-- Nút Xuất PDF (Màu xanh dương) -->
+        <button id="downloadPdfButton"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded shadow-md transition duration-150"
+                data-html2canvas-ignore="true" onclick="downloadPDF()">
+            Xuất PDF
+        </button>
+    </div>
+
+    <!-- KHUNG TÀI LIỆU A4 CHÍNH -->
+    <div id="document-content" class="document-container text-gray-800">
+
+        <!-- HEADER - CỘNG HÒA XÃ HỘI & CÔNG TY -->
+        <div class="grid grid-cols-2 gap-4 text-center pb-6 border-b border-gray-300">
+            <div>
+                <p class="font-bold uppercase header-text-large">CÔNG TY TNHH VINACHI VIỆT NAM</p>
+            </div>
+            <div>
+                <p class="font-bold uppercase header-text-large">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</p>
+                <p class="font-bold border-b border-gray-800 inline-block">Độc lập – Tự do – Hạnh phúc</p>
+            </div>
+        </div>
+
+        <!-- SỐ & ĐỊA ĐIỂM NGÀY THÁNG -->
+        <div class="flex justify-between pt-4 italic">
+             <p class="text-left">Số: <span class="placeholder-field ml-2" data-key="maPhieu">[Mã phiếu]</span></p>
+            <p class="text-right">Bắc Ninh, ngày <span class="placeholder-field" data-key="ngayTao">[TG tạo: Ngày]</span> tháng <span class="placeholder-field" data-key="thangTao">[TG tạo: Tháng]</span> Năm <span class="placeholder-field" data-key="namTao">[TG tạo: Năm]</span></p>
+        </div>
+        
+        <!-- TIÊU ĐỀ CHÍNH -->
+        <div class="text-center pt-8">
+            <h1 class="font-black uppercase header-title-main">QUYẾT ĐỊNH</h1>
+            <p class="font-semibold pt-1 header-title-sub italic">(V/v: chấm dứt hợp đồng lao động)</p>
+            <p class="font-bold uppercase pt-4">GIÁM ĐỐC CÔNG TY TNHH VINACHI VIỆT NAM</p>
+        </div>
+
+        <!-- CĂN CỨ (Toàn bộ in nghiêng) -->
+        <div class="pt-8 italic">
+            <p class="mb-2">- Căn cứ vào Bộ luật lao động hiện hành;</p>
+            <p class="mb-2">- Căn cứ vào chức năng, quyền hạn của Ban giám đốc Công ty;</p>
+            <p class="mb-2">- Căn cứ vào đơn xin nghỉ việc của Nhân sự <span class="placeholder-field" data-key="hoTenNghiViec">[Họ và tên]</span>;</p>
+            <p>- Căn cứ vào đề xuất của phòng Hành chính Nhân sự.</p>
+        </div>
+
+        <!-- NỘI DUNG QUYẾT ĐỊNH -->
+        <div class="pt-8">
+            <h2 class="font-bold uppercase text-lg text-center mb-6">QUYẾT ĐỊNH</h2>
+
+            <!-- ĐIỀU 1 -->
+            <p class="font-bold"><span class="mr-2">Điều 1:</span> Quyết định chấm dứt hợp đồng lao động đối với Nhân sự:</p>
+            <div class="ml-6 mt-2 space-y-1">
+                <p>Họ và tên: <span class="placeholder-field" data-key="hoTenMaNV">[Mã NV. Họ và tên]</span> <span class="ml-10">Sinh ngày: <span class="placeholder-field" data-key="ngaySinh">[Mã NV. Ngày sinh]</span></span></p>
+                <p>Phòng/ban: <span class="placeholder-field" data-key="phongBan">[Mã NV. Tên sơ đồ phòng ban]</span> <span class="ml-10">Vị trí công việc: <span class="placeholder-field" data-key="chucVu">[Chức vụ sau thay đổi]</span></span></p>
+                <p>Được thôi việc kể từ ngày <span class="placeholder-field ml-2" data-key="ngayHieuLuc">[Ngày hiệu lực]</span></p>
+            </div>
+
+            <!-- ĐIỀU 2 -->
+            <p class="mt-4"><span class="font-bold mr-2">Điều 2:</span> Nhân sự <span class="placeholder-field" data-key="hoTenMaNV">[Mã NV. Họ và tên]</span> có trách nhiệm bàn giao tất cả công việc, tài liệu (bản cứng, bản mềm), trang thiết bị, dụng cụ hỗ trợ có liên quan mà công ty đã cấp phát sử dụng phục vụ trong công việc cho người kế nhiệm hoặc quản lý trực tiếp và Phòng HCNS trước khi nghỉ việc (Trừ những tài sản được tặng, biếu, mua, cho từ cá nhân khác hoặc chính sách của công ty).</p>
+
+            <!-- ĐIỀU 3 -->
+            <p class="mt-4"><span class="font-bold mr-2">Điều 3:</span> Tiền lương và các chế độ kèm theo khác của nhân sự <span class="placeholder-field" data-key="hoTenMaNV">[Mã NV. Họ và tên]</span> sẽ được xử lý, giải quyết theo quy định của công ty sau khi hoàn thành Điều 2.</p>
+
+            <!-- ĐIỀU 4 -->
+            <p class="mt-4"><span class="font-bold mr-2">Điều 4:</span> Phòng HCNS, Phòng TC – KT, các phòng ban, đơn vị đối tác, khách hàng có liên quan và Ông / Bà <span class="placeholder-field" data-key="hoTenCuoi">[Họ và tên]</span> có trách nhiệm thực hiện quyết định này.</p>
+
+            <!-- ĐIỀU 5 -->
+            <p class="mt-4"><span class="font-bold mr-2">Điều 5:</span> Mọi giao dịch công việc có liên quan tới nhân sự <span class="placeholder-field" data-key="hoTenMaNV">[Mã NV. Họ và tên]</span> kể từ ngày <span class="placeholder-field" data-key="ngayHieuLuc">[Ngày hiệu lực]</span> trở về sau sẽ không có giá trị và Công ty TNHH Vinachi sẽ chịu trách nhiệm với bất kỳ cá nhân, tổ chức nào dưới mọi hình thức.</p>
+
+            <p class="italic text-right mt-6">Quyết định này có hiệu lực từ ngày ký./.</p>
+        </div>
+
+        <!-- NƠI NHẬN & CHỮ KÝ -->
+        <div class="mt-10 grid grid-cols-2">
+            <!-- NƠI NHẬN (Toàn bộ in nghiêng) -->
+            <div>
+                <p class="font-bold underline mb-2">Nơi nhận:</p>
+                <ul class="list-disc ml-4 space-y-1 italic">
+                    <li>Ban giám đốc (Để báo cáo);</li>
+                    <li>Các phòng ban (Để thực hiện);</li>
+                    <li>Lưu văn thư (Để quản lý);</li>
+                    <li><span class="placeholder-field" data-key="hoTenCuoi">[Họ và tên]</span> (Để thực hiện).</li>
+                </ul>
+            </div>
+
+            <!-- CHỮ KÝ -->
+            <div class="text-center">
+                <p class="font-bold uppercase">TM CÔNG TY TNHH VINACHI VIỆT NAM</p>
+                <p class="font-bold uppercase">BAN GIÁM ĐỐC</p>
+                <p class="italic mt-16">(Ký, đóng dấu)</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
